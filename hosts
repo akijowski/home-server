@@ -1,0 +1,11 @@
+[servers]
+ubuntu_nas ansible_host=192.168.11.97
+
+[proxmox]
+proxmox-ve ansible_host=192.168.11.139
+
+[plex]
+ubuntu_plex ansible_host=192.168.11.5 ansible_ssh_private_key_file=~/.ssh/akijowski_github
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

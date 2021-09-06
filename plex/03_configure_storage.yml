@@ -1,0 +1,32 @@
+---
+- hosts: all
+  name: Configure Plex LXC
+  become: true
+  vars:
+    plex_library_path: /opt/plex/metadata
+
+  tasks:
+    - name: Stop Plexmediaserver
+      systemd:
+        name: plexmediaserver
+        state: stopped
+    
+    - name: Create systemd directory
+      file:
+        path: /etc/systemd/system/plexmediaserver.service.d/
+        state: directory
+        owner: root
+        group: root
+
+    - name: Copy override to systemd
+      template:
+        src: conf/systemd-override.conf
+        dest: /etc/systemd/system/plexmediaserver.service.d/override.conf
+        owner: root
+        group: root
+
+    - name: Reload systemd and start Plexmediaserver
+      systemd:
+        daemon_reload: yes
+        name: plexmediaserver
+        state: started
