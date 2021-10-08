@@ -17,7 +17,7 @@ ansible-inventory -i hosts --list -y
 
 **Check connections**
 ```bash
-ansible all -i hosts -m ping -u <user>
+ansible all -i hosts -m ping -u <user> [--private-key <ssh-private-key-file>]
 ```
 
 ### Playbooks
@@ -36,7 +36,7 @@ The `-K` switch prompts for the BECOME password in Ansible.  This is the passwor
 
 ## Proxmox
 
-The `proxmox` directory contains some basic ansible scripts to configure the promox host itself.  It can be run with the default `root` user with the following command:
+The `proxmox` directory contains a basic ansible playbook to configure the promox host itself.  It can be run with the default `root` user with the following command:
 
 ```bash
 ansible-playbook proxmox/playbook.yml -l proxmox -i hosts  -u root -k -K
@@ -46,6 +46,10 @@ ansible-playbook proxmox/playbook.yml -l proxmox -i hosts  -u root -k -K
 ## LXC
 
 Rather than install one giant VM as initially planned, instead we will look at running LXC instances on ProxMox.  Most of these LXC instances will be "vanilla" Ubuntu 20.04 LTS and we can use Ansible to configure them with appropriate software to meet their purpose.
+
+### Creating an LXC (CT)
+
+In Proxmox, a new container can be created with the UI.  In the dialog box the base template can be selected along with configuration for CPU, RAM, and Networking.  **Note**: You can upload a public key during creation.  This public key will be added to the `authorized keys` file for the `root` user.  This will make it possible for Ansible to connect over SSH immediately to the instance after creation!
 
 ### Default
 

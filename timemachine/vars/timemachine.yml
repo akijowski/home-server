@@ -1,0 +1,15 @@
+create_user: adam
+create_user_key: https://github.com/akijowski.keys
+sys_packages: ['curl', 'vim', 'git', 'ufw', 'fail2ban']
+sys_groups:
+  - name: timemachine
+    gid: '1101'
+sys_users:
+  - name: adamk
+    uid: '1101'
+    group: 'timemachine'
+    create_home: no
+  - name: kelseyk
+    uid: '1102'
+    group: 'timemachine'
+    create_home: no

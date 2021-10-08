@@ -4,11 +4,6 @@
   become: true
   vars_files:
     - vars/proxmox.yml
-  vars_prompt:
-    - name: create_user_password
-      prompt: "Enter the password to be used for {{ create_user }}"
-      encrypt: sha512_crypt
-      confirm: yes
 
   tasks:
     - name: Install Prerequisites
