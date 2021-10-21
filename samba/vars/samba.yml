@@ -4,8 +4,14 @@ sys_packages: ['curl', 'vim', 'git', 'ufw', 'fail2ban']
 sys_groups:
   - name: plex
     gid: '998'
+  - name: sambaetc
+    gid: '1200'
 sys_users:
   - name: plex
     uid: '998'
     group: 'plex'
+    create_home: no
+  - name: sambaetc
+    uid: '1200'
+    group: 'sambaetc'
     create_home: no

@@ -7,6 +7,8 @@ sys_groups:
     gid: '998'
   - name: 'timemachine'
     gid: '1101'
+  - name: 'sambaetc'
+    gid: '1200'
 sys_users:
   - name: 'plex'
     uid: '998'
@@ -19,4 +21,8 @@ sys_users:
   - name: 'kelseyk'
     uid: '1102'
     group: 'timemachine'
+    create_home: no
+  - name: 'sambaetc'
+    uid: '1200'
+    group: 'sambaetc'
     create_home: no

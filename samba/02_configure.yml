@@ -26,6 +26,10 @@
         name: samba,avahi-daemon
         state: latest
 
+    - name: Samba Information
+      debug:
+        msg: Now that Samba is installed, make sure to manage users with smbpasswd and pdbedit!
+
     - name: Copy Samba config
       copy:
         src: conf/smb.conf
