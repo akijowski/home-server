@@ -33,7 +33,7 @@
         shell: /bin/bash
 
     - name: Set authorized key for remote user
-      authorized_key:
+      ansible.posix.authorized_key:
         user: "{{ create_user }}"
         state: present
         key: "{{ create_user_key }}"
@@ -59,12 +59,22 @@
 
   # UFW Setup
     - name: UFW - Allow SSH connections
-      ufw:
+      community.general.ufw:
         rule: allow
         name: OpenSSH
 
     - name: UFW - Deny all other incoming traffic by default
-      ufw:
+      community.general.ufw:
         state: enabled
         policy: deny
         direction: incoming
+
+  # Unattended Upgrades
+    - name: Unattended Upgrades
+      import_role:
+        name: jnv.unattended-upgrades
+      vars:
+        unattended_automatic_reboot: true
+        unattended_syslog_enable: true
+        unattended_mail: 'agkijow@gmail.com'
+        unattended_mail_only_on_error: true

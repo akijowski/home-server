@@ -69,6 +69,7 @@
         policy: deny
         direction: incoming
 
+  # Unattended Upgrades
     - name: Unattended Upgrades
       import_role:
         name: jnv.unattended-upgrades
