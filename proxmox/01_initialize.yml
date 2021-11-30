@@ -62,3 +62,17 @@
       apt:
         name: "{{ sys_packages }}"
         state: latest
+
+  # Unattended Upgrades
+    - name: Unattended Upgrades
+      import_role:
+        name: jnv.unattended-upgrades
+      vars:
+        unattended_automatic_reboot: true
+        unattended_syslog_enable: true
+        unattended_mail: 'agkijow@gmail.com'
+        unattended_mail_only_on_error: true
+        unattended_origins_patterns:
+          - 'origin=Debian,codename=${distro_codename}-security'
+          - 'origin=Debian,codename=${distro_codename}-updates'
+          - 'origin=Proxmox,archive=stable,component=pve-no-subscription,site=download.proxmox.com'
