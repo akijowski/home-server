@@ -3,7 +3,7 @@
   name: Configure Plex LXC
   become: true
   vars:
-    plex_library_path: /opt/plex/metadata
+    plex_library_path: /opt/plex/metadata # used in systemd-override.conf
 
   tasks:
     - name: Stop Plexmediaserver
