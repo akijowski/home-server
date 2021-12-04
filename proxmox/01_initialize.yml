@@ -68,7 +68,6 @@
       import_role:
         name: jnv.unattended-upgrades
       vars:
-        unattended_automatic_reboot: true
         unattended_syslog_enable: true
         unattended_mail: 'agkijow@gmail.com'
         unattended_mail_only_on_error: true
