@@ -1,0 +1,1 @@
+sys_packages: ['curl', 'vim', 'git', 'ufw', 'fail2ban', 'mailutils']

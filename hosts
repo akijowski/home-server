@@ -13,5 +13,8 @@ ubuntu_samba ansible_host=192.168.11.6
 [timemachine]
 ubuntu_timemachine ansible_host=192.168.11.7
 
+[k8s]
+ubuntu_k8s ansible_host=192.168.11.8
+
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
