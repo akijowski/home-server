@@ -51,3 +51,14 @@
       loop:
         - vxlan.calico
         - cali+
+
+    - name: Configure kube API Access
+      community.general.ufw:
+        comment: kubernetes api
+        port: '16443'
+        direction: in
+        src: "{{ item }}"
+        rule: allow
+        state: enabled
+      loop:
+        - '192.168.11.111'
