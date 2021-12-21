@@ -1,0 +1,16 @@
+---
+- hosts: all
+  name: Install Observability Tools
+  become: true
+
+  tasks:
+    # https://github.com/prometheus/node_exporter
+    - name: Install Prometheus Node Exporter
+      import_role:
+        name: cloudalchemy.node_exporter
+
+    - name: Configure UFW for Node Exporter
+      community.general.ufw:
+        rule: allow
+        port: '9100'
+        proto: tcp

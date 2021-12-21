@@ -1,0 +1,7 @@
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+
+logs:
+  access:
+    enabled: false

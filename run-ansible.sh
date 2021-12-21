@@ -23,3 +23,4 @@ willhallonline/ansible:${image_version} \
 
 # pip3 install cryptography
 # apk add py-cryptography
+# apk add --no-cache tar
