@@ -28,20 +28,22 @@
 
     - name: Copy Nginx config
       copy:
-        src: conf/nginx.conf
-        dest: /etc/nginx/sites-available/proxmox.home.lan
+        src: "{{ item.local_path }}"
+        dest: "{{ item.remote_path }}"
         owner: root
         group: root
         mode: '0644'
+      loop: "{{ vhosts }}"
 
     - name: Link config
       file:
-        path: /etc/nginx/sites-enabled/proxmox.home.lan
-        src: /etc/nginx/sites-available/proxmox.home.lan
+        path: "{{ item.enabled_path }}"
+        src: "{{ item.remote_path }}"
         state: link
         owner: root
         group: root
         mode: '0644'
+      loop: "{{ vhosts }}"
 
     - name: Enable Nginx in Systemctl
       ansible.builtin.systemd:
@@ -56,4 +58,4 @@
 
     - name: Message
       debug:
-      msg: Make sure to configure DNS to point to proxmox.home.lan
+        msg: Make sure to configure DNS to point to proxmox.home.lan
