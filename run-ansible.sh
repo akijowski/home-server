@@ -20,3 +20,6 @@ willhallonline/ansible:${image_version} \
 #ansible-playbook samba/01_initialize.yml -i hosts -l samba -u adam --private-key /root/.ssh/github_akijowski_mbp13 -K
 
 # ansible-galaxy install -r requirements.yml
+
+# pip3 install cryptography
+# apk add py-cryptography

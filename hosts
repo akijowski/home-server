@@ -1,6 +1,3 @@
-[servers]
-ubuntu_nas ansible_host=192.168.11.97
-
 [proxmox]
 proxmox-ve ansible_host=192.168.11.139
 
@@ -15,6 +12,9 @@ ubuntu_timemachine ansible_host=192.168.11.7
 
 [k8s]
 ubuntu_k8s ansible_host=192.168.11.8
+
+[nginx]
+ubuntu_nginx ansible_host=192.168.11.9
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3

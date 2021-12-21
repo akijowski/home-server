@@ -1,0 +1,59 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars/nginx.yml
+
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: latest
+
+    - name: Copy SSL key
+      copy:
+        src: ./ssl/proxmox.key
+        dest: /etc/nginx/ssl/proxmox/pve.key
+    
+    - name: Copy SSL certificate
+      copy:
+        src: ./ssl/proxmox.pem
+        dest: /etc/nginx/ssl/proxmox/pve.pem
+
+    - name: Remove default site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        follow: yes
+        state: absent
+
+    - name: Copy Nginx config
+      copy:
+        src: conf/nginx.conf
+        dest: /etc/nginx/sites-available/proxmox.home.lan
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Link config
+      file:
+        path: /etc/nginx/sites-enabled/proxmox.home.lan
+        src: /etc/nginx/sites-available/proxmox.home.lan
+        state: link
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable Nginx in Systemctl
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Allow Nginx in UFW
+      community.general.ufw:
+        rule: allow
+        name: "Nginx Full"
+
+    - name: Message
+      debug:
+      msg: Make sure to configure DNS to point to proxmox.home.lan
