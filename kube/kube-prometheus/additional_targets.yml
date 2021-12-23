@@ -1,0 +1,42 @@
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: proxmox-external
+  namespace: external
+subsets:
+  - addresses:
+    - ip: 192.168.11.139
+    ports:
+      - port: 9100
+        name: metrics
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    prometheus: enabled
+  name: proxmox-external
+  namespace: external
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9100
+    targetPort: 9100
+    name: metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: proxmox-external
+  namespace: monitoring
+spec:
+  endpoints:
+    - interval: 30s
+      port: metrics
+  selector:
+    matchLabels:
+      prometheus: enabled
+  namespaceSelector:
+    matchNames:
+      - external
