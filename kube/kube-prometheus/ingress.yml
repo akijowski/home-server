@@ -2,33 +2,60 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: prometheus-dashboard
+  name: prometheus-dashboard-tls
   namespace: monitoring
 spec:
   entryPoints:
     - web
+    - websecure
   routes:
-    - match: Host(`prometheus.home.lan`)
+    - match: Host(`prometheus.home.kijowski.io`)
       kind: Rule
       services:
-        - name: prometheus-k8s
-          kind: Service #default
-          port: web
+        - name: kube-prometheus-kube-prome-prometheus
+          kind: Service
+          port: http-web
           namespace: monitoring
+      middlewares:
+        - name: redirect-https
+          namespace: ingress
+  tls:
+    certResolver: aws-dns
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: alertmanager-dashboard
+  name: alert-manager-dashboard-tls
   namespace: monitoring
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
-    - match: Host(`alert-manager.home.lan`)
+    - match: Host(`alert-manager.home.kijowski.io`)
       kind: Rule
       services:
-        - name: alertmanager-main
-          kind: Service #default
-          port: web
+        - name: kube-prometheus-kube-prome-alertmanager
+          kind: Service
+          port: http-web
           namespace: monitoring
+  tls:
+    certResolver: aws-dns
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grafana-dashboard-tls
+  namespace: monitoring
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`grafana.home.kijowski.io`)
+      kind: Rule
+      services:
+        - name: kube-prometheus-grafana
+          kind: Service
+          port: http-web
+          namespace: monitoring
+  tls:
+    certResolver: aws-dns

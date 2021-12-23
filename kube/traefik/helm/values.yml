@@ -9,11 +9,15 @@ logs:
 persistence:
   enabled: true
 
+providers:
+  kubernetesCRD:
+    allowCrossNamespace: true # allow using middleware, etc across namespaces
+
 additionalArguments:
   - "--certificatesresolvers.aws-dns.acme.email=agkijow@gmail.com"
   - "--certificatesresolvers.aws-dns.acme.storage=/data/acme.json"
-  - "--certificatesresolvers.aws-dns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-  # - "--certificatesresolvers.aws-dns.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+  # - "--certificatesresolvers.aws-dns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+  - "--certificatesresolvers.aws-dns.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
   - "--certificatesresolvers.aws-dns.acme.dnschallenge=true"
   - "--certificatesresolvers.aws-dns.acme.dnschallenge.provider=route53"
 

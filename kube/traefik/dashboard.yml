@@ -11,3 +11,50 @@ spec:
       services:
         - name: api@internal
           kind: TraefikService
+    - match: Host(`traefik.home.kijowski.io`)
+      kind: Rule
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+        - name: redirect-https
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dashboardtls
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`traefik.home.kijowski.io`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+    - match: Host(`traefik.home.kijowski.io`)
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+      middlewares:
+        - name: prefix-dashboard
+  tls:
+    certResolver: aws-dns
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: prefix-dashboard
+spec:
+  addPrefix:
+    prefix: /dashboard/
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
