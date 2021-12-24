@@ -5,8 +5,8 @@ prometheus-node-exporter:
     monitor:
       enabled: true
 
+# Set these to false to remove the label selector requirement on service/pod monitors
 # prometheus:
 #   prometheusSpec:
-#     serviceMonitorNamespaceSelector:
-#       matchLabels:
-#         prometheus: enabled
+#     serviceMonitorSelectorNilUsesHelmValues: false
+#     podMonitorSelectorNilUsesHelmValues: false
