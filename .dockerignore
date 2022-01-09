@@ -1,0 +1,6 @@
+kube
+
+ansible/*
+!ansible/requirements.yml
+
+*.md

@@ -2,14 +2,11 @@
 
 # https://github.com/willhallonline/docker-ansible
 
-image_version=2.10-alpine-3.13
-
 docker run --rm -it \
--v $(pwd):/ansible \
--v ~/.ssh/github_akijowski_mbp13:/root/.ssh/github_akijowski_mbp13 \
+-v $(pwd)/ansible:/ansible \
+-v ~/.ssh/github_akijowski_mbp14:/root/.ssh/github_akijowski_mbp14 \
 -v ~/.ssh/known_hosts:/root/.ssh/known_hosts \
-willhallonline/ansible:${image_version} \
-/bin/sh
+ansible-local
 
 #
 # mkdir -p ~/.ssh && \
