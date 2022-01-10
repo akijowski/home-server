@@ -6,11 +6,6 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`traefik.home.lan`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
-      kind: Rule
-      services:
-        - name: api@internal
-          kind: TraefikService
     - match: Host(`traefik.home.kijowski.io`)
       kind: Rule
       services:

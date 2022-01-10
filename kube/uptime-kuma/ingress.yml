@@ -35,5 +35,3 @@ spec:
       middlewares:
         - name: redirect-https
           namespace: ingress
-  tls:
-    certResolver: aws-dns
