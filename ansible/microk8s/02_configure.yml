@@ -54,11 +54,11 @@
 
     - name: Configure kube API Access
       community.general.ufw:
-        comment: kubernetes api
+        comment: kubernetes API
         port: '16443'
         direction: in
         src: "{{ item }}"
         rule: allow
         state: enabled
       loop:
-        - '192.168.11.111'
+        - '192.168.11.0/24'

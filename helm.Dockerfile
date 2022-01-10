@@ -1,8 +1,8 @@
-FROM --platform=arm64 hashicorp/terraform:1.1.1 AS terraform-cli
+FROM hashicorp/terraform:1.1.1 AS terraform-cli
 
-FROM --platform=arm64 bitnami/kubectl:1.23.1 AS kubectl
+FROM bitnami/kubectl:1.23.1 AS kubectl
 
-FROM --platform=arm64 ubuntu:focal AS base
+FROM ubuntu:focal AS base
 
 # Copy terraform
 COPY --from=terraform-cli /bin/terraform /usr/local/bin/terraform

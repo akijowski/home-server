@@ -1,5 +1,5 @@
 ARG imageVersion=2.10-alpine-3.13
-FROM --platform=arm64 willhallonline/ansible:${imageVersion}
+FROM willhallonline/ansible:${imageVersion}
 
 # Install Roles
 COPY ansible/requirements.yml /ansible/

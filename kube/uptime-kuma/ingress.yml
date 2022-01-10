@@ -1,0 +1,39 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: uptime-kuma-tls
+  namespace: monitoring
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`uptime-kuma.home.kijowski.io`)
+      kind: Rule
+      services:
+        - name: uptime-kuma
+          kind: Service
+          port: http
+          namespace: monitoring
+  tls:
+    certResolver: aws-dns
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: uptime-kuma
+  namespace: monitoring
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`uptime-kuma.home.kijowski.io`)
+      kind: Rule
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+        - name: redirect-https
+          namespace: ingress
+  tls:
+    certResolver: aws-dns
