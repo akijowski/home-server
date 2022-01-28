@@ -11,7 +11,7 @@ spec:
     - match: Host(`prometheus.home.kijowski.io`)
       kind: Rule
       services:
-        - name: kube-prometheus-kube-prome-prometheus
+        - name: kube-prometheus-prometheus
           kind: Service
           port: http-web
           namespace: monitoring
@@ -48,7 +48,7 @@ spec:
     - match: Host(`alert-manager.home.kijowski.io`)
       kind: Rule
       services:
-        - name: kube-prometheus-kube-prome-alertmanager
+        - name: kube-prometheus-alertmanager
           kind: Service
           port: http-web
           namespace: monitoring

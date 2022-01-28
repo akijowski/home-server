@@ -57,6 +57,10 @@ resource "kubernetes_deployment" "this" {
             mount_path = "/app/data"
             name       = "app-data"
           }
+          env {
+            name = "UPTIME_KUMA_PORT"
+            value = "3001"
+          }
         }
         volume {
           name = "app-data"
