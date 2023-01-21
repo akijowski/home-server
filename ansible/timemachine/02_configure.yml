@@ -45,7 +45,7 @@
         dest: /etc/avahi/services/samba.service
         group: root
         owner: root
-        mode: '0660'
+        mode: '0664'
 
     - name: Restart Samba
       service:
