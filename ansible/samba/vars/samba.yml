@@ -1,6 +1,7 @@
 create_user: adam
 create_user_key: https://github.com/akijowski.keys
 sys_packages: ['curl', 'vim', 'git', 'ufw', 'fail2ban', 'mailutils']
+unattended_email: 'agkijow@gmail.com'
 sys_groups:
   - name: plex
     gid: '998'
@@ -15,3 +16,10 @@ sys_users:
     uid: '1200'
     group: 'sambaetc'
     create_home: no
+nfs_mounts:
+  - host: '192.168.11.116'
+    source_path: '/mnt/tank00-4tb/samba/etc'
+    dest_path: '/opt/share/etc'
+  - host: '192.168.11.116'
+    source_path: '/mnt/tank00-4tb/plex/media'
+    dest_path: '/opt/share/plex/media'

@@ -1,0 +1,11 @@
+---
+- name: UFW - Allow SSH connections
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: UFW - Deny all other incoming traffic by default
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming

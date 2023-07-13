@@ -1,6 +1,6 @@
 ---
-- hosts: all
-  name: Configure Plex LXC
+- hosts: plex
+  name: Install Plex LXC
   become: true
 
   tasks:
@@ -26,6 +26,17 @@
       apt:
         name: plexmediaserver
         state: latest
+
+    - name: Set correct Plex user
+      ansible.builtin.user:
+        name: plex
+        # file permissions require this to be set correctly
+        uid: 998
+
+    - name: Set correct Plex group
+      ansible.builtin.group:
+        name: plex
+        gid: 998
 
   # Configure UFW for Plex
     - name: Copy Plex UFW config

@@ -1,0 +1,80 @@
+version: 3
+
+env:
+  ANSIBLE_DOCKER_VERSION: 2.13-ubuntu-22.04
+
+includes:
+  plex:
+    taskfile: plex.taskfile.yaml
+
+silent: true
+
+tasks:
+  default: task --list
+
+  ansible-create:
+    internal: true
+    # https://github.com/willhallonline/docker-ansible
+    # we mount the ssh pub key so that it can be passed to proxmox when creating a CT
+    cmds:
+      - |
+        docker create --name ansible \
+        -it \
+        --entrypoint /bin/bash \
+        --platform linux/amd64 \
+        -v $PWD/ansible:/ansible \
+        -v ~/.ssh/github_akijowski_mbp14:/root/.ssh/github_akijowski_mbp14 \
+        -v ~/.ssh/github_akijowski_mbp14.pub:/root/.ssh/github_akijowski_mbp14.pub \
+        -v ~/.ssh/known_hosts:/root/.ssh/known_hosts \
+        -e ANSIBLE_ROLES_PATH="/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/ansible/roles" \
+        willhallonline/ansible:{{ .ANSIBLE_DOCKER_VERSION }}
+
+  ansible-cmd:
+    desc: run an ad-hoc ansible command
+    preconditions:
+      - docker ps -a | grep 'ansible'
+    cmds:
+      - docker start ansible > /dev/null
+      - defer: docker stop ansible > /dev/null
+      - |
+        docker exec -it \
+        ansible \
+        {{ .CLI_ARGS }}
+
+  ansible-playbook:
+    desc: run an ansible playbook given with PLAYBOOK_PATH
+    vars:
+      PLAYBOOK_ARGS: -u adam --private-key /root/.ssh/github_akijowski_mbp14
+    cmds:
+      - task: ansible-cmd
+        vars:
+          CLI_ARGS: ansible-playbook -i ./inventory.proxmox.yml {{ .PLAYBOOK_PATH }} {{ .PLAYBOOK_ARGS }}
+
+  setup:
+    desc: start and initialize an Ansible container
+    aliases:
+      - start
+    cmds:
+      - task: ansible-create
+      - task: ansible-cmd
+        vars:
+          CLI_ARGS: ansible-galaxy install -r requirements.yml
+      - task: ansible-cmd
+        vars:
+          # proxmoxer -> proxmox inventory plugin
+          # netaddr -> ipaddr filter for proxmox inventory plugin
+          CLI_ARGS: pip install proxmoxer netaddr
+
+  teardown:
+    desc: remove running Ansible container
+    aliases:
+      - stop
+    cmds:
+     - docker rm ansible
+
+  check-inv:
+    desc: check proxmox inventory
+    cmds:
+      - task: ansible-cmd
+        vars:
+          CLI_ARGS: ansible-inventory -i ./inventory.proxmox.yml --list

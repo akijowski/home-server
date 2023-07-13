@@ -1,0 +1,21 @@
+---
+- name: Update apt
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+
+- name: Install NFS tools
+  apt:
+    name: "nfs-common"
+    state: latest
+
+# TODO: iterate to support multiple mounts
+- name: Mount NFS
+  ansible.posix.mount:
+    src: "{{ item.host }}:{{ item.source_path}}"
+    path: "{{ item.dest_path }}"
+    opts: rw,sync,hard,vers=4
+    state: mounted
+    fstype: nfs
+  loop: "{{ nfs_mounts }}"

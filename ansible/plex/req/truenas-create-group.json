@@ -1,0 +1,8 @@
+{
+  "gid": 998,
+  "name": "plex",
+  "smb": false,
+  "sudo_commands": [],
+  "sudo_commands_nopasswd": [],
+  "allow_duplicate_gid": false
+}

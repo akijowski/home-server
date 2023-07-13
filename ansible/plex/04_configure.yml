@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: plex
   name: Configure Plex LXC
   become: true
   vars:
@@ -10,7 +10,7 @@
       systemd:
         name: plexmediaserver
         state: stopped
-    
+
     - name: Create systemd directory
       file:
         path: /etc/systemd/system/plexmediaserver.service.d/
@@ -30,3 +30,6 @@
         daemon_reload: yes
         name: plexmediaserver
         state: started
+
+    - debug:
+        msg: "UI is at http://{{ inventory_hostname }}:32400/web"

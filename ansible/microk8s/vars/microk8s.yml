@@ -1,3 +1,0 @@
-create_user: adam
-create_user_key: https://github.com/akijowski.keys
-sys_packages: ['curl', 'vim', 'git', 'ufw', 'fail2ban', 'mailutils']

@@ -1,0 +1,17 @@
+{
+    "path": "/mnt/tank00-4tb/plex/media",
+    "aliases": [],
+    "comment": "",
+    "networks": [
+      "192.168.11.0/24"
+    ],
+    "hosts": [],
+    "ro": false,
+    "quiet": false,
+    "mapall_user": "plex",
+    "mapall_group": "plex",
+    "security": [
+      "SYS"
+    ],
+    "enabled": true
+  }

@@ -5,6 +5,6 @@
 
   tasks:
     # https://github.com/prometheus/node_exporter
-    - name: Install Prometheus Node Exporter
-      import_role:
-        name: cloudalchemy.node_exporter
+    # - name: Install Prometheus Node Exporter
+    #   import_role:
+    #     name: cloudalchemy.node_exporter

@@ -1,8 +1,9 @@
 ---
-- hosts: all
+- hosts: plex
+  name: Initialize LXC
   become: true
   vars_files:
-    - vars/samba.yml
+    - vars/plex.yml
 
   roles:
     - apt

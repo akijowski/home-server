@@ -1,0 +1,35 @@
+---
+- name: Install Prerequisites
+  apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
+
+- name: Update apt (async)
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+  async: 1000
+  poll: 0
+  register: apt_sleeper
+
+- name: Poll for apt update to complete
+  async_status:
+    jid: "{{ apt_sleeper.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: 60
+  delay: 10 # 60 x 10 seconds
+
+- name: Install required system packages
+  apt:
+    name: "{{ sys_packages }}"
+    state: latest
+
+- name: Unattended Upgrades
+  # https://github.com/hifis-net/ansible-role-unattended-upgrades
+  import_role:
+    name: hifis.unattended_upgrades
+  vars:
+    unattended_automatic_reboot: true
+    unattended_syslog_enable: true
+    unattended_mail: "{{ unattended_email }}"
+    unattended_mail_only_on_error: true
