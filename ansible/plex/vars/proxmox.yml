@@ -1,0 +1,2 @@
+container_pass: '{{ vault_container_pass }}'
+container_pub_key: '{{ vault_container_pub_key }}'

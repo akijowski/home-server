@@ -4,41 +4,4 @@ tasks:
   update-ssh:
     desc: update the ssh hosts-file for plex
     cmds:
-      - task: :ansible-cmd
-        vars:
-          CLI_ARGS: ssh-keyscan -H 192.168.11.5 >> ~/.ssh/known_hosts
-
-  play:host:
-    desc: run the host init plex playbook
-    cmds:
-      - task: :ansible-cmd
-        vars:
-          CLI_ARGS: ansible-playbook plex-new/01_host_config.yml --extra-vars "@.secrets/secret_vars.yml"
-
-  play:init:
-    desc: run the plex init playbook
-    cmds:
-      - task: :ansible-playbook
-        vars:
-          PLAYBOOK_PATH: plex-new/02_init.yml
-
-  play:install:
-    desc: run the plex install playbook
-    cmds:
-      - task: :ansible-playbook
-        vars:
-          PLAYBOOK_PATH: plex-new/03_install.yml
-
-  play:config:
-    desc: run the plex config playbook
-    cmds:
-      - task: :ansible-playbook
-        vars:
-          PLAYBOOK_PATH: plex-new/04_configure.yml
-
-  ping:
-    desc: ping the plex hosts
-    cmds:
-      - task: :ansible-cmd
-        vars:
-          CLI_ARGS: ansible plex -i ./inventory.proxmox.yml -m ping -u root --private-key /root/.ssh/github_akijowski_mbp14
+      - ssh-keyscan -H 192.168.11.5 >> ~/.ssh/known_hosts

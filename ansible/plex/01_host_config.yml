@@ -6,14 +6,12 @@
 # TODO: make a custom module to interact with the TrueNAS API
 ---
 - name: Configure TrueNAS
-  hosts: 127.0.0.1 # run locally since we just interact with an external API
+  hosts: localhost # run locally since we just interact with an external API
   connection: local
   gather_facts: false
-  vars:
-    truenas_host: 'https://192.168.11.116/api/v2.0'
-  vars_prompt:
-    - name: truenas_api_key
-      prompt: Enter the TrueNAS API key for the ansible user
+  # vars_files:
+  #   - vars/local.yml
+  #   - vars/vault.yml
 
   tasks:
     # Using the REST API: https://www.truenas.com/docs/api/scale_rest_api.html
@@ -125,16 +123,12 @@
 
 # Configure Proxmox
 - name: Configure Proxmox
-  hosts: 127.0.0.1 # run locally since we just interact with an external API
+  hosts: localhost # run locally since we just interact with an external API
   connection: local
   gather_facts: false
-  vars:
-    proxmox_host: '192.168.11.139:8006'
-  vars_prompt:
-    - name: proxmox_root_pass
-      prompt: Enter the Proxmox root password
-    - name: container_pass
-      prompt: Enter the container password
+  vars_files:
+    - vars/proxmox.yml
+    - vars/vault.yml
 
   tasks:
     - name: Create new CT
@@ -153,14 +147,14 @@
           - ubuntu
         ostemplate: 'local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst'
         password: "{{ container_pass }}"
-        pubkey: "{{lookup('ansible.builtin.file', '/root/.ssh/github_akijowski_mbp14.pub') }}"
+        pubkey: "{{ container_pub_key }}"
         cores: 2
         memory: 2048
         swap: 1028
         disk: 'vmstorage:100'
         hostname: plex.lan
         netif:
-          net0: "name=eth0,bridge=vmbr0,firewall=1,gw=192.168.11.1,ip=192.168.11.5/24,ip6=dhcp"
+          net0: "name=eth0,bridge=vmbr0,firewall=1,gw=192.168.50.1,ip=192.168.50.11/24,ip6=dhcp"
         features:
           - 'mount=nfs;cfis'
         unprivileged: false

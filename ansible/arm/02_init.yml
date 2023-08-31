@@ -1,0 +1,16 @@
+# Given:
+# - usb/cdrom attached to host
+# https://pve.proxmox.com/wiki/USB_Devices_in_Virtual_Machines
+# - todo
+
+---
+- hosts: arm
+  name: Initialize VM
+  become: true
+  vars_files:
+    - vars/arm.yml
+
+  roles:
+    - apt
+    - ufw
+    - nfs

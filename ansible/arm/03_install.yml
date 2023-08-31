@@ -1,0 +1,87 @@
+---
+- hosts: arm
+  name: Install Automatic-Ripping-Machine VM
+  become: true
+
+  tasks:
+    - name: Update apt
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+
+    - name: Set correct ARM user
+      ansible.builtin.user:
+        name: arm
+        # file permissions require this to be set correctly
+        uid: 1400
+
+    - name: Set correct ARM group
+      ansible.builtin.group:
+        name: arm
+        gid: 1400
+
+    - name: Create media directory
+      ansible.builtin.file:
+        state: directory
+        recurse: true
+        path: /opt/arm/raw/media
+        mode: '0775'
+        owner: arm
+        group: arm
+
+    - name: Create music directory
+      ansible.builtin.file:
+        state: directory
+        recurse: true
+        path: /opt/arm/raw/music
+        mode: '0775'
+        owner: arm
+        group: arm
+
+    - name: Create logs directory
+      ansible.builtin.file:
+        state: directory
+        recurse: true
+        path: /var/log/arm
+        mode: '0775'
+        owner: arm
+        group: arm
+
+    - name: Download default config file
+      ansible.builtin.get_url:
+        backup: true
+        dest: /opt/arm/config
+        url: 'https://raw.githubusercontent.com/automatic-ripping-machine/automatic-ripping-machine/main/setup/arm.yaml'
+        mode: 0775
+
+    - name: Download install script
+      ansible.builtin.get_url:
+        backup: true
+        dest: /opt/arm
+        url: 'https://raw.githubusercontent.com/automatic-ripping-machine/automatic-ripping-machine/main/scripts/docker-setup.sh'
+        mode: 0750
+
+    - name: Execute install script
+      ansible.builtin.shell: ./docker-setup.sh -t 2.6.60 > setup-logs.txt
+      args:
+        chdir: /opt/arm
+        creates: /home/arm/start_arm_container.sh
+
+    # You must mount both /dev for the cdrom drive
+    # https://github.com/automatic-ripping-machine/automatic-ripping-machine/wiki/Docker-Troubleshooting#makemkv-cant-find-drives
+    - name: Link start script
+      ansible.builtin.file:
+        src: /home/arm/start_arm_container.sh
+        dest: /opt/arm/start_arm_container.sh
+        owner: arm
+        group: arm
+        state: link
+
+    - name: Open UI port
+      community.general.ufw:
+        rule: allow
+        port: '8080'
+        proto: tcp
+        src: '192.168.50.0/24'
+        comment: Allow ARM UI

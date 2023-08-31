@@ -1,0 +1,5 @@
+requests
+jmespath
+# used for proxmox inventory plugin
+proxmoxer
+netaddr

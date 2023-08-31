@@ -1,9 +1,6 @@
 ---
 plugin: community.general.proxmox
 
-user: "{{ lookup('ansible.builtin.ini', 'user', section='proxmox', file='.secrets/inventory_vars.ini') }}"
-password: "{{ lookup('ansible.builtin.ini', 'password', section='proxmox', file='.secrets/inventory_vars.ini') }}"
-url: "{{ lookup('ansible.builtin.ini', 'url', section='proxmox', file='.secrets/inventory_vars.ini') }}"
 validate_certs: false
 want_facts: true
 

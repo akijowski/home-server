@@ -99,3 +99,6 @@ terraform.rc
 ssl
 
 .secrets/
+
+*.env
+!*_example.env

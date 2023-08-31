@@ -2,8 +2,6 @@
 - hosts: plex
   name: Initialize LXC
   become: true
-  vars_files:
-    - vars/plex.yml
 
   roles:
     - apt
