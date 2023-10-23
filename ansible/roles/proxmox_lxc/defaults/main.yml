@@ -1,0 +1,8 @@
+proxmox_root_user: "root@pam"
+lxc_description: "{{ name | capitalize }} container.  Created with Ansible"
+lxc_gateway_ip: "192.168.50.1"
+lxc_cores: 1
+lxc_mem: 512
+lxc_mem_swap: 512
+lxc_disk: "vmstorage:100"
+lxc_tags: "{{ ['ansible', 'ubuntu'] + [name] | list}}"

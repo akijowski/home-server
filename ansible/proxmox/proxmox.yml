@@ -1,0 +1,35 @@
+---
+- name: "Create LXC"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tags:
+    - lxc
+  vars_files:
+    - vars/proxmox.yml
+    - vars/vault.yml
+
+  tasks:
+    - include_role:
+        name: proxmox_lxc
+      vars:
+        name: samba
+        lxc_ip4_cidr: "192.168.50.12/24"
+        lxc_disk: "vmstorage:70"
+
+    - include_role:
+        name: proxmox_lxc
+      vars:
+        name: plex
+        lxc_ip4_cidr: "192.168.50.11/24"
+        lxc_disk: "vmstorage:100"
+        lxc_cores: 2
+        lxc_mem: 2048
+        lxc_swap: 1024
+
+    - include_role:
+        name: proxmox_lxc
+      vars:
+        name: adguard
+        lxc_ip4_cidr: "192.168.50.14/24"
+        lxc_disk: "vmstorage:50"

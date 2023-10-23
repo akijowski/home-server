@@ -28,4 +28,4 @@ tasks:
     desc: check proxmox inventory
     dir: ansible
     cmds:
-      - ansible-inventory -i ./inventory.proxmox.yml --list
+      - ansible-inventory -i ./inventory --list

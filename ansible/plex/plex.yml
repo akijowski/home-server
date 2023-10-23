@@ -1,0 +1,116 @@
+---
+- name: Initialize LXC
+  hosts: plex
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+
+  tasks:
+    - include_role:
+        name: apt
+    - include_role:
+        name: ssh
+    - include_role:
+        name: ufw
+    - include_role:
+        name: nfs
+
+- name: Install Plex
+  hosts: plex
+  become: true
+  debugger: on_failed
+  tags:
+    - install
+
+  tasks:
+    - name: Install Plex Repo GPG key
+      ansible.builtin.apt_key:
+        url: https://downloads.plex.tv/plex-keys/PlexSign.key
+        state: present
+
+    # I think the adding of the gpg key now handles this
+    # - name: Add Plex Repo
+    #   ansible.builtin.apt_repository:
+    #     repo: "deb https://downloads.plex.tv/repo/deb public main"
+    #     state: present
+    #     filename: plexmediaserver
+
+    - name: Update apt
+      ansible.builtin.apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+
+    - name: Install Plex
+      ansible.builtin.apt:
+        name: plexmediaserver
+        state: latest
+
+    - name: Set correct Plex user
+      ansible.builtin.user:
+        name: plex
+        # file permissions require this to be set correctly
+        uid: 998
+
+    - name: Set correct Plex group
+      ansible.builtin.group:
+        name: plex
+        gid: 998
+
+    # Configure UFW for Plex
+    - name: Copy Plex UFW config
+      ansible.builtin.copy:
+        src: conf/ufw-plexmediaserver
+        dest: /etc/ufw/applications.d/plexmediaserver
+        group: root
+        owner: root
+        mode: 0660
+
+    - name: Update UFW
+      community.general.ufw:
+        state: reloaded
+
+    - name: Add Plex to UFW
+      community.general.ufw:
+        rule: allow
+        name: plexmediaserver-all
+
+- name: Configure Plex LXC
+  hosts: plex
+  become: true
+  debugger: on_failed
+  tags:
+    - configure
+    - config
+  vars:
+    plex_library_path: /opt/plex/metadata # used in systemd-override.conf
+
+  tasks:
+    - name: Stop Plexmediaserver
+      ansible.builtin.systemd:
+        name: plexmediaserver
+        state: stopped
+
+    - name: Create systemd directory
+      ansible.builtin.file:
+        path: /etc/systemd/system/plexmediaserver.service.d/
+        state: directory
+        owner: root
+        group: root
+
+    - name: Copy override to systemd
+      ansible.builtin.template:
+        src: conf/systemd-override.conf
+        dest: /etc/systemd/system/plexmediaserver.service.d/override.conf
+        owner: root
+        group: root
+
+    - name: Reload systemd and start Plexmediaserver
+      ansible.builtin.systemd:
+        daemon_reload: yes
+        name: plexmediaserver
+        state: started
+
+    - ansible.builtin.debug:
+        msg: "UI is at http://{{ inventory_hostname }}:32400/web"

@@ -7,10 +7,12 @@
 	"build": {
 		"dockerfile": "ansible.Dockerfile"
 	},
-	"runArgs": ["--name", "ansible_devcontainer", "--env-file", "container.env"],
+	"runArgs": ["--name", "ansible_devcontainer", "--env-file", "${localWorkspaceFolder}/container.env"],
 	"postStartCommand": "task install",
+	// set to vscode so that we can mount in to the vscode home dir
+	"remoteUser": "vscode",
 	"mounts": [
-		"type=bind,src=${localEnv:HOME}/.ssh/github_akijowski_mbp14,dst=${containerWorkspaceFolderBasename}/.ssh/github_akijowski_mbp14,readonly"
+		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly"
 	],
 	"containerEnv": {
 		"ANSIBLE_ROLES_PATH": "/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:${containerWorkspaceFolder}/ansible/roles",

@@ -1,12 +1,12 @@
 ---
 - name: Update apt
-  apt:
+  ansible.builtin.apt:
     upgrade: yes
     update_cache: yes
     cache_valid_time: 86400 #One day
 
 - name: Install NFS tools
-  apt:
+  ansible.builtin.apt:
     name: "nfs-common"
     state: latest
 

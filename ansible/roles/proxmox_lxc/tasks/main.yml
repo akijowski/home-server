@@ -1,0 +1,40 @@
+---
+- name: "Create CT for {{ name | capitalize }}"
+  community.general.proxmox:
+    api_user: "{{ proxmox_root_user }}"
+    api_password: "{{ proxmox_root_pass }}"
+    api_host: "{{ proxmox_host }}"
+    validate_certs: false
+    node: pve
+    description: "{{ lxc_description }}"
+    pool: Ubuntu
+    tags: "{{ lxc_tags }}"
+    ostemplate: 'local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst'
+    password: "{{ container_pass }}"
+    pubkey: "{{ container_pub_key }}"
+    cores: "{{ lxc_cores }}"
+    memory: "{{ lxc_mem }}"
+    swap: "{{ lxc_mem_swap }}"
+    disk: "{{ lxc_disk }}"
+    hostname: "{{ name }}"
+    netif:
+      net0: "name=eth0,bridge=vmbr0,firewall=1,gw={{ lxc_gateway_ip }},ip={{ lxc_ip4_cidr }},ip6=dhcp"
+    features:
+      - 'mount=nfs;cfis'
+    unprivileged: false
+    onboot: true
+    state: present
+  register: lxc_ct
+
+- ansible.builtin.debug:
+    msg: "{{ lxc_ct }}"
+
+- name: Start {{ name | capitalize }} CT
+  community.general.proxmox:
+    api_user: "{{ proxmox_root_user }}"
+    api_password: "{{ proxmox_root_pass }}"
+    api_host: "{{ proxmox_host }}"
+    validate_certs: false
+    node: pve
+    hostname: "{{ name }}"
+    state: started

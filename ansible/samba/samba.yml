@@ -1,8 +1,27 @@
 ---
-- hosts: all
+- name: Initialize LXC
+  hosts: samba
+  debugger: on_failed
   become: true
-  vars_files:
-    - vars/samba.yml
+  tags:
+    - init
+
+  tasks:
+    - include_role:
+        name: apt
+    - include_role:
+        name: ssh
+    - include_role:
+        name: ufw
+    - include_role:
+        name: nfs
+
+- name: Install Samba
+  hosts: samba
+  become: true
+  debugger: on_failed
+  tags:
+    - install
 
   tasks:
     - name: Add Groups (non-Samba)
