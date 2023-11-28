@@ -1,0 +1,10 @@
+---
+- name: Assert usage of systemd as an init system
+  ansible.builtin.assert:
+    that: ansible_service_mgr == 'systemd'
+    msg: "This module only works with systemd"
+
+# - name: "Get checksum for {{ go_arch }} architecture"
+#   ansible.builtin.set_fact:
+#     adguard_checksum: "{{ lookup('url', 'https://github.com/coredns/coredns/releases/download/v' + coredns_version + '/coredns_' + coredns_version + '_linux_' + go_arch + '.tgz.sha256').split(' ')[0] }}"
+#   run_once: true

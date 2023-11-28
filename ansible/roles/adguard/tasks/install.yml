@@ -1,0 +1,121 @@
+---
+- name: "Install dependencies"
+  ansible.builtin.apt:
+    package:
+          - 'bind9-host'
+          - 'unzip'
+    state: latest
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: "Create system group"
+  ansible.builtin.group:
+    name: "{{ adguard_system_group }}"
+    system: true
+    state: present
+
+- name: "Create system user"
+  ansible.builtin.user:
+    name: "{{ adguard_system_user }}"
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+    home: /
+
+- name: create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ adguard_system_user }}"
+    group: "{{ adguard_system_group }}"
+    mode: 0755
+  with_items:
+    - "/etc/adguard" # config
+    - "/var/lib/adguard" # db
+
+- name: Determine if AdGuard is already installed
+  ansible.builtin.stat:
+    path: "{{ adguard_binary_path }}"
+  register: _adguard_binary
+
+- block:
+    - name: "Create unpack dir"
+      become: false
+      ansible.builtin.file:
+        path: "/tmp/adguard_{{ adguard_version }}_linux_{{ go_arch }}"
+        state: directory
+        mode: 0755
+      delegate_to: localhost
+      check_mode: false
+      register: _unpack_dir
+
+    - name: "Download AdGuard binary to local folder"
+      become: false
+      ansible.builtin.get_url:
+      # https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.40/AdGuardHome_linux_amd64.tar.gz
+        url: "https://github.com/AdguardTeam/AdGuardHome/releases/download/v{{ adguard_version }}/AdGuardHome_linux_{{ go_arch }}.tar.gz"
+        dest: "{{ _unpack_dir.path }}/adguard_{{ adguard_version }}_linux_{{ go_arch }}.tgz"
+      register: _download_binary
+      until: _download_binary is succeeded
+      retries: 5
+      delay: 2
+      delegate_to: localhost
+      check_mode: false
+
+    # TODO: checksums
+
+    - name: "Unpack Adguard binary"
+      become: false
+      ansible.builtin.unarchive:
+        src: "{{ _unpack_dir.path }}/adguard_{{ adguard_version }}_linux_{{ go_arch }}.tgz"
+        dest: "{{ _unpack_dir.path }}"
+        creates: "{{ _unpack_dir.path }}/AdGuardHome/AdGuardHome"
+      delegate_to: localhost
+      check_mode: false
+
+    - name: "Propagate Adguard binary"
+      ansible.builtin.copy:
+        src: "{{ _unpack_dir.path }}/AdGuardHome/AdGuardHome"
+        dest: "{{ adguard_binary_path }}"
+        mode: 0750
+        owner: "{{ adguard_system_user }}"
+        group: "{{ adguard_system_group }}"
+      # notify: restart adguard
+      when: not ansible_check_mode
+
+    - name: "Clean up unpack directory"
+      become: false
+      ansible.builtin.file:
+        path: "{{ _unpack_dir.path }}"
+        state: absent
+      delegate_to: localhost
+      check_mode: false
+
+    - name: Update AdGuard is installed
+      ansible.builtin.stat:
+        path: "{{ adguard_binary_path }}"
+      register: _adguard_binary
+  when: not _adguard_binary.stat.exists
+
+- name: Check AdGuard Service status
+  ansible.builtin.command:
+    cmd: "{{ adguard_binary_path }} -s status"
+  register: _adguard_status
+  ignore_errors: true
+  when: _adguard_binary.stat.exists
+
+- name: Determine if AdGuard service is installed
+  ansible.builtin.set_fact:
+    _adguard_is_installed: "{{ _adguard_status.stderr.find('service is not installed') == -1 }}"
+  when: _adguard_binary.stat.exists
+
+- name: "Install Adguard Service"
+  ansible.builtin.command:
+    cmd: "{{ adguard_binary_path }} -s install --work-dir /var/lib/adguard"
+  register: _adguard_service_install
+  when: not _adguard_is_installed
+
+- name: "Install Output"
+  ansible.builtin.debug:
+    msg: "{{ _adguard_service_install.stderr }}"
+  when: not _adguard_is_installed

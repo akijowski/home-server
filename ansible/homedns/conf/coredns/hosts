@@ -1,0 +1,11 @@
+192.168.50.2    adguard.internal.kijowski.io
+192.168.50.3	proxmox.internal.kijowski.io
+# TODO
+192.168.50.5    truenas.internal.kijowski.io
+192.168.50.7    k8s.internal.kijowski.io
+
+192.168.50.11   plex.internal.kijowski.io
+192.168.50.12   samba.internal.kijowski.io
+192.168.50.13   arm.internal.kijowski.io
+
+192.168.50.15   homebridge.internal.kijowski.io

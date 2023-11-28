@@ -1,0 +1,138 @@
+---
+- name: Initialize LXC
+  hosts: adguard_pi
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+
+  tasks:
+    - include_role:
+        name: apt
+    - name: Disable password authentication for root
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+    - include_role:
+        name: ufw
+
+- name: Install AdGuardHome
+  hosts: adguard_pi
+  debugger: on_failed
+  become: true
+  tags:
+    - adguard
+
+  tasks:
+    - include_role:
+        name: adguard
+
+    - name: Copy AdGuard UFW config
+      ansible.builtin.copy:
+        src: conf/adguard/ufw-adguard
+        dest: /etc/ufw/applications.d/adguard
+        group: root
+        owner: root
+        mode: 0660
+
+    - name: Update UFW
+      community.general.ufw:
+        state: reloaded
+
+    - name: Add AdGuard to UFW
+      community.general.ufw:
+        rule: allow
+        name: adguard
+
+- name: Install CoreDNS
+  hosts: adguard_pi
+  debugger: on_failed
+  become: true
+  tags:
+    - coredns
+  vars:
+    go_arch: arm
+    coredns_version: 1.11.1
+
+  tasks:
+    - name: Create hosts file directory
+      ansible.builtin.file:
+        state: directory
+        path: /etc/coredns
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy hosts file
+      ansible.builtin.copy:
+        src: ./conf/coredns/hosts
+        dest: /etc/coredns/hosts
+        owner: root
+        group: root
+        mode: '0644'
+
+    # This role does not properly parse the arch for raspberry pi, so we copy the binary locally and have the role us that
+    - name: "Get checksum for {{ go_arch }} architecture"
+      ansible.builtin.set_fact:
+        coredns_checksum: "{{ lookup('url', 'https://github.com/coredns/coredns/releases/download/v' + coredns_version + '/coredns_' + coredns_version + '_linux_' + go_arch + '.tgz.sha256').split(' ')[0] }}"
+      run_once: true
+
+    - name: Download binary to local folder
+      become: false
+      ansible.builtin.get_url:
+        url: "https://github.com/coredns/coredns/releases/download/v{{ coredns_version }}/coredns_{{ coredns_version }}_linux_{{ go_arch }}.tgz"
+        dest: "/tmp/coredns_{{ coredns_version }}_linux_{{ go_arch }}.tgz"
+        checksum: "sha256:{{ coredns_checksum }}"
+      register: _download_binary
+      until: _download_binary is succeeded
+      retries: 5
+      delay: 2
+      delegate_to: localhost
+      check_mode: false
+
+    - name: Create unpack dir
+      become: false
+      ansible.builtin.file:
+        path: "/tmp/coredns_{{ coredns_version }}_linux_{{ go_arch }}"
+        state: directory
+        mode: 0755
+      delegate_to: localhost
+      check_mode: false
+
+    - name: Unpack coredns binary
+      become: false
+      ansible.builtin.unarchive:
+        src: "/tmp/coredns_{{ coredns_version }}_linux_{{ go_arch }}.tgz"
+        dest: "/tmp/coredns_{{ coredns_version }}_linux_{{ go_arch }}"
+        creates: "/tmp/coredns_{{ coredns_version }}_linux_{{ go_arch }}/coredns"
+      delegate_to: localhost
+      check_mode: false
+
+    - include_role:
+        name: cloudalchemy.coredns
+      vars:
+        coredns_config_file: './conf/coredns/Corefile'
+        coredns_binary_local_dir: "/tmp/coredns_{{ coredns_version }}_linux_arm"
+
+    - name: Add CoreDNS to UFW
+      community.general.ufw:
+        rule: allow
+        name: dns
+
+    - name: Remove download
+      become: false
+      ansible.builtin.file:
+        path: "/tmp/coredns_{{ coredns_version }}_linux_{{ go_arch }}.tgz"
+        state: absent
+      delegate_to: localhost
+      check_mode: false
+
+    - name: Remove unpack dir
+      become: false
+      ansible.builtin.file:
+        path: "/tmp/coredns_{{ coredns_version }}_linux_{{ go_arch }}"
+        state: absent
+      delegate_to: localhost
+      check_mode: false

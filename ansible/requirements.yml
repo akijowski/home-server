@@ -1,6 +1,7 @@
 ---
 roles:
   - name: hifis.unattended_upgrades
+  - name: cloudalchemy.coredns
   # - name: cloudalchemy.node_exporter
 
 collections:

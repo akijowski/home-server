@@ -1,0 +1,4 @@
+[adguard]
+title=AdGuard Home
+description=AdGuard Home Network Ad Blocker
+ports=3000/tcp|80/tcp|443/tcp

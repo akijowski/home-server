@@ -1,0 +1,12 @@
+---
+- name: Update AdGuard Service
+  ansible.builtin.command:
+    cmd: "{{ adguard_binary_path }} --update"
+  register: _adguard_service_update
+  when: _adguard_is_installed
+
+- name: Update Output
+  ansible.builtin.copy:
+    content: "{{ _adguard_service_update.stderr }}\n"
+    dest: /root/update.txt
+  when: _adguard_is_installed
