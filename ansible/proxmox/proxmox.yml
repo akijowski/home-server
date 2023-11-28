@@ -30,6 +30,6 @@
     - include_role:
         name: proxmox_lxc
       vars:
-        name: adguard
-        lxc_ip4_cidr: "192.168.50.14/24"
-        lxc_disk: "vmstorage:50"
+        name: homebridge
+        lxc_ip4_cidr: "192.168.50.15/24"
+        lxc_disk: "vmstorage:70"

@@ -1,0 +1,96 @@
+---
+- name: Initialize LXC
+  hosts: homebridge
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+
+  tasks:
+    - include_role:
+        name: apt
+    - include_role:
+        name: ssh
+    - include_role:
+        name: ufw
+
+- name: Install Homebridge
+  hosts: homebridge
+  debugger: on_failed
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Install pre-reqs
+      ansible.builtin.apt:
+        package:
+          - avahi-daemon
+          - gzip
+        state: latest
+
+    - name: Add Homebridge Group
+      ansible.builtin.group:
+        name: homebridge
+        gid: 1600
+        state: present
+
+    - name: Add Homebridge User
+      ansible.builtin.user:
+        name: homebridge
+        uid: 1600
+        create_home: true
+        home: /home/homebridge
+        group: homebridge
+        state: present
+
+    # - name: Set file permissions
+    #   ansible.builtin.file:
+    #     path: /var/lib/homebridge
+    #     state: directory
+    #     recurse: yes
+    #     owner: homebridge
+    #     group: homebridge
+
+    # - name: Install Repo Key
+    #   ansible.builtin.get_url:
+    #     url: 'https://repo.homebridge.io/KEY.gpg'
+    #     dest: '/usr/share/keyrings/homebridge.gpg'
+
+    # - name: Add Homebridge Repo
+    #   ansible.builtin.apt_repository:
+    #     repo: "deb [signed-by=/usr/share/keyrings/homebridge.gpg] https://repo.homebridge.io stable main"
+
+    - name: Add Homebridge Repo
+      ansible.builtin.deb822_repository:
+        name: homebridge
+        signed_by: 'https://repo.homebridge.io/KEY.gpg'
+        types: deb
+        suites: stable
+        components:
+          - main
+        uris:
+          - https://repo.homebridge.io
+        state: present
+
+    - name: Update apt
+      ansible.builtin.apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 1
+
+    - name: Add Homebridge
+      ansible.builtin.apt:
+        name: homebridge
+        state: latest
+
+    - name: Add FFMpeg
+      ansible.builtin.unarchive:
+        src: https://github.com/homebridge/ffmpeg-for-homebridge/releases/latest/download/ffmpeg-alpine-x86_64.tar.gz
+        dest: '/'
+        remote_src: yes
+
+    - name: Open UFW
+      community.general.ufw:
+        state: enabled
+        policy: allow
