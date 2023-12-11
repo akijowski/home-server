@@ -1,0 +1,10 @@
+---
+- import_tasks: install.yml
+  become: true
+  tags:
+    - acme_install
+
+- import_tasks: issue.yml
+  become: true
+  tags:
+    - acme_issue

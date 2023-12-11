@@ -1,0 +1,89 @@
+---
+# https://github.com/acmesh-official/acme.sh/wiki/sudo
+- name: "Update CA Certs"
+  ansible.builtin.apt:
+    cache_valid_time: 3600
+    name:
+      - ca-certificates
+    state: latest
+
+- name: "Install required packages"
+  ansible.builtin.apt:
+    cache_valid_time: 3600
+    name:
+      - socat
+      # https://stackoverflow.com/a/56379678
+      - acl
+    state: latest
+
+- name: "Create system group"
+  ansible.builtin.group:
+    name: "{{ acme_system_group }}"
+    system: true
+    state: present
+
+- name: "Create system user"
+  ansible.builtin.user:
+    name: "{{ acme_system_user }}"
+    comment: acme-sh service account
+    shell: /usr/sbin/nologin
+    create_home: true
+    home: /etc/acme-sh
+    append: true
+    groups:
+      - users
+      - "{{ acme_system_group }}"
+    state: present
+
+- name: "Grant sudo privleges to {{ acme_system_user }}"
+  ansible.builtin.template:
+    src: templates/sudoers.j2
+    dest: "/etc/sudoers.d/{{ acme_system_user }}_nopasswd"
+    mode: '0440'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: "Create crontab for {{ acme_system_user }}"
+  ansible.builtin.cron:
+    user: "{{ acme_system_user }}"
+    name: acme
+    minute: "12"
+    hour: "0"
+    job: "{{ acme_dir}}/acme.sh --cron --home \"{{ acme_dir }}\" > /dev/null"
+    state: present
+
+- name: Create directory
+  ansible.builtin.file:
+    path: "{{ acme_dir }}"
+    state: directory
+    owner: "{{ acme_system_user }}"
+    mode: '0775'
+
+- name: Download Acme.sh
+  ansible.builtin.git:
+    repo: https://github.com/acmesh-official/acme.sh.git
+    depth: 1
+    dest: "{{ acme_repo_dir }}"
+    version: master
+
+- name: Install Acme.sh
+  become_user: "{{ acme_system_user }}"
+  ansible.builtin.command:
+    # the script is written in a way where you need to be in the root directory when installing
+    chdir: "{{ acme_repo_dir }}"
+    cmd: "./acme.sh --install --debug 3 --home {{ acme_dir }} --email {{ acme_account_email }}"
+    creates: "{{ acme_dir }}/acme.sh"
+  register: __acme_install
+
+- name: Install output
+  ansible.builtin.debug:
+    msg: "{{ __acme_install.cmd + __acme_install.stdout_lines + __acme_install.stderr_lines }}"
+
+- name: Register Acme.sh Account
+  become_user: "{{ acme_system_user }}"
+  ansible.builtin.command:
+    cmd: "{{ acme_dir }}/acme.sh --register-account --email {{ acme_account_email }}"
+  register: __acme_register
+
+- name: Register output
+  ansible.builtin.debug:
+    msg: "{{ __acme_register.cmd + __acme_register.stdout_lines + __acme_register.stderr_lines }}"

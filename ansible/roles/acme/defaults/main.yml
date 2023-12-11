@@ -1,0 +1,5 @@
+acme_system_group: acme
+acme_system_user: acme
+acme_repo_dir: /var/opt/acme
+acme_dir: /opt/acme
+aws_dns_slowrate: 3

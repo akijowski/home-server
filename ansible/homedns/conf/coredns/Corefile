@@ -1,10 +1,16 @@
 # https://coredns.io/manual/toc/
-.:53 {
-   hosts /etc/coredns/hosts internal.kijowski.io {
+.:5300 {
+   hosts /etc/coredns/hosts home.kijowski.io {
       fallthrough
    }
-   forward . 127.0.0.1:5300
-   log internal.kijowski.io
+   # Quad9
+   # https://coredns.io/plugins/forward/
+   forward . tls://9.9.9.11 {
+      tls_servername dns11.quad9.net
+      health_check 5s
+   }
+   cache 30
+   log home.kijowski.io
    errors
    health
    whoami

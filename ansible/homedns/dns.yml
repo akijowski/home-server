@@ -136,3 +136,17 @@
         state: absent
       delegate_to: localhost
       check_mode: false
+
+- name: Add ACME Certs
+  hosts: adguard_pi
+  debugger: on_failed
+  become: true
+  tags:
+    - acme
+
+  tasks:
+    - include_role:
+        name: acme
+      vars:
+        # AWS credentials are in the inventory
+        cert_fqdn: adguard.home.kijowski.io
