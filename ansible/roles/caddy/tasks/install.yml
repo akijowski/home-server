@@ -1,0 +1,62 @@
+---
+- name: Get xcaddy binary
+  ansible.builtin.stat:
+    path: /usr/bin/xcaddy
+  register: __xcaddy_binary
+
+- name: Install xcaddy repo
+  block:
+    - name: Install dependencies
+      ansible.builtin.apt:
+        cache_valid_time: 36000
+        name:
+          - debian-keyring
+          - debian-archive-keyring
+          - apt-transport-https
+        state: latest
+      register: __xcaddy_apt_deps
+      until: __xcaddy_apt_deps is succeeded
+      delay: 10
+      retries: 60
+
+    - name: Get Apt Key
+      ansible.builtin.get_url:
+        url: https://dl.cloudsmith.io/public/caddy/xcaddy/gpg.key
+        dest: /usr/share/keyrings/caddy-xcaddy-archive-keyring.asc
+
+    - name: Add xcaddy apt repo
+      ansible.builtin.apt_repository:
+        filename: caddy-xcaddy
+        repo: "deb [signed-by=/usr/share/keyrings/caddy-xcaddy-archive-keyring.asc] https://dl.cloudsmith.io/public/caddy/xcaddy/deb/debian any-version main"
+        state: present
+
+    - name: Add xcaddy apt src repo
+      ansible.builtin.apt_repository:
+        filename: caddy-xcaddy
+        repo: "deb-src [signed-by=/usr/share/keyrings/caddy-xcaddy-archive-keyring.asc] https://dl.cloudsmith.io/public/caddy/xcaddy/deb/debian any-version main"
+        state: present
+
+    # - name: Add xcaddy repo
+    #   ansible.builtin.deb822_repository:
+    #     name: xcaddy
+    #     types:
+    #       - deb
+    #       - deb-src
+    #     uris: 'https://dl.cloudsmith.io/public/caddy/xcaddy/deb/debian'
+    #     components:
+    #       - any-version
+    #       - main
+    #     signed_by: 'https://dl.cloudsmith.io/public/caddy/xcaddy/gpg.key'
+    #     state: present
+  when: not __xcaddy_binary.stat.exists
+
+- name: Update xcaddy
+  ansible.builtin.apt:
+    name:
+      - xcaddy
+    update_cache: true
+    state: latest
+  register: __xcaddy_apt_install
+  until: __xcaddy_apt_install is succeeded
+  delay: 10
+  retries: 60

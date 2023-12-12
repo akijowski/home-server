@@ -137,16 +137,16 @@
       delegate_to: localhost
       check_mode: false
 
-- name: Add ACME Certs
+- name: Install Caddy
   hosts: adguard_pi
   debugger: on_failed
   become: true
   tags:
-    - acme
+    - caddy
 
   tasks:
     - include_role:
-        name: acme
+        name: caddy
       vars:
-        # AWS credentials are in the inventory
-        cert_fqdn: adguard.home.kijowski.io
+        aws_access_key_id: "{{ hostvars[inventory_hostname].aws_access_key_id }}"
+        aws_secret_access_key: "{{ hostvars[inventory_hostname].aws_secret_access_key }}"

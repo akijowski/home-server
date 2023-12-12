@@ -1,0 +1,45 @@
+---
+- name: Get Go version
+  ansible.builtin.script:
+    cmd: ./files/get_go_version.sh
+  register: __go_version
+
+- name: Register Go fact
+  ansible.builtin.set_fact:
+    __go_version_installed: "{{ go_version }} in {{ __go_version.stdout }}"
+
+- name: "Install Go {{ go_version }} {{go_arch }}"
+  # https://go.dev/doc/install
+  block:
+    - name: Remove existing Go installs
+      ansible.builtin.file:
+        path: /usr/local/go
+        state: absent
+
+    - name: "Download binary archive {{ go_version }} {{ go_arch }}"
+      ansible.builtin.get_url:
+        url: "https://go.dev/dl/go{{ go_version }}.linux-{{ go_arch }}.tar.gz"
+        dest: "/usr/local/go{{ go_version }}.tar.gz"
+        checksum: "sha256:{{ go_archive_checksum }}"
+      register: __go_archive
+      until: __go_archive is succeeded
+      delay: 10
+      retries: 6
+
+    - name: Extract binary
+      ansible.builtin.unarchive:
+        src: "/usr/local/go{{ go_version }}.tar.gz"
+        dest: /usr/local
+        remote_src: yes
+
+    - name: Remove archive
+      ansible.builtin.file:
+        path: "/usr/local/go{{ go_version }}.tar.gz"
+        state: absent
+
+    - name: Set Path
+      ansible.builtin.copy:
+        content: "export PATH=$PATH:/usr/local/go/bin"
+        dest: /etc/profile.d/go_path.sh
+        mode: '0777'
+  when: not __go_version_installed

@@ -1,0 +1,16 @@
+---
+- import_tasks: preflight.yml
+  become: true
+  tags:
+    - caddy_install_uri
+    - caddy_configure
+
+- import_tasks: install_uri.yml
+  become: true
+  tags:
+    - caddy_install_uri
+
+- import_tasks: configure.yml
+  become: true
+  tags:
+    - caddy_configure

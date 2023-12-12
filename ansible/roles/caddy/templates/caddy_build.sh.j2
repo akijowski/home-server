@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+{{ ansible_managed | comment }}
+
+main () {
+    xcaddy build --output /usr/local/bin/caddy --with {{ xcaddy_modules | join('--with ') }}
+}
+
+main "$@"
