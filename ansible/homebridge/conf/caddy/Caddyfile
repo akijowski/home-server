@@ -1,0 +1,17 @@
+{{ ansible_managed | comment }}
+
+homebridge.home.kijowski.io {
+        tls {
+            # https://github.com/caddy-dns/route53
+            dns route53 {
+                access_key_id "{{ aws_access_key_id }}"
+                secret_access_key "{{ aws_secret_access_key }}"
+            }
+        }
+        encode gzip zstd
+        reverse_proxy localhost:8581
+}
+
+:80 {
+        redir https://homebridge.home.kijowski.io{uri}
+}

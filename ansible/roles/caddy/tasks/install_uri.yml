@@ -19,6 +19,4 @@
   until: __caddy_dl is succeeded
   retries: 600
   delay: 10
-  vars:
-    caddy_arch: "arm&arm=7"
   when: not __caddy_bin.stat.exists

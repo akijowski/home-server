@@ -94,3 +94,17 @@
       community.general.ufw:
         state: enabled
         policy: allow
+
+- name: Install Caddy
+  hosts: homebridge
+  debugger: on_failed
+  become: true
+  tags:
+    - caddy
+
+  tasks:
+    - include_role:
+        name: caddy
+      vars:
+        aws_access_key_id: "{{ hostvars[inventory_hostname].aws_access_key_id }}"
+        aws_secret_access_key: "{{ hostvars[inventory_hostname].aws_secret_access_key }}"

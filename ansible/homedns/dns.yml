@@ -150,3 +150,4 @@
       vars:
         aws_access_key_id: "{{ hostvars[inventory_hostname].aws_access_key_id }}"
         aws_secret_access_key: "{{ hostvars[inventory_hostname].aws_secret_access_key }}"
+        caddy_arch: "arm&arm=7"

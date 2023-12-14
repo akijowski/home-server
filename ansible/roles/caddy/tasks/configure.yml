@@ -19,6 +19,8 @@
     shell: /usr/sbin/nologin
     comment: Caddy web server
     system: true
+    append: true
+    groups: "{{ caddy_additional_groups }}"
     state: present
 
 - name: Copy Caddyfile
