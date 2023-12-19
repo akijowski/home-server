@@ -1,0 +1,99 @@
+---
+# TODO: https://github.com/k3s-io/k3s-ansible
+# https://github.com/PyratLabs/ansible-role-k3s
+- name: K3s Prerequisites
+  hosts: k3s_cluster
+  debugger: on_failed
+  become: true
+  # need ask-become-pass flag (-K)
+  remote_user: k3s
+  tags:
+    - pre
+
+  tasks:
+  - name: Create Ansible Group
+    ansible.builtin.group:
+      name: ansible
+      system: true
+      state: present
+
+  - name: Create Ansible User
+    ansible.builtin.user:
+      name: ansible
+      group: ansible
+      create_home: true
+      shell: /bin/bash
+      comment: Ansible automation user
+      system: true
+      state: present
+
+  - name: Allow Ansible group to have passwordless sudo
+    ansible.builtin.copy:
+      content: "%ansible ALL=(ALL:ALL) NOPASSWD:ALL"
+      dest: /etc/sudoers.d/ansible
+      mode: '0440'
+      validate: '/usr/sbin/visudo -cf %s'
+
+  - name: Add SSH key for Ansible
+    ansible.posix.authorized_key:
+      user: ansible
+      state: present
+      key: 'https://github.com/akijowski.keys'
+
+- name: K3s Node Init
+  hosts: k3s_cluster
+  become: true
+  tags:
+    - init
+
+  tasks:
+    - name: Install requirements
+      ansible.builtin.apt:
+        name:
+          - nfs-common
+        update_cache: true
+
+    - name: Disable UFW
+      community.general.ufw:
+        state: disabled
+
+- name: K3s Install
+  hosts: k3s_cluster
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Build cluster with single control node
+      ansible.builtin.include_role:
+        name: xanmanning.k3s
+
+- name: Copy kubeconfig to local machine
+  hosts: k3s_cluster
+  become: true
+  tags:
+    - copy_config
+
+  tasks:
+    # - name: debug
+    #   ansible.builtin.debug:
+    #     msg: "{{ hostvars['kube-0'].ansible_host }}"
+
+    - name: "Get host IP for {{ controller_node }}"
+      ansible.builtin.set_fact:
+        controller_ip: "{{ hostvars[controller_node].ansible_host }}"
+      vars:
+        controller_node: kube-0
+
+    - name: Copy kubeconfig to local machine
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /home/vscode/.kube/k3s.config
+        flat: yes
+
+    - name: Add controller IP
+      delegate_to: 127.0.0.1
+      ansible.builtin.replace:
+        path: /home/vscode/.kube/k3s.config
+        regexp: '(?P<proto>http(s?)://)(?P<uri>\d{0,3}.\d{0,3}.\d{0,3}.\d{0,3})(?P<port>:\d+)$'
+        replace: "\\g<proto>{{ controller_ip }}\\g<port>"

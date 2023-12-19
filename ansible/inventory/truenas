@@ -1,2 +1,0 @@
-[k3s]
-192.168.50.7    ansible_user=ansible

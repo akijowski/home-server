@@ -12,7 +12,9 @@
 	// set to vscode so that we can mount in to the vscode home dir
 	"remoteUser": "vscode",
 	"mounts": [
-		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly"
+		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly",
+		// the k3s role can copy the generated kubeconfig to this location for us
+		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube"
 	],
 	"containerEnv": {
 		"ANSIBLE_ROLES_PATH": "/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:${containerWorkspaceFolder}/ansible/roles",
