@@ -1,8 +1,8 @@
 # nfs role
 nfs_mounts:
-  - host: '192.168.50.95'
+  - host: '192.168.50.4'
     source_path: '/mnt/tank00-4tb/plex/media'
     dest_path: '/opt/plex/media'
-  - host: '192.168.50.95'
+  - host: '192.168.50.4'
     source_path: '/mnt/tank00-4tb/plex/metadata'
     dest_path: '/opt/plex/metadata'

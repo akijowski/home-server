@@ -26,6 +26,8 @@
 
 - name: Unattended Upgrades
   # https://github.com/hifis-net/ansible-role-unattended-upgrades
+  # https://pieterhollander.nl/post/add-external-repository-to-unattended-upgrades/
+  # unattended-upgrades --dry-run (-d -v)
   import_role:
     name: hifis.unattended_upgrades
   vars:
