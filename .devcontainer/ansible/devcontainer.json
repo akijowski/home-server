@@ -1,0 +1,46 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+	"name": "Ansible",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
+	"runArgs": ["--name", "home_server_ansible_devcontainer", "--env-file", "${localWorkspaceFolder}/container.env"],
+	"postCreateCommand": "pipx install --include-deps ansible",
+	"postStartCommand": "task ansible:install",
+	// set to vscode so that we can mount in to the vscode home dir
+	"remoteUser": "vscode",
+	"mounts": [
+		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly",
+		// the k3s role can copy the generated kubeconfig to this location for us
+		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube"
+	],
+	"containerEnv": {
+		"ANSIBLE_VAULT_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.vault_pass.txt",
+		"ANSIBLE_BECOME_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.become_pass.txt"
+	},
+	"shutdownAction": "stopContainer",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers-contrib/features/go-task:1": {}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"redhat.vscode-yaml",
+				"ms-python.python"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

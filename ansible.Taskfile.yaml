@@ -1,0 +1,26 @@
+version: 3
+
+tasks:
+  default: task --list
+
+  install:
+    desc: installs dependencies
+    cmds:
+      - ansible-galaxy install -r ansible/requirements.yml
+      # - pip install -r ansible/pip_requirements.txt --no-cache-dir
+      - pipx runpip ansible install -r ansible/pip_requirements.txt --no-cache-dir
+
+  terminal:
+    desc: open a terminal in the dev container
+    aliases:
+      - shell
+      - sh
+      - zsh
+    cmds:
+      - docker exec -it -w /workspaces/ansible-home-server -u vscode home_server_ansible_devcontainer /usr/bin/zsh
+
+  check-inv:
+    desc: check proxmox inventory
+    dir: ansible
+    cmds:
+      - ansible-inventory -i ./inventory --list

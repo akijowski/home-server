@@ -3,29 +3,16 @@ version: 3
 includes:
   plex:
     taskfile: plex.taskfile.yaml
+  ansible:
+    taskfile: ansible.Taskfile.yaml
+    aliases:
+      - a
+  k8s:
+    taskfile: k8s.Taskfile.yaml
+    aliases:
+      - k
 
 silent: true
 
 tasks:
   default: task --list
-
-  install:
-    desc: installs dependencies
-    cmds:
-      - ansible-galaxy install -r ansible/requirements.yml
-      - pip install -r ansible/pip_requirements.txt --no-cache-dir
-
-  terminal:
-    desc: open a terminal in the dev container
-    aliases:
-      - shell
-      - sh
-      - zsh
-    cmds:
-      - docker exec -it -w /workspaces/home-server -u vscode ansible_devcontainer /usr/bin/zsh
-
-  check-inv:
-    desc: check proxmox inventory
-    dir: ansible
-    cmds:
-      - ansible-inventory -i ./inventory --list

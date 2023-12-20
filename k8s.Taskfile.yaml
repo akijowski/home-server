@@ -1,0 +1,13 @@
+version: 3
+
+tasks:
+  default: task --list
+
+  terminal:
+    desc: open a terminal in the dev container
+    aliases:
+      - shell
+      - sh
+      - zsh
+    cmds:
+      - docker exec -it -w /workspaces/k8s-home-server -u vscode home_server_k8s_devcontainer /usr/bin/zsh
