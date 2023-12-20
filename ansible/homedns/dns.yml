@@ -115,6 +115,7 @@
       vars:
         coredns_config_file: './conf/coredns/Corefile'
         coredns_binary_local_dir: "/tmp/coredns_{{ coredns_version }}_linux_arm"
+        coredns_zone_files_paths: 'conf/coredns/zones/*'
 
     - name: Add CoreDNS to UFW
       community.general.ufw:

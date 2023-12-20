@@ -5,13 +5,13 @@ sequenceDiagram
     participant ag as AdGuard
     participant r as Router
 
-    u->>cd: foo.local.kijowski.io:53
-    cd->>u: (hosts) 192.168.50.20
+    u->>ag: foo.home.kijowski.io
+    ag->>cd: foo.home.kijowski.io:5300
+    cd->>ag: 192.168.50.x
+    ag->>u: 192.168.50.x
 
-    u->>cd: arstechnica.com:53
-    cd->>ag: arstechnica.com:5300
-    ag->>cd: 1.2.3.4
-    cd->>u: 1.2.3.4
+    u->>ag: arstechnica.com
+    ag->>u: 1.2.3.4
 
     u->>r: dhcp/ip request
     r->>u: ip lease + DNS (CoreDNS)

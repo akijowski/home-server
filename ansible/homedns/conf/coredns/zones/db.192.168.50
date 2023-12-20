@@ -1,0 +1,31 @@
+$ORIGIN 50.168.192.in-addr.arpa.
+$TTL 86400
+@    IN    SOA    ns1.home.kijowski.io. hostmaster.kijowski.io. (
+      1          ; serial, update on changes
+			21600      ; refresh after 6 hours
+			3600       ; retry after 1 hour
+			604800     ; expire after 1 week
+			86400 )    ; minimum TTL of 1 day
+;
+
+; name servers - NS records
+@    IN    NS    ns1
+
+; name servers - A records
+ns1.home.kijowski.io.    IN    A    192.168.50.2
+
+; reverse servers
+2   IN  PTR adguard.home.kijowski.io.
+3   IN  PTR proxmox.home.kijowski.io.
+4   IN  PTR truenas.home.kijowski.io.
+
+
+7   IN  PTR *.k8s.home.kijowski.io.
+
+
+
+11  IN  PTR plex.home.kijowski.io.
+12  IN  PTR samba.home.kijowski.io.
+13  IN  PTR arm.home.kijowski.io.
+
+15  IN  PTR homebridge.home.kijowski.io.
