@@ -1,0 +1,11 @@
+---
+{{ ansible_managed | comment }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-config
+  namespace: kube-system
+data:
+  AWS_REGION: us-east-1
+  AWS_HOSTED_ZONE_ID: Z1FIS9DBY538D8
