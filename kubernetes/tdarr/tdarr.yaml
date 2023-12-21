@@ -1,0 +1,152 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tdarr-server
+  namespace: tdarr
+  labels:
+    app: tdarr-server
+    app.kubernetes.io/name: tdarr-server
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: tdarr
+spec:
+  selector:
+    app: tdarr-server
+  ports:
+    - name: web
+      port: 8265
+      targetPort: web
+    - name: server
+      port: 8266
+      targetPort: server
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tdarr-server
+  namespace: tdarr
+  labels:
+    app: tdarr-server
+    app.kubernetes.io/name: tdarr-server
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: tdarr
+spec:
+  selector:
+    matchLabels:
+      app: tdarr-server
+  template:
+    metadata:
+      labels:
+        app: tdarr-server
+        app.kubernetes.io/name: tdarr-server
+        app.kubernetes.io/component: server
+        app.kubernetes.io/part-of: tdarr
+    spec:
+      containers:
+        - name: tdarr-server
+          image: ghcr.io/haveagitgat/tdarr:2.17.01
+          resources:
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          ports:
+            - containerPort: 8265
+              name: web
+            - containerPort: 8266
+              name: server
+          # https://tdarr.readme.io/reference/get_status
+          # readiness
+          # liveness
+          envFrom:
+            - configMapRef:
+                name: tdarr-server-env
+          volumeMounts:
+            - name: nfs-server
+              mountPath: /app/server
+            - name: nfs-config
+              mountPath: /app/configs
+            # - name: server-config-json
+            #   mountPath: /app/configs
+            #   subPath: Tdarr_Server_Config.json
+            - name: logs
+              mountPath: /app/logs
+            - name: nfs-media
+              mountPath: /media
+            - name: nfs-cache
+              mountPath: /temp
+            - name: nfs-plex-media
+              mountPath: /opt/plex/media
+      restartPolicy: Always
+
+      volumes:
+        - name: nfs-cache
+          persistentVolumeClaim:
+            claimName: tdarr-cache
+        - name: logs
+          emptyDir: {}
+        # - name: server-config-json
+        #   configMap:
+        #     name: tdarr-server-config
+        #     # set the file mode
+        #     defaultMode: 0664
+        #     items:
+        #       - key: Tdarr_Server_Config.json
+        #         path: Tdarr_Server_Config.json
+        - name: nfs-media
+          persistentVolumeClaim:
+            claimName: tdarr-arm-raw-pvc
+        - name: nfs-server
+          persistentVolumeClaim:
+            claimName: tdarr-server
+        - name: nfs-config
+          persistentVolumeClaim:
+            claimName: tdarr-config
+        - name: nfs-plex-media
+          persistentVolumeClaim:
+            claimName: plex-media
+
+      # Any filesystem mounted to the pod will be owned by this group
+      securityContext:
+        fsGroup: 1400
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tdarr-server-env
+  namespace: tdarr
+  labels:
+    app: tdarr-server
+    app.kubernetes.io/name: tdarr-server-env
+    app.kubernetes.io/component: config
+    app.kubernetes.io/part-of: tdarr
+data:
+  TZ: "America/Denver"
+  PUID: "1400"
+  PGID: "1400"
+  serverIP: "0.0.0.0"
+  serverPort: "8266"
+  webUIPort: "8265"
+  internalNode: "true"
+  inContainer: "true"
+  ffmpegVersion: "6"
+  nodeName: "TrueNASServer"
+
+# Not currently used
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: tdarr-server-config
+#   namespace: tdarr
+#   labels:
+#     app: tdarr-server
+#     app.kubernetes.io/name: tdarr-server-env
+#     app.kubernetes.io/component: config
+#     app.kubernetes.io/part-of: tdarr
+# data:
+#   Tdarr_Server_Config.json: |
+#     {
+#       "pathTranslators": []
+#     }

@@ -20,7 +20,107 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank00-4tb/automatic-ripping-machine/raw
+    path: /mnt/tank00-4tb/autoripm/media
+    server: 192.168.50.4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tdarr-cache
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: tdarr-cache
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  capacity:
+    storage: 1Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/tank00-4tb/tdarr/cache
+    server: 192.168.50.4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tdarr-server
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: tdarr-server
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  capacity:
+    storage: 1Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/tank00-4tb/tdarr/server
+    server: 192.168.50.4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: plex-media
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: plex-media
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  capacity:
+    storage: 4Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/tank00-4tb/plex/media
+    server: 192.168.50.4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tdarr-config
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: tdarr-config
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  capacity:
+    storage: 5Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/tank00-4tb/tdarr/config
     server: 192.168.50.4
 
 ---
@@ -42,6 +142,86 @@ spec:
   accessModes:
     - ReadWriteMany
   volumeName: tdarr-arm-raw-pv
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tdarr-cache
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: tdarr-cache
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  resources:
+    requests:
+      storage: 1Ti
+  volumeMode: Filesystem
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  volumeName: tdarr-cache
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tdarr-server
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: tdarr-server
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  resources:
+    requests:
+      storage: 1Ti
+  volumeMode: Filesystem
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  volumeName: tdarr-server
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-media
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: plex-media
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  resources:
+    requests:
+      storage: 4Ti
+  volumeMode: Filesystem
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  volumeName: plex-media
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tdarr-config
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: tdarr-config
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  resources:
+    requests:
+      storage: 5Mi
+  volumeMode: Filesystem
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  volumeName: tdarr-config
 
 ---
 apiVersion: apps/v1
@@ -78,10 +258,32 @@ spec:
             memory: "128Mi"
             cpu: "250m"
         volumeMounts:
-          - name: nfs
+          - name: nfs-arm-raw
             mountPath: /opt/arm/raw
+            readOnly: true
+          - name: nfs-tdarr-server
+            mountPath: /opt/tdarr/server
+          - name: nfs-tdarr-cache
+            mountPath: /opt/tdarr/cache
+            readOnly: true
+          - name: nfs-plex-media
+            mountPath: /opt/plex/media
+          - name: nfs-tdarr-config
+            mountPath: /opt/tdarr/config
 
       volumes:
-        - name: nfs
+        - name: nfs-arm-raw
           persistentVolumeClaim:
             claimName: tdarr-arm-raw-pvc
+        - name: nfs-tdarr-server
+          persistentVolumeClaim:
+            claimName: tdarr-server
+        - name: nfs-tdarr-cache
+          persistentVolumeClaim:
+            claimName: tdarr-cache
+        - name: nfs-plex-media
+          persistentVolumeClaim:
+            claimName: plex-media
+        - name: nfs-tdarr-config
+          persistentVolumeClaim:
+            claimName: tdarr-config
