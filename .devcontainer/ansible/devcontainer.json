@@ -15,6 +15,7 @@
 		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube"
 	],
 	"containerEnv": {
+		"ANSIBLE_ROLES_PATH": "/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:${containerWorkspaceFolder}/ansible/roles",
 		"ANSIBLE_VAULT_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.vault_pass.txt",
 		"ANSIBLE_BECOME_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.become_pass.txt"
 	},
