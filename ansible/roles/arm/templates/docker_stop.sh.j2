@@ -1,0 +1,10 @@
+#!/bin/bash
+
+{{ ansible_managed | comment }}
+
+docker container rm -f {{ arm_container_name }}
+
+while docker container inspect {{ arm_container_name }} > /dev/null 2>&1; do
+    echo "waiting for {{ arm_container_name }} to be removed"
+    sleep 1
+done

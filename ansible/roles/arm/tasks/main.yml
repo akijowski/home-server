@@ -1,0 +1,13 @@
+---
+
+- name: Ensure system state
+  import_tasks: ensure.yml
+  become: true
+  tags:
+    - arm_ensure
+
+- name: Install ARM
+  import_tasks: install.yml
+  become: true
+  tags:
+    - arm_install

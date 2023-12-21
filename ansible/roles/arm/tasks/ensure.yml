@@ -1,0 +1,49 @@
+---
+- name: Ensure system packages are installed
+  ansible.builtin.apt:
+    name:
+      - nfs-common
+      - lsscsi
+    state: latest
+
+- name: Ensure Docker is installed
+  community.docker.docker_host_info:
+  register: __docker_info
+
+# - ansible.builtin.debug:
+#     var: __docker_info
+
+- name: Ensure ARM group exists
+  ansible.builtin.group:
+    name: "{{ arm_group_name }}"
+    gid: "{{ arm_group_id }}"
+    state: present
+
+- name: Ensure ARM user exists
+  ansible.builtin.user:
+    name: "{{ arm_user_name }}"
+    create_home: true
+    home: "{{ arm_user_home }}"
+    uid: "{{ arm_user_id }}"
+    group: "{{ arm_group_name }}"
+    groups:
+      - cdrom
+      - video
+      - docker
+    append: true
+    shell: /bin/bash
+    state: present
+
+- name: "Ensure ARM directories exist"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0775'
+    owner: "{{ arm_user_name }}"
+    group: "{{ arm_group_name }}"
+  loop:
+    - "{{ arm_base_dir }}"
+    - "{{ arm_music_dir }}"
+    - "{{ arm_logs_dir }}"
+    - "{{ arm_media_dir }}"
+    - "{{ arm_config_dir }}"

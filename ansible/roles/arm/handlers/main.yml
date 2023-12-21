@@ -1,0 +1,7 @@
+---
+- name: restart arm
+  become: true
+  systemd:
+    daemon_reload: true
+    name: arm
+    state: restarted

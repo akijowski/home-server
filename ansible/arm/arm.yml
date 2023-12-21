@@ -1,0 +1,115 @@
+---
+- name: Ansible Setup
+  hosts: arm
+  debugger: on_failed
+  become: true
+  # need ask-become-pass flag (-K)
+  remote_user: adam
+  tags:
+    - prep
+
+  tasks:
+  - name: Create Ansible Group
+    ansible.builtin.group:
+      name: ansible
+      system: true
+      state: present
+
+  - name: Create Ansible User
+    ansible.builtin.user:
+      name: ansible
+      group: ansible
+      create_home: true
+      shell: /bin/bash
+      comment: Ansible automation user
+      system: true
+      state: present
+
+  - name: Allow Ansible group to have passwordless sudo
+    ansible.builtin.copy:
+      content: "%ansible ALL=(ALL:ALL) NOPASSWD:ALL"
+      dest: /etc/sudoers.d/ansible
+      mode: '0440'
+      validate: '/usr/sbin/visudo -cf %s'
+
+  - name: Add SSH key for Ansible
+    ansible.posix.authorized_key:
+      user: ansible
+      state: present
+      key: 'https://github.com/akijowski.keys'
+
+- name: ARM Init
+  hosts: arm
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+
+  tasks:
+    - name: Upgrade packages
+      ansible.builtin.apt:
+        autoclean: true
+        autoremove: true
+        cache_valid_time: 600
+        update_cache: true
+        upgrade: 'yes'
+        state: present
+
+    - name: Install basic packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - vim
+          - git
+          - fail2ban
+          - gpg
+          - mailutils
+          - unzip
+          - wget
+        state: latest
+
+    - name: Install unattended_upgrades
+      ansible.builtin.import_role:
+        name: hifis.unattended_upgrades
+      vars:
+        unattended_automatic_reboot: true
+        unattended_syslog_enable: true
+        unattended_mail: "{{ unattended_email }}"
+        unattended_mail_only_on_error: true
+
+- name: ARM Install
+  hosts: arm
+  debugger: on_failed
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Update apt
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 600
+
+    - name: Install Docker
+      ansible.builtin.include_role:
+        name: geerlingguy.docker
+      vars:
+        docker_edition: 'ce'
+        docker_packages:
+            - "docker-{{ docker_edition }}"
+            - "docker-{{ docker_edition }}-cli"
+            - "docker-{{ docker_edition }}-rootless-extras"
+        docker_packages_state: present
+        docker_install_compose: false
+
+    - name: Install ARM
+      ansible.builtin.include_role:
+        name: arm
+
+    - name: Install Caddy
+      ansible.builtin.include_role:
+        name: caddy
+      vars:
+        aws_access_key_id: "{{ hostvars[inventory_hostname].aws_access_key_id }}"
+        aws_secret_access_key: "{{ hostvars[inventory_hostname].aws_secret_access_key }}"

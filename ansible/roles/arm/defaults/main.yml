@@ -1,0 +1,28 @@
+arm_user_name: arm
+arm_group_name: arm
+arm_user_id: 1400
+arm_group_id: 1400
+arm_user_home: /home/arm
+
+arm_base_dir: /var/lib/arm
+arm_music_dir: /var/lib/arm/music
+arm_logs_dir: /var/lib/arm/logs
+arm_media_dir: /var/lib/arm/media
+arm_config_dir: /etc/arm/config
+
+arm_port: 8080
+
+arm_docker_image: 'automaticrippingmachine/automatic-ripping-machine'
+arm_docker_tag: '2.6.60' # Later versions seem to have a bug (2.6.67)
+arm_container_name: arm-rippers
+arm_docker_cpuset_cpus: '0,1'
+arm_docker_start_script: start_arm_container.sh
+arm_docker_stop_script: stop_arm_container.sh
+
+nfs_mounts:
+  - host: '192.168.50.4'
+    src: /mnt/tank00-4tb/autoripm/media
+    dest: "{{ arm_media_dir }}"
+  - host: '192.168.50.4'
+    src: /mnt/tank00-4tb/autoripm/config
+    dest: "{{ arm_config_dir }}"
