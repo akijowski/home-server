@@ -68,6 +68,9 @@
         name: xanmanning.k3s
       vars:
         aws_dns_email: agkijow@gmail.com
+        # https://github.com/PyratLabs/ansible-role-k3s/blob/main/README.md#important-note-about-k3s_install_hard_links
+        # converting symbolic links to hard links: https://superuser.com/a/560610
+        k3s_install_hard_links: true
         # file names must be kabab-case: https://docs.k3s.io/installation/packaged-components#file-naming-requirements
         # available traefik helm options: https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
         k3s_server_manifests_templates:
