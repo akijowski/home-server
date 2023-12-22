@@ -6,7 +6,8 @@ tasks:
   install:
     desc: installs dependencies
     cmds:
-      - ansible-galaxy install -r ansible/requirements.yml
+      # if the role exists you get an error :(
+      - ansible-galaxy install --ignore-errors -r ansible/requirements.yml
       # - pip install -r ansible/pip_requirements.txt --no-cache-dir
       - pipx runpip ansible install -r ansible/pip_requirements.txt --no-cache-dir
 
