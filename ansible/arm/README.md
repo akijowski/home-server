@@ -23,7 +23,7 @@ Caddy performs TLS using AWS Route53 DNS challenges.
 
 ## Links
 
-- https://tdarr.k8s.home.kijowski.io
+- https://arm.k8s.home.kijowski.io
 
 ## TODO
 

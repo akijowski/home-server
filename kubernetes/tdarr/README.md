@@ -32,6 +32,10 @@ This means TrueNAS (or whatever is the NFS) must share the following directories
 - Server plugins, etc (`/app/server` as `<nfs mount>/tdarr/server`)
 - Server config (`/app/configs` as `<nfs mount>/tdarr/configs`)
 
+## Links
+
+- https://tdarr.k8s.home.kijowski.io
+
 ## TODO
 
 - [ ] Learn how to use Tdarr and what set of plugins work best for my needs

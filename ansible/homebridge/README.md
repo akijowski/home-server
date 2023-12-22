@@ -18,6 +18,10 @@ The role installs via the official repository for Debian/Ubuntu systems.
 Caddy is installed as a reverse proxy to the running service.
 Caddy performs TLS using AWS Route53 DNS challenges.
 
+## Links
+
+- https://homebridge.k8s.home.kijowski.io
+
 ## TODO
 
 - [ ] Automatic updates?
