@@ -78,6 +78,9 @@
           - 'manifests/traefik-env.yaml.j2'
           - 'manifests/traefik-config.yaml.j2'
           - 'manifests/k8s-dashboard.yaml.j2'
+        k3s_server_manifests_urls:
+          - url: 'https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.70.0/stripped-down-crds.yaml'
+            filename: prometheus-operator.yaml
 
 - name: Copy kubeconfig to local machine
   hosts: k3s_cluster
