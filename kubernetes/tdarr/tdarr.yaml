@@ -32,6 +32,8 @@ metadata:
     app.kubernetes.io/component: server
     app.kubernetes.io/part-of: tdarr
 spec:
+  replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: tdarr-server
@@ -49,14 +51,23 @@ spec:
           resources:
             limits:
               memory: "3Gi"
-              cpu: "8"
+              cpu: "10"
           ports:
             - containerPort: 8265
               name: web
             - containerPort: 8266
               name: server
+          # TODO:
           # https://tdarr.readme.io/reference/get_status
-          # readiness
+          # readinessProbe:
+          #   initialDelaySeconds: 20
+          #   periodSeconds: 10
+          #   timeoutSeconds: 1
+          #   successThreshold: 1
+          #   failureThreshold: 6
+          #   httpGet:
+          #     path: /api/v2/status
+          #     port: web
           # liveness
           envFrom:
             - configMapRef:

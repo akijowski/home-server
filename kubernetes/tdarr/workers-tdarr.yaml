@@ -1,0 +1,112 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tdarr-worker
+  namespace: tdarr
+  labels:
+    app: tdarr-worker
+    app.kubernetes.io/name: tdarr-worker
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: tdarr
+spec:
+  selector:
+    app: tdarr-worker
+  ports:
+    - name: server
+      port: 8266
+      targetPort: server
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tdarr-worker
+  namespace: tdarr
+  labels:
+    app: tdarr-worker
+    app.kubernetes.io/name: tdarr-worker
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: tdarr
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: tdarr-worker
+  template:
+    metadata:
+      labels:
+        app: tdarr-worker
+        app.kubernetes.io/name: tdarr-worker
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: tdarr
+    spec:
+      containers:
+        - name: tdarr-worker
+          image: ghcr.io/haveagitgat/tdarr_node:2.17.01
+          resources:
+            limits:
+              memory: "3Gi"
+              cpu: "5"
+          ports:
+            - containerPort: 8266
+              name: server
+          # https://tdarr.readme.io/reference/get_status
+          # readiness
+          # liveness
+          env:
+            - name: nodeName
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          envFrom:
+            - configMapRef:
+                name: tdarr-worker-env
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            - name: nfs-media
+              mountPath: /media
+            - name: nfs-cache
+              mountPath: /temp
+            - name: nfs-plex-media
+              mountPath: /opt/plex/media
+      restartPolicy: Always
+
+      volumes:
+        - name: nfs-cache
+          persistentVolumeClaim:
+            claimName: tdarr-cache
+        - name: logs
+          emptyDir: {}
+        - name: nfs-media
+          persistentVolumeClaim:
+            claimName: tdarr-arm-raw-pvc
+        - name: nfs-plex-media
+          persistentVolumeClaim:
+            claimName: plex-media
+
+      # Any filesystem mounted to the pod will be owned by this group
+      securityContext:
+        fsGroup: 1400
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tdarr-worker-env
+  namespace: tdarr
+  labels:
+    app: tdarr-worker
+    app.kubernetes.io/name: tdarr-worker-env
+    app.kubernetes.io/component: config
+    app.kubernetes.io/part-of: tdarr
+data:
+  TZ: "America/Denver"
+  PUID: "1400"
+  PGID: "1400"
+  serverIP: "tdarr-server.tdarr"
+  serverPort: "8266"
+  inContainer: "true"
+  ffmpegVersion: "6"
