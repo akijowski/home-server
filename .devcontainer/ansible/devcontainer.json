@@ -37,7 +37,8 @@
 		"vscode": {
 			"extensions": [
 				"redhat.vscode-yaml",
-				"ms-python.python"
+				"ms-python.python",
+				"wholroyd.jinja"
 			]
 		}
 	}

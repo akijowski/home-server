@@ -48,8 +48,8 @@ spec:
           image: ghcr.io/haveagitgat/tdarr:2.17.01
           resources:
             limits:
-              memory: "2Gi"
-              cpu: "2"
+              memory: "3Gi"
+              cpu: "8"
           ports:
             - containerPort: 8265
               name: web

@@ -74,6 +74,7 @@
           - 'manifests/dns-secrets.yaml.j2'
           - 'manifests/traefik-env.yaml.j2'
           - 'manifests/traefik-config.yaml.j2'
+          - 'manifests/k8s-dashboard.yaml.j2'
 
 - name: Copy kubeconfig to local machine
   hosts: k3s_cluster
