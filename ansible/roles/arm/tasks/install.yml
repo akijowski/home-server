@@ -7,7 +7,7 @@
 # - name: Configure mountpoints
 - name: Create docker start command
   ansible.builtin.template:
-    backup: true
+    backup: false
     dest: "{{ arm_user_home }}/{{ arm_docker_start_script }}"
     group: "{{ arm_group_name }}"
     owner: "{{ arm_user_name }}"
@@ -16,7 +16,7 @@
 
 - name: Create docker stop command
   ansible.builtin.template:
-    backup: true
+    backup: false
     dest: "{{ arm_user_home }}/{{ arm_docker_stop_script }}"
     group: "{{ arm_group_name }}"
     owner: "{{ arm_user_name }}"
