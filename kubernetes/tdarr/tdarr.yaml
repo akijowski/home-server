@@ -21,6 +21,27 @@ spec:
       targetPort: server
 
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tdarr-server-external
+  namespace: tdarr
+  labels:
+    app: tdarr-server-external
+    app.kubernetes.io/name: tdarr-server-external
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: tdarr
+spec:
+  selector:
+    app: tdarr-server
+  type: NodePort
+  ports:
+    - name: server
+      port: 8266
+      targetPort: server
+      nodePort: 30001
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

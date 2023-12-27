@@ -54,6 +54,14 @@ metadata:
 spec:
   serviceAccountName: prometheus
   replicas: 1
+  serviceMonitorSelector: {}
+  serviceMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  podMonitorNamespaceSelector: {}
+  probeSelector: {}
+  probeNamespaceSelector: {}
+  scrapeConfigSelector: {}
+  scrapeConfigNamespaceSelector: {}
   alerting:
     alertmanagers:
       - namespace: monitoring
@@ -66,4 +74,11 @@ spec:
   resources:
     requests:
       memory: 400Mi
+  # fixing this, the feature flag didn't seem to help, also made the alertmanager appear?
+  # https://github.com/prometheus-operator/prometheus-operator/issues/501
+  containers:
+  - name: prometheus
+    env:
+    - name: "GOMAXPROCS"
+      value: "1"
   enableAdminAPI: false
