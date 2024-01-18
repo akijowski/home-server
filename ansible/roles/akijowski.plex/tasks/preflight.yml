@@ -1,0 +1,10 @@
+---
+- name: Assert usage of systemd as an init system
+  ansible.builtin.assert:
+    that: ansible_service_mgr == 'systemd'
+    msg: "This module only works with systemd"
+
+- name: Assert Debian or Ubuntu release (apt required)
+  ansible.builtin.assert:
+    that: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    msg: "This module only works with Debian and Ubuntu releases"

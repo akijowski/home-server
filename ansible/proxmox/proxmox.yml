@@ -16,8 +16,11 @@
         name: samba
         lxc_ip4_cidr: "192.168.50.12/24"
         lxc_disk: "vmstorage:70"
+        lxc_features:
+          - "mount=nfs;cfis"
+        lxc_unprivileged: false
 
-    - include_role:
+    - ansible.builtin.include_role:
         name: proxmox_lxc
       vars:
         name: plex
@@ -26,6 +29,11 @@
         lxc_cores: 2
         lxc_mem: 2048
         lxc_swap: 1024
+        lxc_features:
+          - "mount=nfs;cfis"
+        lxc_unprivileged: false
+        lxc_mounts:
+          mp0: "ssdstorage:100,mp=/mnt/ssd,backup=1,size=25G"
 
     - include_role:
         name: proxmox_lxc

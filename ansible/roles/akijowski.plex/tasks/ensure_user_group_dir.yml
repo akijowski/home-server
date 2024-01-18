@@ -1,0 +1,34 @@
+---
+- name: Ensure Plex Goup exists
+  ansible.builtin.group:
+    name: "{{ plex_group_name }}"
+    gid: "{{ plex_group_id }}"
+    state: present
+
+- name: Ensure Plex User exists
+  ansible.builtin.user:
+    name: "{{ plex_user_name }}"
+    uid: "{{ plex_user_id }}"
+    group: "{{ plex_group_name }}"
+    comment: plex media server
+    shell: /usr/sbin/nologin
+    append: true
+    groups: "{{ plex_additional_groups }}"
+    state: present
+
+- name: Ensure Plex directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ plex_user_name }}"
+    group: "{{ plex_group_name }}"
+  loop:
+    - "{{ plex_metadata_basedir }}"
+
+- name: Ensure Plex extra directories ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ plex_user_name }}"
+    group: "{{ plex_group_name }}"
+  loop: "{{ plex_additional_dirs }}"

@@ -1,0 +1,15 @@
+---
+- name: Ensure UFW Plex rules exist
+  ansible.builtin.copy:
+    src: ufw-plexmediaserver
+    dest: /etc/ufw/applications.d/plexmediaserver
+    group: root
+    owner: root
+    mode: 0660
+  notify:
+    - Restart UFW service
+
+- name: Ensure Plex is allowed in UFW
+  community.general.ufw:
+    rule: allow
+    name: plexmediaserver-all

@@ -1,8 +1,27 @@
+#unattended upgrades
+unattended_email: agkijow@gmail.com
 # nfs role
+truenas_ipv4: '192.168.50.4'
+plex_libraries_root_dir: '/var/lib/plex/libraries'
+plex_metadata_nfs_root_dir: '/opt/plex/metadata'
 nfs_mounts:
-  - host: '192.168.50.4'
-    source_path: '/mnt/tank00-4tb/plex/media'
-    dest_path: '/opt/plex/media'
-  - host: '192.168.50.4'
+  - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank00-4tb/plex/metadata'
-    dest_path: '/opt/plex/metadata'
+    dest_path: '{{ plex_metadata_nfs_root_dir }}'
+
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank00-4tb/plex/libraries/video/movies'
+    dest_path: '{{ plex_libraries_root_dir }}/video/movies'
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank00-4tb/plex/libraries/video/9round'
+    dest_path: '{{ plex_libraries_root_dir }}/video/9round'
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank00-4tb/plex/libraries/audio/music'
+    dest_path: '{{ plex_libraries_root_dir }}/audio/music'
+
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank01-4tb/plex/libraries/video/tv-shows'
+    dest_path: '{{ plex_libraries_root_dir }}/video/tv-shows'
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank01-4tb/plex/libraries/video/uhd-movies'
+    dest_path: '{{ plex_libraries_root_dir }}/video/uhd-movies'

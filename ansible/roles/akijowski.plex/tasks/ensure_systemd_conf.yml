@@ -1,0 +1,16 @@
+---
+- name: Ensure Plex systemd directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/plexmediaserver.service.d/
+    state: directory
+    owner: root
+    group: root
+
+- name: Copy override to systemd
+  ansible.builtin.template:
+    src: systemd-override.conf
+    dest: /etc/systemd/system/plexmediaserver.service.d/override.conf
+    owner: root
+    group: root
+  notify:
+    - Restart plexmediaserver service

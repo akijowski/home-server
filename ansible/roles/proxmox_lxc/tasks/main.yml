@@ -9,19 +9,19 @@
     description: "{{ lxc_description }}"
     pool: Ubuntu
     tags: "{{ lxc_tags }}"
-    ostemplate: 'local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst'
+    ostemplate: "{{ lxc_os_template }}"
     password: "{{ container_pass }}"
     pubkey: "{{ container_pub_key }}"
     cores: "{{ lxc_cores }}"
     memory: "{{ lxc_mem }}"
     swap: "{{ lxc_mem_swap }}"
     disk: "{{ lxc_disk }}"
+    mounts: "{{ lxc_mounts }}"
     hostname: "{{ name }}"
     netif:
       net0: "name=eth0,bridge=vmbr0,firewall=1,gw={{ lxc_gateway_ip }},ip={{ lxc_ip4_cidr }},ip6=dhcp"
-    features:
-      - 'mount=nfs;cfis'
-    unprivileged: false
+    features: "{{ lxc_features }}"
+    unprivileged: "{{ lxc_unprivileged }}"
     onboot: true
     state: present
   register: lxc_ct
@@ -38,3 +38,5 @@
     node: pve
     hostname: "{{ name }}"
     state: started
+  when:
+    - "{{ lxc_autostart }}"

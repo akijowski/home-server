@@ -1,0 +1,26 @@
+---
+- ansible.builtin.import_tasks: ensure_user_group_dir.yml
+
+- name: Ensure Plex repo GPG key is installed
+  ansible.builtin.get_url:
+    url: https://downloads.plex.tv/plex-keys/PlexSign.key
+    dest: /usr/share/keyrings/plexmediaserver-archive-keyring.asc
+    checksum: md5:19930ce0357f723e590210e3101321a3
+    mode: '0544'
+
+- name: Ensure Plex repo is available
+  ansible.builtin.apt_repository:
+    filename: plexmediaserver
+    repo: "deb [signed-by=/usr/share/keyrings/plexmediaserver-archive-keyring.asc] https://downloads.plex.tv/repo/deb public main"
+    state: present
+
+- name: Install Plexmediaserver
+  ansible.builtin.apt:
+    update_cache: yes
+    name:
+      - plexmediaserver
+    state: latest
+
+- ansible.builtin.import_tasks: ensure_ufw.yml
+
+- ansible.builtin.import_tasks: ensure_systemd_conf.yml
