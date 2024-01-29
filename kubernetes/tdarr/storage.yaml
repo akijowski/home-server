@@ -45,7 +45,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank00-4tb/tdarr/cache
+    path: /mnt/tank01-4tb/tdarr/cache
     server: 192.168.50.4
 
 ---
@@ -70,17 +70,17 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank00-4tb/tdarr/server
+    path: /mnt/tank01-4tb/tdarr/server
     server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: plex-media
+  name: plex-media-movies
   namespace: tdarr
   labels:
-    app.kubernetes.io/name: plex-media
+    app.kubernetes.io/name: plex-media-movies
     app.kubernetes.io/component: storage
     app.kubernetes.io/part-of: tdarr
 spec:
@@ -95,7 +95,32 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank00-4tb/plex/media
+    path: /mnt/tank00-4tb/plex/libraries/video/movies
+    server: 192.168.50.4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: plex-media-uhd-movies
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: plex-media-uhd-movies
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  capacity:
+    storage: 4Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/tank01-4tb/plex/libraries/video/uhd-movies
     server: 192.168.50.4
 
 ---
@@ -120,7 +145,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank00-4tb/tdarr/config
+    path: /mnt/tank01-4tb/tdarr/config
     server: 192.168.50.4
 
 ---
@@ -187,10 +212,10 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: plex-media
+  name: plex-media-movies
   namespace: tdarr
   labels:
-    app.kubernetes.io/name: plex-media
+    app.kubernetes.io/name: plex-media-movies
     app.kubernetes.io/component: storage
     app.kubernetes.io/part-of: tdarr
 spec:
@@ -201,7 +226,27 @@ spec:
   storageClassName: ""
   accessModes:
     - ReadWriteMany
-  volumeName: plex-media
+  volumeName: plex-media-movies
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-media-uhd-movies
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: plex-media-uhd-movies
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  resources:
+    requests:
+      storage: 4Ti
+  volumeMode: Filesystem
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  volumeName: plex-media-uhd-movies
 
 ---
 apiVersion: v1
@@ -234,6 +279,7 @@ metadata:
     app.kubernetes.io/component: storage
     app.kubernetes.io/part-of: tdarr
 spec:
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: nfs-debug
@@ -266,8 +312,10 @@ spec:
           - name: nfs-tdarr-cache
             mountPath: /opt/tdarr/cache
             readOnly: true
-          - name: nfs-plex-media
-            mountPath: /opt/plex/media
+          - name: nfs-plex-media-movies
+            mountPath: /opt/plex/libraries/movies
+          - name: nfs-plex-media-uhd-movies
+            mountPath: /opt/plex/libraries/uhd-movies
           - name: nfs-tdarr-config
             mountPath: /opt/tdarr/config
 
@@ -281,9 +329,12 @@ spec:
         - name: nfs-tdarr-cache
           persistentVolumeClaim:
             claimName: tdarr-cache
-        - name: nfs-plex-media
+        - name: nfs-plex-media-movies
           persistentVolumeClaim:
-            claimName: plex-media
+            claimName: plex-media-movies
+        - name: nfs-plex-media-uhd-movies
+          persistentVolumeClaim:
+            claimName: plex-media-uhd-movies
         - name: nfs-tdarr-config
           persistentVolumeClaim:
             claimName: tdarr-config

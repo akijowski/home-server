@@ -28,7 +28,7 @@ This means TrueNAS (or whatever is the NFS) must share the following directories
 
 - Raw media to transcode (`/media` mounted from service like Automatic-Ripping-Machine)
 - Transcode cache :important: (`/temp` as `<nfs mount>/tdarr/cache`)
-- Transcode output such as Plex (`/opt/plex/media` as `<nfs mount>/plex/media`)
+- Transcode output such as Plex (`/opt/plex/libraries` as `<nfs mount>/plex/libraries`)
 - Server plugins, etc (`/app/server` as `<nfs mount>/tdarr/server`)
 - Server config (`/app/configs` as `<nfs mount>/tdarr/configs`)
 

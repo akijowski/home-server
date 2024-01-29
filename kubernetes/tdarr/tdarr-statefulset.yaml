@@ -2,59 +2,58 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tdarr-worker
+  name: tdarr-node
   namespace: tdarr
   labels:
-    app: tdarr-worker
-    app.kubernetes.io/name: tdarr-worker
-    app.kubernetes.io/component: worker
+    app: tdarr-node
+    app.kubernetes.io/name: tdarr-node
+    app.kubernetes.io/component: node
     app.kubernetes.io/part-of: tdarr
 spec:
   selector:
-    app: tdarr-worker
+    app: tdarr-node
+  clusterIP: None
   ports:
-    - name: server
+    - name: node
       port: 8266
-      targetPort: server
 
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: tdarr-worker
+  name: tdarr-node
   namespace: tdarr
   labels:
-    app: tdarr-worker
-    app.kubernetes.io/name: tdarr-worker
-    app.kubernetes.io/component: worker
+    app: tdarr-node
+    app.kubernetes.io/name: tdarr-node
+    app.kubernetes.io/component: node
     app.kubernetes.io/part-of: tdarr
 spec:
+  serviceName: tdarr-node
   replicas: 1
   revisionHistoryLimit: 5
   selector:
     matchLabels:
-      app: tdarr-worker
+      app: tdarr-node
   template:
     metadata:
       labels:
-        app: tdarr-worker
-        app.kubernetes.io/name: tdarr-worker
-        app.kubernetes.io/component: worker
+        app: tdarr-node
+        app.kubernetes.io/name: tdarr-node
+        app.kubernetes.io/component: node
         app.kubernetes.io/part-of: tdarr
     spec:
       containers:
-        - name: tdarr-worker
+        - name: tdarr-node
           image: ghcr.io/haveagitgat/tdarr_node:2.17.01
+          imagePullPolicy: Always
           resources:
             limits:
-              memory: "2Gi"
-              cpu: "5"
+              memory: "6Gi"
+              cpu: "12"
           ports:
             - containerPort: 8266
-              name: server
-          # https://tdarr.readme.io/reference/get_status
-          # readiness
-          # liveness
+              name: node
           env:
             - name: nodeName
               valueFrom:
@@ -62,30 +61,46 @@ spec:
                   fieldPath: metadata.name
           envFrom:
             - configMapRef:
-                name: tdarr-worker-env
+                name: tdarr-node-env
           volumeMounts:
+            - name: config
+              mountPath: /app/configs
             - name: logs
               mountPath: /app/logs
-            - name: nfs-media
+            - name: nfs-raw-media
               mountPath: /media
             - name: nfs-cache
               mountPath: /temp
-            - name: nfs-plex-media
-              mountPath: /opt/plex/media
+            - name: nfs-plex-media-movies
+              mountPath: /opt/plex/libraries/movies
+            - name: nfs-plex-media-uhd-movies
+              mountPath: /opt/plex/libraries/uhd-movies
       restartPolicy: Always
 
       volumes:
+        - name: logs
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+
         - name: nfs-cache
           persistentVolumeClaim:
             claimName: tdarr-cache
-        - name: logs
-          emptyDir: {}
-        - name: nfs-media
+        - name: nfs-raw-media
           persistentVolumeClaim:
             claimName: tdarr-arm-raw-pvc
-        - name: nfs-plex-media
+        - name: nfs-server
           persistentVolumeClaim:
-            claimName: plex-media
+            claimName: tdarr-server
+        - name: nfs-config
+          persistentVolumeClaim:
+            claimName: tdarr-config
+        - name: nfs-plex-media-movies
+          persistentVolumeClaim:
+            claimName: plex-media-movies
+        - name: nfs-plex-media-uhd-movies
+          persistentVolumeClaim:
+            claimName: plex-media-uhd-movies
 
       # Any filesystem mounted to the pod will be owned by this group
       securityContext:
@@ -95,11 +110,11 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tdarr-worker-env
+  name: tdarr-node-env
   namespace: tdarr
   labels:
-    app: tdarr-worker
-    app.kubernetes.io/name: tdarr-worker-env
+    app: tdarr-node
+    app.kubernetes.io/name: tdarr-node-env
     app.kubernetes.io/component: config
     app.kubernetes.io/part-of: tdarr
 data:
@@ -108,5 +123,7 @@ data:
   PGID: "1400"
   serverIP: "tdarr-server.tdarr"
   serverPort: "8266"
+  internalNode: "false"
   inContainer: "true"
   ffmpegVersion: "6"
+  logLevel: "DEBUG"
