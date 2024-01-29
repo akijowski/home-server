@@ -24,6 +24,8 @@
     unprivileged: "{{ lxc_unprivileged }}"
     onboot: true
     state: present
+    # NFS based volumes can take time to operate
+    timeout: 600
   register: lxc_ct
 
 - ansible.builtin.debug:
@@ -39,4 +41,4 @@
     hostname: "{{ name }}"
     state: started
   when:
-    - "{{ lxc_autostart }}"
+    - lxc_autostart

@@ -1,21 +1,120 @@
+unattended_email: agkijow@gmail.com
+
 sys_groups:
-  - name: plex
-    gid: '998'
   - name: sambaetc
     gid: '1200'
+  - name: arm
+    gid: '1400'
+  - name: 'plex'
+    gid: '1800'
+
 sys_users:
-  - name: plex
-    uid: '998'
-    group: 'plex'
-    create_home: no
   - name: sambaetc
+    comment: samba etc folder shares
     uid: '1200'
     group: 'sambaetc'
     create_home: no
+  # arm and tdarr share the same uid/gid
+  - name: arm
+    comment: arm folder shares
+    uid: '1400'
+    group: 'arm'
+    create_home: no
+  - name: plex
+    comment: plex folder shares
+    uid: '1800'
+    group: 'plex'
+    create_home: no
+
+samba_global_include: smb-global.conf
+samba_apple_extensions: yes
+samba_server_string: '%h %v'
+samba_server_min_protocol: SMB2
+samba_map_to_guest: bad user
+# the ownership and directories are managed by nfs mounts
+samba_manage_directories: false
+
+samba_shares_root: /opt/share
+samba_shares:
+  - name: etc
+    comment: Etc Folders
+    path: /opt/share/etc
+    browseable: yes
+    public: yes
+    guest_ok: yes
+    read_only: no
+    # writes to this share will be mapped to this uid/gid
+    user: sambaetc
+    group: sambaetc
+    # connected users can be in this group
+    write_list: '+sambas'
+
+  - name: arm-media
+    comment: autoripmachine media
+    path: /opt/share/arm/media
+    browseable: no
+    public: no
+    guest_ok: no
+    read_only: no
+    user: arm
+    group: arm
+    write_list: '+sambas'
+
+  - name: plex-movies
+    comment: plex movies
+    path: /opt/share/plex/movies
+    browseable: no
+    public: no
+    guest_ok: no
+    read_only: no
+    user: plex
+    group: plex
+    write_list: '+sambas'
+
+  - name: plex-uhd-movies
+    comment: plex uhd movies
+    path: /opt/share/plex/uhd-movies
+    browseable: no
+    public: no
+    guest_ok: no
+    read_only: no
+    user: plex
+    group: plex
+    write_list: '+sambas'
+
+  - name: tdarr-cache
+    comment: tdarr transcode cache
+    path: /opt/share/tdarr/cache
+    browseable: no
+    public: no
+    guest_ok: no
+    read_only: no
+    user: arm
+    group: arm
+    write_list: '+sambas'
+
+samba_users:
+  - name: adam
+    password: "{{ vault_adam_password }}"
+  - name: windows
+    password: "{{ vault_windows_password }}"
+
+nfs_host: '192.168.50.4'
 nfs_mounts:
-  - host: '192.168.50.95'
+  - host: "{{ nfs_host }}"
     source_path: '/mnt/tank00-4tb/samba/etc'
     dest_path: '/opt/share/etc'
-  - host: '192.168.50.95'
-    source_path: '/mnt/tank00-4tb/plex/media'
-    dest_path: '/opt/share/plex/media'
+  - host: "{{ nfs_host }}"
+    source_path: '/mnt/tank00-4tb/autoripm/media'
+    dest_path: '/opt/share/arm/media'
+
+  - host: "{{ nfs_host }}"
+    source_path: '/mnt/tank00-4tb/plex/libraries/video/movies'
+    dest_path: '/opt/share/plex/movies'
+  - host: "{{ nfs_host }}"
+    source_path: '/mnt/tank01-4tb/plex/libraries/video/uhd-movies'
+    dest_path: '/opt/share/plex/uhd-movies'
+
+  - host: "{{ nfs_host }}"
+    source_path: '/mnt/tank01-4tb/tdarr/cache'
+    dest_path: '/opt/share/tdarr/cache'

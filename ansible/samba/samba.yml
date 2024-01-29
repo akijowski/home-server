@@ -7,76 +7,158 @@
     - init
 
   tasks:
-    - include_role:
-        name: apt
-    - include_role:
-        name: ssh
-    - include_role:
-        name: ufw
-    - include_role:
-        name: nfs
+    - name: Update packages
+      ansible.builtin.apt:
+        upgrade: yes
+        state: present
+
+    - name: Install packages
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 86400 # 1 day
+        name:
+          - curl
+          - wget
+          - fail2ban
+          - vim
+          - unzip
+          - ufw
+          - gpg
+          - mailutils
+          - git
+        state: latest
+
+    - name: Install unattended upgrades
+      ansible.builtin.import_role:
+        name: hifis.unattended_upgrades
+      vars:
+        unattended_automatic_reboot: true
+        unattended_syslog_enable: true
+        unattended_mail: "{{ unattended_email }}"
+        unattended_mail_only_on_error: true
+
+    - name: Disable password authentication for root
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+
+    - name: UFW - Allow SSH connections
+      community.general.ufw:
+        rule: allow
+        name: OpenSSH
+
+    - name: UFW - Deny all other incoming traffic by default
+      community.general.ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
 
 - name: Install Samba
   hosts: samba
-  become: true
   debugger: on_failed
+  become: true
   tags:
     - install
 
+  handlers:
+    - name: Restart Avahi service
+      ansible.builtin.systemd:
+        daemon_reload: true
+        name: avahi-daemon
+        state: restarted
+
+    - name: Restart UFW service
+      community.general.ufw:
+        state: reloaded
+
   tasks:
-    - name: Add Groups (non-Samba)
-      group:
+    - name: Install additional packages
+      ansible.builtin.apt:
+        update_cache: yes
+        name:
+          - nfs-common
+          - avahi-daemon
+        state: latest
+
+    - name: Mount NFS directories
+      ansible.posix.mount:
+        src: "{{ item.host }}:{{ item.source_path}}"
+        path: "{{ item.dest_path }}"
+        opts: rw,sync,hard,vers=4,sec=sys
+        state: mounted
+        fstype: nfs
+      loop: "{{ nfs_mounts }}"
+
+    - name: Ensure samba write group
+      ansible.builtin.group:
+        name: sambas
+        gid: 1000
+        state: present
+
+    - name: Ensure system groups
+      ansible.builtin.group:
         name: "{{ item.name }}"
         gid: "{{ item.gid }}"
         state: present
       loop: "{{ sys_groups }}"
 
-    - name: Add Users (non-Samba)
-      user:
+    - name: Ensure system users
+      ansible.builtin.user:
         name: "{{ item.name }}"
+        comment: "{{ item.comment | default(omit) }}"
         uid: "{{ item.uid }}"
         group: "{{ item.group }}"
+        append: true
+        groups:
+          - sambas
         create_home: "{{ item.create_home }}"
+        shell: /usr/sbin/nologin
         state: present
       loop: "{{ sys_users }}"
 
-    - name: Install Samba and Avahi
-      apt:
-        name: samba,avahi-daemon
-        state: latest
+    # NOTE: no password is being set here, only on the samba side with smbpasswd
+    - name: Ensure login users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        comment: "{{ item.comment | default('samba user')}}"
+        append: true
+        groups:
+          - sambas
+        create_home: false
+        shell: /usr/sbin/nologin
+        state: present
+      loop: "{{ samba_users }}"
 
-    - name: Samba Information
-      debug:
-        msg: Now that Samba is installed, make sure to manage users with smbpasswd and pdbedit!
+    # vars are stored in host inventory
+    - name: Install Samba
+      ansible.builtin.include_role:
+        name: vladgh.samba.server
 
-    - name: Copy Samba config
-      copy:
-        src: conf/smb.conf
-        dest: /etc/samba/smb.conf
-        group: root
+    - name: Ensure Avahi directory
+      ansible.builtin.file:
+        path: /etc/avahi/services/
+        state: directory
         owner: root
-        mode: '0660'
-        backup: yes
+        group: root
 
-    - name: Copy Avahi config
-      copy:
-        src: conf/avahi.conf
+    - name: Ensure Avahi config
+      ansible.builtin.template:
+        src: avahi_samba.service.j2
         dest: /etc/avahi/services/samba.service
         group: root
         owner: root
         mode: '0664'
-
-    - name: Restart Samba
-      service:
-        name: smbd
-        state: restarted
-
-    - name: Restart Avahi
-      service:
-        name: avahi-daemon
-        state: restarted
+      vars:
+        smb_model: RackMac
+        smb_name: Samba Server
+      notify:
+        - Restart Avahi service
 
     - name: Allow Samba UFW
-      ufw:
+      community.general.ufw:
         rule: allow
-        name: samba
+        name: Samba
+      notify:
+        - Restart UFW service

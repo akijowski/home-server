@@ -11,3 +11,4 @@ collections:
   - name: ansible.utils
   - name: community.general
   - name: community.crypto
+  - name: vladgh.samba

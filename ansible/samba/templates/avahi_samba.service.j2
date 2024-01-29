@@ -9,11 +9,11 @@
  <service>
    <type>_device-info._tcp</type>
    <port>0</port>
-   <txt-record>model=RackMac</txt-record>
+   <txt-record>model={{ smb_model }}</txt-record>
  </service>
  <service>
    <type>_adisk._tcp</type>
    <txt-record>sys=waMa=0,adVF=0x100</txt-record>
-   <txt-record>dk0=adVN=Samba Server,adVF=0x82</txt-record>
+   <txt-record>dk0=adVN={{ smb_name }},adVF=0x82</txt-record>
  </service>
 </service-group>
