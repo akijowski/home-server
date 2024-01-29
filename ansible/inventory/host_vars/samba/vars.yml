@@ -30,6 +30,8 @@ samba_global_include: smb-global.conf
 samba_apple_extensions: yes
 samba_server_string: '%h %v'
 samba_server_min_protocol: SMB2
+# https://unix.stackexchange.com/a/377531
+# TODO: experiment with this setting
 samba_map_to_guest: bad user
 # the ownership and directories are managed by nfs mounts
 samba_manage_directories: false
