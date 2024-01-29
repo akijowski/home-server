@@ -7,7 +7,15 @@
     - arm_ensure
 
 - name: Install ARM
-  import_tasks: install.yml
+  import_tasks: install_docker.yml
   become: true
   tags:
     - arm_install
+  when: use_docker
+
+- name: Install ARM
+  import_tasks: install_podman.yml
+  become: true
+  tags:
+    - arm_install
+  when: not use_docker

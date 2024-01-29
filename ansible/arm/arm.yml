@@ -91,17 +91,17 @@
         update_cache: yes
         cache_valid_time: 600
 
-    - name: Install Docker
-      ansible.builtin.include_role:
-        name: geerlingguy.docker
-      vars:
-        docker_edition: 'ce'
-        docker_packages:
-            - "docker-{{ docker_edition }}"
-            - "docker-{{ docker_edition }}-cli"
-            - "docker-{{ docker_edition }}-rootless-extras"
-        docker_packages_state: present
-        docker_install_compose: false
+    # - name: Install Docker
+    #   ansible.builtin.include_role:
+    #     name: geerlingguy.docker
+    #   vars:
+    #     docker_edition: 'ce'
+    #     docker_packages:
+    #         - "docker-{{ docker_edition }}"
+    #         - "docker-{{ docker_edition }}-cli"
+    #         - "docker-{{ docker_edition }}-rootless-extras"
+    #     docker_packages_state: present
+    #     docker_install_compose: false
 
     - name: Install ARM
       ansible.builtin.include_role:

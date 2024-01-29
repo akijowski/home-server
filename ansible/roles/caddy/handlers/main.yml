@@ -1,7 +1,8 @@
 ---
 - name: Restart caddy service
   become: true
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     daemon_reload: true
+    enabled: true
     name: caddy
     state: restarted

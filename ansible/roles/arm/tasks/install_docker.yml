@@ -1,7 +1,7 @@
 ---
-- name: Pull Docker Image ({{ arm_docker_tag }})
+- name: Pull Docker Image ({{ arm_container_tag }})
   community.docker.docker_image:
-    name: "{{ arm_docker_image }}:{{ arm_docker_tag }}"
+    name: "{{ arm_container_image }}:{{ arm_container_tag }}"
     source: pull
 
 # - name: Configure mountpoints
@@ -23,15 +23,6 @@
     mode: '0755'
     src: templates/docker_stop.sh.j2
 
-- name: Mount NFS ({{ item.dest }})
-  ansible.posix.mount:
-    src: "{{ item.host }}:{{ item.src }}"
-    path: "{{ item.dest }}"
-    opts: rw,sync,hard,vers=4
-    state: mounted
-    fstype: nfs
-  loop: "{{ nfs_mounts }}"
-
 # TODO:
 # https://blog.container-solutions.com/running-docker-containers-with-systemd
 # https://github.com/ibuildthecloud/systemd-docker (check the issues, not maintained)
@@ -43,3 +34,6 @@
 #     group: root
 #     mode: '0644'
 #   notify: restart arm
+
+# TODO:
+# Switch to Podman, native support for systemd

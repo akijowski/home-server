@@ -6,9 +6,17 @@
       - lsscsi
     state: latest
 
+- name: Ensure Podman is installed
+  ansible.builtin.apt:
+    name:
+      - podman
+    state: latest
+  when: not use_docker
+
 - name: Ensure Docker is installed
   community.docker.docker_host_info:
   register: __docker_info
+  when: use_docker
 
 # - ansible.builtin.debug:
 #     var: __docker_info
@@ -47,3 +55,12 @@
     - "{{ arm_logs_dir }}"
     - "{{ arm_media_dir }}"
     - "{{ arm_config_dir }}"
+
+- name: Ensure NFS mounts
+  ansible.posix.mount:
+    src: "{{ item.host }}:{{ item.src }}"
+    path: "{{ item.dest }}"
+    opts: rw,sync,hard,vers=4
+    state: mounted
+    fstype: nfs
+  loop: "{{ nfs_mounts }}"

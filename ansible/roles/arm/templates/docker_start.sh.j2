@@ -18,5 +18,5 @@ docker run -d \
     --privileged \
     --restart "always" \
     --name "{{ arm_container_name }}" \
-    --cpuset-cpus="{{ arm_docker_cpuset_cpus | quote }}" \
-    {{ arm_docker_image }}:{{ arm_docker_tag }}
+    --cpuset-cpus="{{ arm_container_cpuset_cpus | quote }}" \
+    {{ arm_container_image }}:{{ arm_container_tag }}
