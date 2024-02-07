@@ -18,7 +18,7 @@ tasks:
       - sh
       - zsh
     cmds:
-      - docker exec -it -w /workspaces/ansible-home-server -u vscode home_server_ansible_devcontainer /usr/bin/zsh
+      - docker exec -it -w /workspaces/home-server-ansible -u vscode home_server_ansible_devcontainer /usr/bin/zsh
 
   check-inv:
     desc: check proxmox inventory

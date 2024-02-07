@@ -55,3 +55,8 @@ The default container has only the user `root` and the group `root`.  A separate
 The Proxmox also hosts an Ubuntu VM running [microk8s](https://microk8s.io).  A combination of Kubernetes resources, and Helm files are used to configure the cluster.
 
 To make using Helm and Kubernetes resources more consistent there are Terraform files to manage the resources.  Also I just wanted to experiment with how well that would work (so far TBD).
+
+## TrueNAS
+
+Benchmarking disk performance with fio
+https://docs.oracle.com/en-us/iaas/Content/Block/References/samplefiocommandslinux.htm

@@ -1,18 +1,22 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
 	"name": "Ansible",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
-	"runArgs": ["--name", "home_server_ansible_devcontainer", "--env-file", "${localWorkspaceFolder}/container.env"],
-	"postCreateCommand": "pipx install --include-deps ansible",
-	"postStartCommand": "task ansible:install",
 	// set to vscode so that we can mount in to the vscode home dir
 	"remoteUser": "vscode",
+	"runArgs": [
+		// make sure podman maps properly in a rootless container.  Not needed for Docker.
+		"--userns=keep-id:uid=1000,gid=1000",
+		"--name=home_server_ansible_devcontainer",
+		"--env-file=${localWorkspaceFolder}/container.env"
+	],
+	"postCreateCommand": "pipx install --include-deps ansible",
+	"postStartCommand": "task ansible:install",
+	// "updateRemoteUserUID": true,
 	"mounts": [
-		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly",
-		// the k3s role can copy the generated kubeconfig to this location for us
-		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube"
+		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly"
 	],
 	"containerEnv": {
 		"ANSIBLE_ROLES_PATH": "/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:${containerWorkspaceFolder}/ansible/roles",

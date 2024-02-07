@@ -4,7 +4,11 @@
 	"name": "Kubernetes",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
-	"runArgs": ["--name", "home_server_k8s_devcontainer"],
+	"runArgs": [
+		// make sure podman maps properly in a rootless container.  Not needed for Docker.
+		"--userns=keep-id:uid=1000,gid=1000",
+		"--name=home_server_k8s_devcontainer"
+	],
 	// set to vscode so that we can mount in to the vscode home dir
 	"remoteUser": "vscode",
 	"mounts": [
