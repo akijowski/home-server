@@ -10,4 +10,4 @@ tasks:
       - sh
       - zsh
     cmds:
-      - docker exec -it -w /workspaces/k8s-home-server -u vscode home_server_k8s_devcontainer /usr/bin/zsh
+      - docker exec -it -w /workspaces/home-server-k8s -u vscode home_server_k8s_devcontainer /usr/bin/zsh

@@ -13,7 +13,7 @@ arm_config_dir: /etc/arm/config
 arm_port: 8080
 
 arm_container_image: 'docker.io/automaticrippingmachine/automatic-ripping-machine'
-arm_container_tag: '2.6.60' # Later versions seem to have a bug (2.6.67)
+arm_container_tag: '2.6.70'
 arm_container_name: arm-rippers
 arm_container_cpuset_cpus: '0,1'
 arm_docker_start_script: start_arm_container.sh
