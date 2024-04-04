@@ -3,7 +3,7 @@ roles:
   - name: hifis.unattended_upgrades
   - name: cloudalchemy.coredns
   - name: xanmanning.k3s
-  - name: geerlingguy.docker
+  # - name: geerlingguy.docker
   # - name: cloudalchemy.node_exporter
 
 collections:
@@ -11,4 +11,5 @@ collections:
   - name: ansible.utils
   - name: community.general
   - name: community.crypto
-  - name: vladgh.samba
+  - name: amazon.aws
+  # - name: vladgh.samba
