@@ -1,6 +1,6 @@
 {{ ansible_managed | comment }}
 
-proxmox.home.kijowski.io {
+proxmox.kijowski.casa {
         tls {
             # https://github.com/caddy-dns/route53
             dns route53 {
@@ -20,5 +20,5 @@ proxmox.home.kijowski.io {
 }
 
 :80 {
-        redir https://proxmox.home.kijowski.io{uri}
+        redir https://proxmox.kijowski.casa{uri}
 }

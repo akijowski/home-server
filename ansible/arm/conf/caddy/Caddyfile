@@ -1,6 +1,6 @@
 {{ ansible_managed | comment }}
 
-arm.home.kijowski.io {
+arm.kijowski.casa {
         tls {
             # https://github.com/caddy-dns/route53
             dns route53 {
@@ -14,5 +14,5 @@ arm.home.kijowski.io {
 }
 
 :80 {
-        redir https://arm.home.kijowski.io{uri}
+        redir https://arm.kijowski.casa{uri}
 }
