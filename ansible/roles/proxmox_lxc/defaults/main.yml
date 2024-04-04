@@ -1,4 +1,5 @@
 proxmox_root_user: "root@pam"
+proxmox_node: hyperion
 lxc_description: "{{ name | capitalize }} container.  Created with Ansible"
 lxc_gateway_ip: "192.168.50.1"
 lxc_cores: 1

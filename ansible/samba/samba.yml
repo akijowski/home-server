@@ -1,164 +1,166 @@
 ---
-- name: Initialize LXC
-  hosts: samba
-  debugger: on_failed
-  become: true
-  tags:
-    - init
+# - Deprecated in favor of TurnkeyLinux Fileserver ISO
+#
+# - name: Initialize LXC
+#   hosts: samba
+#   debugger: on_failed
+#   become: true
+#   tags:
+#     - init
 
-  tasks:
-    - name: Update packages
-      ansible.builtin.apt:
-        upgrade: yes
-        state: present
+#   tasks:
+#     - name: Update packages
+#       ansible.builtin.apt:
+#         upgrade: yes
+#         state: present
 
-    - name: Install packages
-      ansible.builtin.apt:
-        update_cache: yes
-        cache_valid_time: 86400 # 1 day
-        name:
-          - curl
-          - wget
-          - fail2ban
-          - vim
-          - unzip
-          - ufw
-          - gpg
-          - mailutils
-          - git
-        state: latest
+#     - name: Install packages
+#       ansible.builtin.apt:
+#         update_cache: yes
+#         cache_valid_time: 86400 # 1 day
+#         name:
+#           - curl
+#           - wget
+#           - fail2ban
+#           - vim
+#           - unzip
+#           - ufw
+#           - gpg
+#           - mailutils
+#           - git
+#         state: latest
 
-    - name: Install unattended upgrades
-      ansible.builtin.import_role:
-        name: hifis.unattended_upgrades
-      vars:
-        unattended_automatic_reboot: true
-        unattended_syslog_enable: true
-        unattended_mail: "{{ unattended_email }}"
-        unattended_mail_only_on_error: true
+#     - name: Install unattended upgrades
+#       ansible.builtin.import_role:
+#         name: hifis.unattended_upgrades
+#       vars:
+#         unattended_automatic_reboot: true
+#         unattended_syslog_enable: true
+#         unattended_mail: "{{ unattended_email }}"
+#         unattended_mail_only_on_error: true
 
-    - name: Disable password authentication for root
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        state: present
-        regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin prohibit-password'
+#     - name: Disable password authentication for root
+#       ansible.builtin.lineinfile:
+#         path: /etc/ssh/sshd_config
+#         state: present
+#         regexp: '^#?PermitRootLogin'
+#         line: 'PermitRootLogin prohibit-password'
 
-    - name: UFW - Allow SSH connections
-      community.general.ufw:
-        rule: allow
-        name: OpenSSH
+#     - name: UFW - Allow SSH connections
+#       community.general.ufw:
+#         rule: allow
+#         name: OpenSSH
 
-    - name: UFW - Deny all other incoming traffic by default
-      community.general.ufw:
-        state: enabled
-        policy: deny
-        direction: incoming
+#     - name: UFW - Deny all other incoming traffic by default
+#       community.general.ufw:
+#         state: enabled
+#         policy: deny
+#         direction: incoming
 
-- name: Install Samba
-  hosts: samba
-  debugger: on_failed
-  become: true
-  tags:
-    - install
+# - name: Install Samba
+#   hosts: samba
+#   debugger: on_failed
+#   become: true
+#   tags:
+#     - install
 
-  handlers:
-    - name: Restart Avahi service
-      ansible.builtin.systemd:
-        daemon_reload: true
-        name: avahi-daemon
-        state: restarted
+#   handlers:
+#     - name: Restart Avahi service
+#       ansible.builtin.systemd:
+#         daemon_reload: true
+#         name: avahi-daemon
+#         state: restarted
 
-    - name: Restart UFW service
-      community.general.ufw:
-        state: reloaded
+#     - name: Restart UFW service
+#       community.general.ufw:
+#         state: reloaded
 
-  tasks:
-    - name: Install additional packages
-      ansible.builtin.apt:
-        update_cache: yes
-        name:
-          - nfs-common
-          - avahi-daemon
-        state: latest
+#   tasks:
+#     - name: Install additional packages
+#       ansible.builtin.apt:
+#         update_cache: yes
+#         name:
+#           - nfs-common
+#           - avahi-daemon
+#         state: latest
 
-    - name: Mount NFS directories
-      ansible.posix.mount:
-        src: "{{ item.host }}:{{ item.source_path}}"
-        path: "{{ item.dest_path }}"
-        opts: rw,hard,vers=4
-        state: mounted
-        fstype: nfs
-      loop: "{{ nfs_mounts }}"
+#     - name: Mount NFS directories
+#       ansible.posix.mount:
+#         src: "{{ item.host }}:{{ item.source_path}}"
+#         path: "{{ item.dest_path }}"
+#         opts: rw,hard,vers=4
+#         state: mounted
+#         fstype: nfs
+#       loop: "{{ nfs_mounts }}"
 
-    - name: Ensure samba write group
-      ansible.builtin.group:
-        name: sambas
-        gid: 1000
-        state: present
+#     - name: Ensure samba write group
+#       ansible.builtin.group:
+#         name: sambas
+#         gid: 1000
+#         state: present
 
-    - name: Ensure system groups
-      ansible.builtin.group:
-        name: "{{ item.name }}"
-        gid: "{{ item.gid }}"
-        state: present
-      loop: "{{ sys_groups }}"
+#     - name: Ensure system groups
+#       ansible.builtin.group:
+#         name: "{{ item.name }}"
+#         gid: "{{ item.gid }}"
+#         state: present
+#       loop: "{{ sys_groups }}"
 
-    - name: Ensure system users
-      ansible.builtin.user:
-        name: "{{ item.name }}"
-        comment: "{{ item.comment | default(omit) }}"
-        uid: "{{ item.uid }}"
-        group: "{{ item.group }}"
-        append: true
-        groups:
-          - sambas
-        create_home: "{{ item.create_home }}"
-        shell: /usr/sbin/nologin
-        state: present
-      loop: "{{ sys_users }}"
+#     - name: Ensure system users
+#       ansible.builtin.user:
+#         name: "{{ item.name }}"
+#         comment: "{{ item.comment | default(omit) }}"
+#         uid: "{{ item.uid }}"
+#         group: "{{ item.group }}"
+#         append: true
+#         groups:
+#           - sambas
+#         create_home: "{{ item.create_home }}"
+#         shell: /usr/sbin/nologin
+#         state: present
+#       loop: "{{ sys_users }}"
 
-    # NOTE: no password is being set here, only on the samba side with smbpasswd
-    - name: Ensure login users
-      ansible.builtin.user:
-        name: "{{ item.name }}"
-        comment: "{{ item.comment | default('samba user')}}"
-        append: true
-        groups:
-          - sambas
-        create_home: false
-        shell: /usr/sbin/nologin
-        state: present
-      loop: "{{ samba_users }}"
+#     # NOTE: no password is being set here, only on the samba side with smbpasswd
+#     - name: Ensure login users
+#       ansible.builtin.user:
+#         name: "{{ item.name }}"
+#         comment: "{{ item.comment | default('samba user')}}"
+#         append: true
+#         groups:
+#           - sambas
+#         create_home: false
+#         shell: /usr/sbin/nologin
+#         state: present
+#       loop: "{{ samba_users }}"
 
-    # vars are stored in host inventory
-    - name: Install Samba
-      ansible.builtin.include_role:
-        name: vladgh.samba.server
+#     # vars are stored in host inventory
+#     - name: Install Samba
+#       ansible.builtin.include_role:
+#         name: vladgh.samba.server
 
-    - name: Ensure Avahi directory
-      ansible.builtin.file:
-        path: /etc/avahi/services/
-        state: directory
-        owner: root
-        group: root
+#     - name: Ensure Avahi directory
+#       ansible.builtin.file:
+#         path: /etc/avahi/services/
+#         state: directory
+#         owner: root
+#         group: root
 
-    - name: Ensure Avahi config
-      ansible.builtin.template:
-        src: avahi_samba.service.j2
-        dest: /etc/avahi/services/samba.service
-        group: root
-        owner: root
-        mode: '0664'
-      vars:
-        smb_model: RackMac
-        smb_name: Samba Server
-      notify:
-        - Restart Avahi service
+#     - name: Ensure Avahi config
+#       ansible.builtin.template:
+#         src: avahi_samba.service.j2
+#         dest: /etc/avahi/services/samba.service
+#         group: root
+#         owner: root
+#         mode: '0664'
+#       vars:
+#         smb_model: RackMac
+#         smb_name: Samba Server
+#       notify:
+#         - Restart Avahi service
 
-    - name: Allow Samba UFW
-      community.general.ufw:
-        rule: allow
-        name: Samba
-      notify:
-        - Restart UFW service
+#     - name: Allow Samba UFW
+#       community.general.ufw:
+#         rule: allow
+#         name: Samba
+#       notify:
+#         - Restart UFW service

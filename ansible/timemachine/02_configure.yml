@@ -1,63 +1,63 @@
----
-- hosts: all
-  become: true
-  vars_files:
-    - vars/timemachine.yml
+# ---
+# - hosts: all
+#   become: true
+#   vars_files:
+#     - vars/timemachine.yml
 
-  tasks:
-    - name: Add Groups (non-Samba)
-      group:
-        name: "{{ item.name }}"
-        gid: "{{ item.gid }}"
-        state: present
-      loop: "{{ sys_groups }}"
+#   tasks:
+#     - name: Add Groups (non-Samba)
+#       group:
+#         name: "{{ item.name }}"
+#         gid: "{{ item.gid }}"
+#         state: present
+#       loop: "{{ sys_groups }}"
 
-    - name: Add Users (non-Samba)
-      user:
-        name: "{{ item.name }}"
-        uid: "{{ item.uid }}"
-        group: "{{ item.group }}"
-        create_home: "{{ item.create_home }}"
-        state: present
-      loop: "{{ sys_users }}"
+#     - name: Add Users (non-Samba)
+#       user:
+#         name: "{{ item.name }}"
+#         uid: "{{ item.uid }}"
+#         group: "{{ item.group }}"
+#         create_home: "{{ item.create_home }}"
+#         state: present
+#       loop: "{{ sys_users }}"
 
-    - name: Install Samba and Avahi
-      apt:
-        name: samba,avahi-daemon
-        state: latest
+#     - name: Install Samba and Avahi
+#       apt:
+#         name: samba,avahi-daemon
+#         state: latest
 
-    - name: Samba Information
-      debug:
-        msg: Now that Samba is installed, make sure to manage users with smbpasswd and pdbedit!
+#     - name: Samba Information
+#       debug:
+#         msg: Now that Samba is installed, make sure to manage users with smbpasswd and pdbedit!
 
-    - name: Copy Samba config
-      copy:
-        src: conf/smb.conf
-        dest: /etc/samba/smb.conf
-        group: root
-        owner: root
-        mode: '0660'
-        backup: yes
+#     - name: Copy Samba config
+#       copy:
+#         src: conf/smb.conf
+#         dest: /etc/samba/smb.conf
+#         group: root
+#         owner: root
+#         mode: '0660'
+#         backup: yes
 
-    - name: Copy Avahi config
-      copy:
-        src: conf/avahi.conf
-        dest: /etc/avahi/services/samba.service
-        group: root
-        owner: root
-        mode: '0664'
+#     - name: Copy Avahi config
+#       copy:
+#         src: conf/avahi.conf
+#         dest: /etc/avahi/services/samba.service
+#         group: root
+#         owner: root
+#         mode: '0664'
 
-    - name: Restart Samba
-      service:
-        name: smbd
-        state: restarted
+#     - name: Restart Samba
+#       service:
+#         name: smbd
+#         state: restarted
 
-    - name: Restart Avahi
-      service:
-        name: avahi-daemon
-        state: restarted
+#     - name: Restart Avahi
+#       service:
+#         name: avahi-daemon
+#         state: restarted
 
-    - name: Allow Samba UFW
-      ufw:
-        rule: allow
-        name: samba
+#     - name: Allow Samba UFW
+#       ufw:
+#         rule: allow
+#         name: samba

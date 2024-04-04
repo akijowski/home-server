@@ -5,7 +5,7 @@
     api_password: "{{ proxmox_root_pass }}"
     api_host: "{{ proxmox_host }}"
     validate_certs: false
-    node: pve
+    node: "{{ proxmox_node }}"
     description: "{{ lxc_description }}"
     pool: Ubuntu
     tags: "{{ lxc_tags }}"

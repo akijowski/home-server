@@ -10,15 +10,15 @@
     - vars/vault.yml
 
   tasks:
-    - include_role:
-        name: proxmox_lxc
-      vars:
-        name: samba
-        lxc_ip4_cidr: "192.168.50.12/24"
-        lxc_disk: "vmstorage:70"
-        lxc_features:
-          - "mount=nfs;cfis"
-        lxc_unprivileged: false
+    # - include_role:
+    #     name: proxmox_lxc
+    #   vars:
+    #     name: samba
+    #     lxc_ip4_cidr: "192.168.50.12/24"
+    #     lxc_disk: "vmstorage:70"
+    #     lxc_features:
+    #       - "mount=nfs;cfis"
+    #     lxc_unprivileged: false
 
     - ansible.builtin.include_role:
         name: proxmox_lxc
@@ -39,8 +39,24 @@
         name: proxmox_lxc
       vars:
         name: homebridge
+        proxmox_node: phoebe
         lxc_ip4_cidr: "192.168.50.15/24"
         lxc_disk: "vmstorage:70"
+
+    # - ansible.builtin.include_role:
+    #     name: proxmox_lxc
+    #   vars:
+    #     name: fileserver
+    #     proxmox_node: phoebe
+    #     lxc_os_template: nfs-iso:vztmpl/debian-11-turnkey-fileserver_17.1-1_amd64.tar.gz
+    #     lxc_ip4_cidr: "192.168.50.12/24"
+    #     lxc_disk: "local-lvm:70"
+    #     lxc_cores: 2
+    #     lxc_mem: 1024
+    #     lxc_features:
+    #       - "mount=nfs;cfis"
+    #     lxc_unprivileged: false
+    #     lxc_autostart: false
 
 - name: Install Caddy
   hosts: proxmox
