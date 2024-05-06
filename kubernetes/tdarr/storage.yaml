@@ -20,7 +20,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank00-4tb/autoripm/media
+    path: /mnt/tank0400/autoripm/media
     server: 192.168.50.4
 
 ---
@@ -45,7 +45,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank01-4tb/tdarr/cache
+    path: /mnt/tank0400/tdarr/cache
     server: 192.168.50.4
 
 ---
@@ -70,7 +70,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank01-4tb/tdarr/server
+    path: /mnt/tank0400/tdarr/server
     server: 192.168.50.4
 
 ---
@@ -95,7 +95,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank00-4tb/plex/libraries/video/movies
+    path: /mnt/tank1600/plex/libraries/video/movies
     server: 192.168.50.4
 
 ---
@@ -120,7 +120,32 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank01-4tb/plex/libraries/video/uhd-movies
+    path: /mnt/tank1600/plex/libraries/video/uhd-movies
+    server: 192.168.50.4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: plex-media-tv
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: plex-media-tv
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  capacity:
+    storage: 4Ti
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/tank1600/plex/libraries/video/tv-shows
     server: 192.168.50.4
 
 ---
@@ -145,7 +170,7 @@ spec:
     - hard
     - nfsvers=4.1
   nfs:
-    path: /mnt/tank01-4tb/tdarr/config
+    path: /mnt/tank0400/tdarr/config
     server: 192.168.50.4
 
 ---
@@ -247,6 +272,26 @@ spec:
   accessModes:
     - ReadWriteMany
   volumeName: plex-media-uhd-movies
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plex-media-tv
+  namespace: tdarr
+  labels:
+    app.kubernetes.io/name: plex-media-tv
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: tdarr
+spec:
+  resources:
+    requests:
+      storage: 4Ti
+  volumeMode: Filesystem
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
+  volumeName: plex-media-tv
 
 ---
 apiVersion: v1

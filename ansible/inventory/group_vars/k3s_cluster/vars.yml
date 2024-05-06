@@ -4,5 +4,5 @@ ansible_python_interpreter: /usr/bin/python3
 k3s_release_version: stable
 k3s_become: true
 # aws creds
-aws_access_key_id: "{{ vault_aws_access_key_id }}"
+aws_access_key_id: "{{ vault_aws_access_key_id }}" # ACMEKijowskiCasa
 aws_secret_access_key: "{{ vault_aws_secret_access_key }}"

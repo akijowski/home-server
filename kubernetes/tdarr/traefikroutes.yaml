@@ -48,7 +48,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`tdarr.k8s.home.kijowski.io`)
+    - match: Host(`tdarr.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: tdarr-server
@@ -72,7 +72,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`tdarr.k8s.home.kijowski.io`)
+    - match: Host(`tdarr.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: noop@internal

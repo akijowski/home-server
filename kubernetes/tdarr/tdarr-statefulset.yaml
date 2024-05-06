@@ -75,6 +75,8 @@ spec:
               mountPath: /opt/plex/libraries/movies
             - name: nfs-plex-media-uhd-movies
               mountPath: /opt/plex/libraries/uhd-movies
+            - name: nfs-plex-media-tv
+              mountPath: /opt/plex/libraries/tv-shows
       restartPolicy: Always
 
       volumes:
@@ -101,6 +103,9 @@ spec:
         - name: nfs-plex-media-uhd-movies
           persistentVolumeClaim:
             claimName: plex-media-uhd-movies
+        - name: nfs-plex-media-tv
+          persistentVolumeClaim:
+            claimName: plex-media-tv
 
       # Any filesystem mounted to the pod will be owned by this group
       securityContext:

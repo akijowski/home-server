@@ -35,7 +35,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`whoami.k8s.home.kijowski.io`)
+    - match: Host(`whoami.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: whoami
@@ -56,7 +56,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`whoami.k8s.home.kijowski.io`)
+    - match: Host(`whoami.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: noop@internal

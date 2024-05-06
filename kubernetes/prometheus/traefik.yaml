@@ -62,7 +62,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`prometheus.k8s.home.kijowski.io`)
+    - match: Host(`prometheus.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: prometheus
@@ -85,7 +85,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`prometheus.k8s.home.kijowski.io`)
+    - match: Host(`prometheus.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: noop@internal
@@ -107,7 +107,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`alertmanager.k8s.home.kijowski.io`)
+    - match: Host(`alertmanager.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: alertmanager
@@ -130,7 +130,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`alertmanager.k8s.home.kijowski.io`)
+    - match: Host(`alertmanager.k8s.kijowski.casa`)
       kind: Rule
       services:
         - name: noop@internal
