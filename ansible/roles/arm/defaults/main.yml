@@ -21,10 +21,10 @@ arm_docker_stop_script: stop_arm_container.sh
 
 nfs_mounts:
   - host: '192.168.50.4'
-    src: /mnt/tank00-4tb/autoripm/media
+    src: /mnt/tank0400/autoripm/media
     dest: "{{ arm_media_dir }}"
   - host: '192.168.50.4'
-    src: /mnt/tank00-4tb/autoripm/config
+    src: /mnt/tank0400/autoripm/config
     dest: "{{ arm_config_dir }}"
 
 use_docker: false
