@@ -1,8 +1,6 @@
 version: 3
 
 includes:
-  plex:
-    taskfile: plex.taskfile.yaml
   ansible:
     taskfile: ansible.Taskfile.yaml
     aliases:
@@ -16,3 +14,19 @@ silent: true
 
 tasks:
   default: task --list
+
+  terminal:
+    desc: open a terminal in the dev container
+    aliases:
+      - shell
+      - sh
+      - zsh
+    cmds:
+      - docker exec -it -w /workspaces/home-server -u vscode home_server_devcontainer /usr/bin/zsh
+
+  ssh:key:rm:
+    desc: Remove local ssh key hashs, use IVP4 variable
+    aliases:
+      - ssh:rm
+    cmds:
+      - 'ssh-keygen -R {{ .IPV4 }}'

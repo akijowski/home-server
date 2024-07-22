@@ -22,6 +22,15 @@ tasks:
 
   check-inv:
     desc: check proxmox inventory
+    aliases:
+      - inv
     dir: ansible
     cmds:
-      - ansible-inventory -i ./inventory --list
+      - 'ansible-inventory -i ./inventory --graph --vars {{ .ANSIBLE_HOST }}'
+
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html
+  hostvars:
+    desc: print hostvars for ANSIBLE_HOST
+    dir: ansible
+    cmds:
+      - ansible -i ./inventory -m ansible.builtin.setup {{ .ANSIBLE_HOST }} | tee hostvars | less
