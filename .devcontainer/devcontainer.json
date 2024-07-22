@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-	"name": "Ansible",
+	"name": "Home-Server",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
 	// set to vscode so that we can mount in to the vscode home dir
@@ -9,7 +9,7 @@
 	"runArgs": [
 		// make sure podman maps properly in a rootless container.  Not needed for Docker.
 		"--userns=keep-id:uid=1000,gid=1000",
-		"--name=home_server_ansible_devcontainer",
+		"--name=home_server_devcontainer",
 		"--env-file=${localWorkspaceFolder}/container.env"
 	],
 	"postCreateCommand": "pipx install --include-deps ansible",
@@ -17,7 +17,8 @@
 	// "updateRemoteUserUID": true,
 	"mounts": [
 		// https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
-		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly"
+		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly",
+		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube"
 	],
 	"containerEnv": {
 		"ANSIBLE_ROLES_PATH": "/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:${containerWorkspaceFolder}/ansible/roles",
@@ -28,7 +29,15 @@
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/go-task:1": {}
+		"ghcr.io/devcontainers-contrib/features/go-task:1": {},
+        "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+            "minikube": "none"
+        },
+		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
+			// space separated list
+			"plugins": "kubectl"
+		},
+		"ghcr.io/dhoeric/features/k9s:1": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -43,7 +52,8 @@
 			"extensions": [
 				"redhat.vscode-yaml",
 				"ms-python.python",
-				"wholroyd.jinja"
+				"wholroyd.jinja",
+				"ms-kubernetes-tools.vscode-kubernetes-tools"
 			]
 		}
 	}

@@ -13,7 +13,8 @@
 	"remoteUser": "vscode",
 	"mounts": [
 		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly",
-		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube"
+		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube",
+		"type=bind,src=${localEnv:HOME}/.1password,dst=/home/vscode/.1password"
 	],
 	"containerEnv": {
 		"KUBECONFIG": "/home/vscode/.kube/k3s.config"
