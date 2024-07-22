@@ -6,6 +6,17 @@
     pull: true
     state: present
 
+- name: Stop old containers
+  ansible.builtin.systemd_service:
+    name: "container-{{ arm_container_name}}"
+    state: stopped
+
+- name: Remove any existing container
+  containers.podman.podman_container:
+    name: "{{ arm_container_name }}"
+    image: "{{ arm_container_image }}:{{ arm_container_tag }}"
+    state: absent
+
 - name: Create podman container
   containers.podman.podman_container:
     name: "{{ arm_container_name }}"

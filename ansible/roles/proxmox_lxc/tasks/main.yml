@@ -42,3 +42,7 @@
     state: started
   when:
     - lxc_autostart
+  register: __lxc_started
+  until: __lxc_started is succeeded
+  retries: 6
+  delay: 10

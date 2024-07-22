@@ -68,7 +68,7 @@ spec:
     spec:
       containers:
         - name: tdarr-server
-          image: ghcr.io/haveagitgat/tdarr:2.17.01
+          image: ghcr.io/haveagitgat/tdarr:2.22.01
           imagePullPolicy: Always
           resources:
             limits:
