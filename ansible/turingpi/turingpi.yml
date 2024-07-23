@@ -1,43 +1,4 @@
-- name: TuringPi Prerequisites
-  hosts: turingpi_cluster
-  debugger: on_failed
-  become: true
-  # must use ask-become-pass (-K)
-  # You must use pubkey certs for ssh
-  # ssh-copy-id -i ~/.ssh/<pubkeyfile> ubuntu@<ipaddress>
-  tags:
-    - pre
-
-  tasks:
-  - name: Create Ansible Group
-    ansible.builtin.group:
-      name: ansible
-      system: true
-      state: present
-
-  - name: Create Ansible User
-    ansible.builtin.user:
-      name: ansible
-      group: ansible
-      create_home: true
-      shell: /bin/bash
-      comment: Ansible automation user
-      system: true
-      state: present
-
-  - name: Allow Ansible group to have passwordless sudo
-    ansible.builtin.copy:
-      content: "%ansible ALL=(ALL:ALL) NOPASSWD:ALL"
-      dest: /etc/sudoers.d/ansible
-      mode: '0440'
-      validate: '/usr/sbin/visudo -cf %s'
-
-  - name: Add SSH key for Ansible
-    ansible.posix.authorized_key:
-      user: ansible
-      state: present
-      key: 'https://github.com/akijowski.keys'
-
+# TODO: Not in use
 - name: TuringPi Init
   hosts: turingpi_cluster
   debugger: on_failed
@@ -66,6 +27,7 @@
         name:
           - nfs-common
           - fail2ban
+          - net-tools
           - unzip
           - vim
         state: latest
@@ -74,11 +36,6 @@
       ansible.builtin.stat:
         path: /var/run/reboot-required
       register: reboot_required
-
-    - name: Check if cloud init is installed.
-      ansible.builtin.stat:
-        path: "/etc/cloud/templates/hosts.debian.tmpl"
-      register: cloud_installed
 
     - name: Report if reboot is needed.
       ansible.builtin.debug:
@@ -95,28 +52,6 @@
         test_command: whoami
       when: reboot_required.stat.exists
 
-# https://linuxconfig.org/netplan-network-configuration-tutorial-for-beginners
-    - name: Disable cloud-init from changing network config
-      ansible.builtin.copy:
-        content: |
-          network: {config: disabled}
-        dest: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
-        owner: root
-        group: root
-        mode: 0644
-      when: cloud_installed.stat.exists
-
-    - name: Configure netplan with static IP
-      ansible.builtin.template:
-        src: templates/netplan.yaml.j2
-        dest: /etc/netplan/60-static-ip.yaml
-        owner: root
-        group: root
-        mode: 0600
-      when: cloud_installed.stat.exists
-      notify:
-        - netplan apply
-
     - name: Remove old packages from the cache
       ansible.builtin.apt:
         autoclean: yes
@@ -125,9 +60,3 @@
       ansible.builtin.apt:
         autoremove: yes
         purge: yes
-
-  handlers:
-  # this will hang :(
-  # to consider: https://serverfault.com/questions/1123343/how-to-handle-network-changes-and-restart-with-ansible
-    - name: netplan apply
-      ansible.builtin.command: netplan apply

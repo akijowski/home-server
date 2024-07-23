@@ -8,12 +8,9 @@ network:
                 name: eth*
             dhcp4: false
             addresses:
-                - {{ init_static_ip4 }}
+                - {{ static_ip4 | ansible.utils.ipaddr('host') }}
             nameservers:
-                addresses:
-                    - 192.168.50.2
-                    - 9.9.9.10
-                    - 192.168.50.1
+                addresses: {{ nameservers | ansible.utils.ipaddr }}
             routes:
                 - to: default
-                  via: 192.168.50.1
+                  via: {{ gateway | ansible.utils.ipaddr }}

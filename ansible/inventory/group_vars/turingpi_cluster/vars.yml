@@ -1,2 +1,18 @@
-ansible_user: ansible
-ansible_python_interpreter: /usr/bin/python3
+# Used to configure static IP addresses on the machine
+nameservers:
+  - '192.168.50.1'
+  - '9.9.9.10'
+gateway: '192.168.50.1'
+# Email settings
+unattended_email: agkijow@gmail.com
+# Default packages
+apt_default_packages:
+  - curl
+  - wget
+  - fail2ban
+  - vim
+  - unzip
+  - gpg
+  - mailutils
+  - ufw
+  - git
