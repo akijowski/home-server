@@ -1,0 +1,10 @@
+apt_default_packages:
+  - curl
+  - wget
+  - fail2ban
+  - vim
+  - unzip
+  - gpg
+  - mailutils
+  - ufw
+  - git

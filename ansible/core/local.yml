@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook
+---
+- name: Copy SSH Config
+  hosts:
+    - all
+  debugger: on_failed
+  tags:
+    - ssh_config
+  tasks:
+    - name: Copy SSH Config to local directory
+      delegate_to: 127.0.0.1
+      ansible.builtin.template:
+        src: templates/ssh.conf.j2
+        dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.ssh/config.d/{{ hostname }}.conf"
+      vars:
+        hostname: '{{ ssh_cfg_hostname | default(inventory_hostname) }}'
+        ssh_user: '{{ ssh_cfg_user | default(ansible_user) }}'

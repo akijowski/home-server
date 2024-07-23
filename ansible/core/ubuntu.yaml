@@ -1,0 +1,134 @@
+---
+# https://docs.ansible.com/ansible/latest/reference_appendices/general_precedence.html
+# use -e 'ansible_user=root' to override the default user set in inventory vars
+- name: Update APT packages
+  hosts:
+    - ubuntu
+    - turingpi_cluster
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+    - packages
+  tasks:
+    - name: Update packages
+      ansible.builtin.apt:
+        upgrade: true
+        update_cache: true
+        autoclean: true
+        autoremove: true
+        cache_valid_time: 86400 # 1 day
+        state: present
+      register: upgrade
+      retries: 30 # 5 minutes
+      delay: 10
+      until: upgrade is success
+
+- name: Initialize Ubuntu System
+  hosts:
+    - ubuntu
+    - turingpi_cluster
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+    - base
+  tasks:
+    - name: Update packages
+      ansible.builtin.apt:
+        upgrade: true
+        state: present
+
+    - name: Install base packages
+      ansible.builtin.apt:
+        update_cache: true
+        autoclean: true
+        autoremove: true
+        cache_valid_time: 86400 # 1 day
+        name: "{{ apt_default_packages }}"
+        state: latest
+
+- name: Ensure default users exist
+  hosts:
+    - ubuntu
+    - turingpi_cluster
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+    - users
+  tasks:
+    - name: Create Ansible Group
+      ansible.builtin.group:
+        name: ansible
+        system: true
+        state: present
+
+    - name: Create Ansible User
+      ansible.builtin.user:
+        name: ansible
+        group: ansible
+        create_home: true
+        shell: /bin/bash
+        comment: Ansible automation user
+        system: true
+        state: present
+
+    - name: Allow Ansible group to have passwordless sudo
+      ansible.builtin.copy:
+        content: "%ansible ALL=(ALL:ALL) NOPASSWD:ALL"
+        dest: /etc/sudoers.d/ansible
+        mode: '0440'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: Add SSH key for Ansible
+      ansible.posix.authorized_key:
+        user: ansible
+        state: present
+        key: 'https://github.com/akijowski.keys'
+
+- name: Ensure base security applied
+  hosts:
+    - ubuntu
+    - turingpi_cluster
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+    - security
+  tasks:
+    - name: Install unattended upgrades
+      ansible.builtin.import_role:
+        name: hifis.unattended_upgrades
+      vars:
+        unattended_automatic_reboot: true
+        unattended_syslog_enable: true
+        unattended_email: "{{ unattended_email }}"
+        unattended_mail_only_on_error: true
+
+    - name: Disable password authentication for root
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+
+    - name: UFW - Allow SSH connections
+      community.general.ufw:
+        rule: allow
+        name: OpenSSH
+      notify:
+        - restart ufw
+
+    - name: UFW - Deny all other incoming traffic by default
+      community.general.ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+      notify:
+        - restart ufw
+
+  handlers:
+    - name: restart ufw
+      community.general.ufw:
+        state: reloaded
