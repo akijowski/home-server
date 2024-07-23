@@ -9,22 +9,25 @@ metadata:
 spec:
     # it seems best to keep these helm values together in a single crd
   valuesContent: |-
+    image:
+      name: traefik
+      tag: 3.1
     logs:
       general:
         level: INFO
     envFrom:
-        - secretRef:
-            name: dns-aws-credentials
-        - configMapRef:
-            name: aws-config
+      - secretRef:
+          name: dns-aws-credentials # dns-secrets.yaml
+      - configMapRef:
+          name: aws-config #traefik-env.yaml
     certResolvers:
-        aws-dns: # acme is added automatically
-          email: {{ aws_dns_email }}
-          storage: /data/acme.json # must match persistence
-          #caServer: https://acme-staging-v02.api.letsencrypt.org/directory
-          caServer: https://acme-v02.api.letsencrypt.org/directory
-          dnsChallenge:
-              provider: route53
+      aws-dns: # acme is added automatically
+        email: {{ aws_dns_email }}
+        storage: /data/acme.json # must match persistence
+        #caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+        caServer: https://acme-v02.api.letsencrypt.org/directory
+        dnsChallenge:
+          provider: route53
     persistence:
-        enabled: true
-        # defaults to creating a /data directory
+      enabled: true
+      # defaults to creating a /data directory

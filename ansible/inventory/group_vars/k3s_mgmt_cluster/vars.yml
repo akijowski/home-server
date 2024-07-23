@@ -4,8 +4,3 @@ k3s_become: true
 # https://github.com/PyratLabs/ansible-role-k3s/blob/main/README.md#important-note-about-k3s_install_hard_links
 # converting symbolic links to hard links: https://superuser.com/a/560610
 k3s_install_hard_links: true
-# aws creds
-aws_access_key_id: "{{ vault_aws_access_key_id }}" # ACMEKijowskiCasa
-aws_secret_access_key: "{{ vault_aws_secret_access_key }}"
-aws_dns_email: agkijow@gmail.com
-aws_hosted_zone_id: Z04339162XE6R6IN7WK59 # kijowski.casa

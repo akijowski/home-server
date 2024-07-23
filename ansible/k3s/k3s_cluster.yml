@@ -1,114 +1,83 @@
 ---
 # https://github.com/PyratLabs/ansible-role-k3s
-- name: K3s Prerequisites
-  hosts: k3s_cluster
-  debugger: on_failed
-  become: true
-  # need ask-become-pass flag (-K)
-  remote_user: k3s
-  tags:
-    - pre
-
-  tasks:
-  - name: Create Ansible Group
-    ansible.builtin.group:
-      name: ansible
-      system: true
-      state: present
-
-  - name: Create Ansible User
-    ansible.builtin.user:
-      name: ansible
-      group: ansible
-      create_home: true
-      shell: /bin/bash
-      comment: Ansible automation user
-      system: true
-      state: present
-
-  - name: Allow Ansible group to have passwordless sudo
-    ansible.builtin.copy:
-      content: "%ansible ALL=(ALL:ALL) NOPASSWD:ALL"
-      dest: /etc/sudoers.d/ansible
-      mode: '0440'
-      validate: '/usr/sbin/visudo -cf %s'
-
-  - name: Add SSH key for Ansible
-    ansible.posix.authorized_key:
-      user: ansible
-      state: present
-      key: 'https://github.com/akijowski.keys'
-
-- name: K3s Node Init
-  hosts: k3s_cluster
+- name: K3s Install
+  hosts:
+    - k3s_cluster
+    - k3s_mgmt_cluster
   become: true
   tags:
-    - init
-
-  tasks:
+    - install
+  pre_tasks:
     - name: Install requirements
       ansible.builtin.apt:
         name:
           - nfs-common
+          - wireguard # for wireguard-native CNI
         update_cache: true
+    # https://docs.k3s.io/installation/requirements?os=pi#operating-systems
+    - name: Install rpi kernal patches
+      ansible.builtin.apt:
+        name:
+          - linux-modules-extra-raspi
+      when: is_raspberry_pi
+
+    - name: Is UFW Installed
+      ansible.builtin.command: which ufw
+      ignore_errors: true
+      register: ufw_installed
 
     - name: Disable UFW
       community.general.ufw:
         state: disabled
-
-- name: K3s Install
-  hosts: k3s_cluster
-  become: true
-  tags:
-    - install
-
+      when: ufw_installed.stdout
   tasks:
-    - name: Build cluster with single control node
+    - name: Build cluster
       ansible.builtin.include_role:
         name: xanmanning.k3s
-      vars:
-        aws_dns_email: agkijow@gmail.com
-        aws_hosted_zone_id: Z04339162XE6R6IN7WK59 # kijowski.casa
-        # https://github.com/PyratLabs/ansible-role-k3s/blob/main/README.md#important-note-about-k3s_install_hard_links
-        # converting symbolic links to hard links: https://superuser.com/a/560610
-        k3s_install_hard_links: true
-        # file names must be kabab-case: https://docs.k3s.io/installation/packaged-components#file-naming-requirements
-        # available traefik helm options: https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
-        k3s_server_manifests_templates:
-          - 'manifests/dns-secrets.yaml.j2'
-          - 'manifests/traefik-env.yaml.j2'
-          - 'manifests/traefik-config.yaml.j2'
-          # - 'manifests/k8s-dashboard.yaml.j2'
-        k3s_server_manifests_urls:
-          - url: 'https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.70.0/stripped-down-crds.yaml'
-            filename: prometheus-operator.yaml
 
 - name: Copy kubeconfig to local machine
-  hosts: k3s_cluster
+  hosts:
+    - k3s_cluster
+    - k3s_mgmt_cluster
   become: true
   tags:
     - copy_config
-
   tasks:
     # - name: debug
     #   ansible.builtin.debug:
     #     msg: "{{ hostvars['kube-0'].ansible_host }}"
 
-    - name: "Get host IP for {{ controller_node }}"
-      ansible.builtin.set_fact:
-        controller_ip: "{{ hostvars[controller_node].ansible_host }}"
-      vars:
-        controller_node: kube-0
+    - name: Find kubeconfig on server
+      ansible.builtin.stat:
+        path: /etc/rancher/k3s/k3s.yaml
+      register: __has_config
 
     - name: Copy kubeconfig to local machine
-      ansible.builtin.fetch:
-        src: /etc/rancher/k3s/k3s.yaml
-        dest: /home/vscode/.kube/k3s.config
-        flat: yes
+      when: __has_config
+      block:
+        - name: "Get host IP for {{ inventory_hostname }}"
+          ansible.builtin.set_fact:
+            controller_ip: "{{ ansible_host }}"
 
-    - name: Add controller IP
-      delegate_to: 127.0.0.1
-      ansible.builtin.replace:
-        path: /home/vscode/.kube/k3s.config
-        regexp: '(?P<proto>http(s?)://)(?P<uri>\d{0,3}.\d{0,3}.\d{0,3}.\d{0,3})(?P<port>:\d+)$'
-        replace: "\\g<proto>{{ controller_ip }}\\g<port>"
+        # If needed at some point
+        # https://stackoverflow.com/a/58665099
+
+        - name: Copy file
+          ansible.builtin.fetch:
+            src: /etc/rancher/k3s/k3s.yaml
+            dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube/{{ group_names | last }}_{{ inventory_hostname }}.yaml"
+            flat: yes
+
+        - name: Add controller IP
+          delegate_to: 127.0.0.1
+          ansible.builtin.replace:
+            path: "/home/vscode/.kube/{{ group_names | last }}_{{ inventory_hostname }}.yaml"
+            regexp: '(?P<proto>http(s?)://)(?P<uri>\d{0,3}.\d{0,3}.\d{0,3}.\d{0,3})(?P<port>:\d+)$'
+            replace: "\\g<proto>{{ controller_ip }}\\g<port>"
+
+        - name: Update context name
+          delegate_to: 127.0.0.1
+          ansible.builtin.replace:
+            path: "/home/vscode/.kube/{{ group_names | last }}_{{ inventory_hostname }}.yaml"
+            regexp: 'default\b$'
+            replace: "{{ group_names | last }}"

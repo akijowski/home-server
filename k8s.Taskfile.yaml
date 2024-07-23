@@ -11,3 +11,11 @@ tasks:
       - zsh
     cmds:
       - docker exec -it -w /workspaces/home-server-k8s -u vscode home_server_k8s_devcontainer /usr/bin/zsh
+
+# https://stackoverflow.com/questions/46184125/how-to-merge-kubectl-config-file-with-kube-config
+  config:
+    desc: merge k3s cluster configs to a single config
+    aliases:
+      - merge
+    cmds:
+      - ./bin/merge_k8s_config

@@ -19,7 +19,7 @@ Also, the role seemed to have only occasional support compared to this actively 
 ## How it is used
 
 K3s is used as the Kubernetes cluster for my entire homelab.
-The cluster will run most workloads that do not require certain hardware requirements or privledges.
+The cluster will run most workloads that do not require certain hardware requirements or privileges.
 It will also make for a nice testbed for experiments.
 
 ## Useful operations
@@ -36,4 +36,10 @@ $ ansible-playbook -i ./inventory k3s/k3s_cluster.yml --become --tags install -e
 
 ```bash
 $ ansible-playbook -i ./inventory k3s/k3s_cluster.yml --become --tags install -e 'k3s_state=stopped'
+```
+
+### Run for management cluster
+
+```bash
+$ ansible-playbook -i ./inventory --limit k3s_mgmt_cluster k3s/k3s_cluster.yml --tags install
 ```

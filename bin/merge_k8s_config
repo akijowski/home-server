@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+CONFIGS="$HOME/.kube/config:$HOME/.kube/k3s.config:$HOME/.kube/k3s_mgmt_cluster_rpi-0.yaml"
+
+function merge() {
+    KUBECONFIG="$CONFIGS" kubectl config view --flatten --merge > "$HOME/.kube/config"
+}
+
+function main() {
+    merge
+}
+
+main "$@"
