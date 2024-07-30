@@ -100,5 +100,4 @@ ssl
 
 .secrets/
 
-*.env
 !*_example.env

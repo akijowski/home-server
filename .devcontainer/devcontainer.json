@@ -9,8 +9,8 @@
 	"runArgs": [
 		// make sure podman maps properly in a rootless container.  Not needed for Docker.
 		"--userns=keep-id:uid=1000,gid=1000",
-		"--name=home_server_devcontainer",
-		"--env-file=${localWorkspaceFolder}/container.env"
+		"--name=home_server_devcontainer"
+		// "--env-file=${localWorkspaceFolder}/container.env"
 	],
 	"postCreateCommand": "pipx install --include-deps ansible",
 	"postStartCommand": "task ansible:install",
@@ -29,6 +29,7 @@
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
+		"ghcr.io/devcontainers-contrib/features/direnv:1": {},
 		"ghcr.io/devcontainers-contrib/features/go-task:1": {},
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
             "minikube": "none"
