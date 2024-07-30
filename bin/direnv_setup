@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+function config() {
+    mkdir -p ~/.config/direnv
+
+    toml=$(cat <<EOF
+[global]
+load_dotenv = true
+
+EOF
+)
+    echo "$toml" > ~/.config/direnv/direnv.toml
+}
+
+function profile() {
+    echo -e 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+}
+
+function main() {
+    echo "WARNING! This should only be run once"
+    config
+    profile
+}
+
+main "$@"

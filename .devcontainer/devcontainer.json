@@ -12,7 +12,7 @@
 		"--name=home_server_devcontainer"
 		// "--env-file=${localWorkspaceFolder}/container.env"
 	],
-	"postCreateCommand": "pipx install --include-deps ansible",
+	"postCreateCommand": "task devcontainer:postcreate",
 	"postStartCommand": "task ansible:install",
 	// "updateRemoteUserUID": true,
 	"mounts": [

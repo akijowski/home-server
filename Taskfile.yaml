@@ -15,6 +15,12 @@ silent: true
 tasks:
   default: task --list
 
+  devcontainer:postcreate:
+    desc: postCreate commands for dev container
+    cmds:
+      - pipx install --include-deps ansible
+      - ./bin/direnv_setup
+
   terminal:
     desc: open a terminal in the dev container
     aliases:

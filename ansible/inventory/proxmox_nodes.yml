@@ -1,0 +1,6 @@
+proxmox_nodes:
+  hosts:
+    hyperion:
+      ansible_host: 192.168.50.3
+    phoebe:
+      ansible_host: 192.168.50.6
