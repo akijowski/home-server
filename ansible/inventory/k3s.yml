@@ -36,6 +36,13 @@ k3s_mgmt_cluster:
       ansible_host: 192.168.50.23
       is_raspberry_pi: false # used to install specific binaries based on hardware, like custom kernal patches
       k3s_control_node: true
+      k3s_server_manifests_templates:
+        - 'manifests/cluster-upgrade.yaml.j2'
+      k3s_server_manifests_urls:
+        - url: 'https://github.com/rancher/system-upgrade-controller/releases/download/v0.13.4/system-upgrade-controller.yaml'
+          filename: system-upgrade-controller.yaml
+        - url: 'https://github.com/rancher/system-upgrade-controller/releases/download/v0.13.4/crd.yaml'
+          filename: system-upgrade-controller-crd.yaml
       k3s_server:
         flannel-backend: 'wireguard-native'
         node-label:
