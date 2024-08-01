@@ -17,10 +17,12 @@
 	// "updateRemoteUserUID": true,
 	"mounts": [
 		// https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
-		"type=bind,src=${localEnv:HOME}/.ssh,dst=/home/vscode/.ssh,readonly",
-		"type=bind,src=${localEnv:HOME}/.kube,dst=/home/vscode/.kube"
+		"type=bind,src=${localEnv:HOME}/.1password,dst=${containerEnv:HOME}/.1password",
+		"type=bind,src=${localEnv:HOME}/.ssh,dst=${containerEnv:HOME}/.ssh",
+		"type=bind,src=${localEnv:HOME}/.kube,dst=${containerEnv:HOME}/.kube"
 	],
 	"containerEnv": {
+		"SSH_AUTH_SOCK": "${containerEnv:HOME}/.1password/agent.sock",
 		"ANSIBLE_ROLES_PATH": "/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:${containerWorkspaceFolder}/ansible/roles",
 		"ANSIBLE_VAULT_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.vault_pass.txt",
 		"ANSIBLE_BECOME_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.become_pass.txt"
