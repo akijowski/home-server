@@ -18,10 +18,21 @@ function profile() {
     echo -e 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 }
 
+function direnv_allow() {
+    if [ -n "$(command -v direnv)" ]; then
+        direnv allow /workspaces/home-server
+    else
+        echo "direnv not installed!"
+    fi
+}
+
 function main() {
+    echo "Creating config for direnv"
     echo "WARNING! This should only be run once"
     config
     profile
+    direnv_allow
+    echo "Reload shell to complete setup"
 }
 
 main "$@"
