@@ -158,6 +158,7 @@
         ttl: 7200
         value: "{{ item.value }}"
         wait: false
+        overwrite: true
         aws_access_key_id: "{{ dns_aws_access_key_id }}"
         aws_secret_access_key: "{{ dns_aws_secret_access_key }}"
       loop: "{{ dns_record_sets }}"

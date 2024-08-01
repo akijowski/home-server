@@ -2,7 +2,7 @@ dns_aws_access_key_id: "{{ vault_dns_aws_access_key_id }}"
 dns_aws_secret_access_key: "{{ vault_dns_aws_secret_access_key }}"
 dns_record_sets:
   - record: proxmox.kijowski.casa
-    value: "192.168.50.3"
+    value: "192.168.50.3,192.168.50.6,192.168.50.9"
   - record: truenas.kijowski.casa
     value: "192.168.50.4"
   - record: "*.k8s.kijowski.casa"
@@ -13,3 +13,5 @@ dns_record_sets:
     value: "192.168.50.13"
   - record: homebridge.kijowski.casa
     value: "192.168.50.15"
+  - record: "*.mgmt.k8s.kijowski.casa"
+    value: "192.168.50.23"
