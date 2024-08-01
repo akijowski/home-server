@@ -39,7 +39,6 @@
   hosts:
     - k3s_cluster
     - k3s_mgmt_cluster
-  become: true
   tags:
     - copy_config
   tasks:
@@ -55,6 +54,12 @@
     - name: Copy kubeconfig to local machine
       when: __has_config
       block:
+        - name: Ensure config directory on local machine
+          delegate_to: 127.0.0.1
+          ansible.builtin.file:
+            path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube"
+            state: directory
+
         - name: "Get host IP for {{ inventory_hostname }}"
           ansible.builtin.set_fact:
             controller_ip: "{{ ansible_host }}"
@@ -63,6 +68,7 @@
         # https://stackoverflow.com/a/58665099
 
         - name: Copy file
+          become: true
           ansible.builtin.fetch:
             src: /etc/rancher/k3s/k3s.yaml
             dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube/{{ group_names | last }}_{{ inventory_hostname }}.yaml"

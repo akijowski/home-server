@@ -8,10 +8,12 @@ metadata:
   namespace: kube-system
 spec:
     # it seems best to keep these helm values together in a single crd
+    # https://github.com/traefik/traefik-helm-chart/blob/v25.0.0/traefik/VALUES.md
   valuesContent: |-
-    image:
-      repository: "traefik"
-      tag: "3.1"
+    # This helm chart is locked at v2 of Traefik. K3s is managing the compatible Traefik versions.
+    # image:
+    #   repository: "traefik"
+    #   tag: "3.1"
     logs:
       general:
         level: INFO
