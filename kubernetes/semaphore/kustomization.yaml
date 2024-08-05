@@ -24,6 +24,7 @@ configMapGenerator:
       - SEMAPHORE_ADMIN_PASSWORD=changeme
       - SEMAPHORE_ADMIN_NAME=Administrator
       - SEMAPHORE_ADMIN_EMAIL=admin@localhost
+      - TZ=UTC
 
   - name: semaphore-pip-requirements
     files:
