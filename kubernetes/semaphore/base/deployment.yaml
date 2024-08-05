@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: semaphore
+spec:
+  selector:
+    app: semaphore
+  ports:
+  - port: 3000
+    targetPort: web
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: semaphore
+spec:
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: semaphore
+  template:
+    metadata:
+      labels:
+        app: semaphore
+    spec:
+      containers:
+      - name: semaphore
+        image: semaphoreui/semaphore:latest
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 3000
+          name: web
+        envFrom:
+          - configMapRef:
+              name: semaphore-env-vars
+        volumeMounts:
+          - name: pip-reqs
+            mountPath: /etc/semaphore
+      volumes:
+      - name: pip-reqs
+        configMap:
+          name: semaphore-pip-requirements

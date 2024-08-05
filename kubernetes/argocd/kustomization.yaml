@@ -5,6 +5,7 @@ namespace: argocd
 resources:
   - base/argocd-namespace.yaml
   - base/traefik-ingressroute.yaml
+  - base/apps.yaml
   - https://raw.githubusercontent.com/argoproj/argo-cd/v2.7.2/manifests/install.yaml
 
 patches:

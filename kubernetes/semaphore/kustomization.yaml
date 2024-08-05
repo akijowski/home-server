@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: semaphore
+
+commonLabels:
+  app: semaphore
+  app.kubernetes.io/name: semaphore
+  app.kubernetes.io/part-of: semaphore
+
+resources:
+  - base/deployment.yaml
+  - base/traefik.yaml
+
+replicas:
+  - name: semaphore
+    count: 1
+
+configMapGenerator:
+  - name: semaphore-env-vars
+    literals:
+      - SEMAPHORE_DB_DIALECT=bolt
+      - SEMAPHORE_ADMIN=admin
+      - SEMAPHORE_ADMIN_PASSWORD=changeme
+      - SEMAPHORE_ADMIN_NAME=Administrator
+      - SEMAPHORE_ADMIN_EMAIL=admin@localhost
+
+  - name: semaphore-pip-requirements
+    files:
+      - pip_requirements.txt
+
+images:
+  - name: semaphoreui/semaphore
+    newTag: v2.10.22

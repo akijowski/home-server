@@ -1,0 +1,55 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: TraefikService
+metadata:
+  name: semaphore
+spec:
+  weighted:
+    services:
+      - name: semaphore
+        kind: Service
+        port: web
+---
+# Redirect to https
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: semaphore-redirect-https
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: semaphore-tls
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`semaphore.mgmt.k8s.kijowski.casa`)
+      kind: Rule
+      services:
+        - name: semaphore
+          kind: TraefikService
+
+  tls:
+    certResolver: aws-dns
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: semaphore
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`semaphore.mgmt.k8s.kijowski.casa`)
+      kind: Rule
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+        - name: semaphore-redirect-https
