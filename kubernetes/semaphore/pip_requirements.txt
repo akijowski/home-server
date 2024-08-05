@@ -1,4 +1,3 @@
-ansible-lint
 requests
 jmespath
 # used for proxmox inventory plugin
