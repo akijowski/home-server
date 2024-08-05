@@ -42,9 +42,19 @@ spec:
           - configMapRef:
               name: semaphore-env-vars
         volumeMounts:
+          - name: semaphore-home
+            mountPath: /home/semaphore
+          - name: semaphore-temp
+            mountPath: /tmp/semaphore
           - name: pip-reqs
             mountPath: /etc/semaphore
+      securityContext:
+        fsGroup: 1001 # pulled from running container
       volumes:
+      - name: semaphore-home
+        emptyDir: {}
+      - name: semaphore-temp
+        emptyDir: {}
       - name: pip-reqs
         configMap:
           name: semaphore-pip-requirements
