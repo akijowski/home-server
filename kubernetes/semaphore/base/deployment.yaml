@@ -49,7 +49,7 @@ spec:
           - name: semaphore-etc
             mountPath: /etc/semaphore
           - name: pip-reqs
-            mountPath: /etc/semaphore/pip_requirements.txt
+            mountPath: /etc/semaphore/requirements.txt
             subPath: pip_requirements.txt
       securityContext:
         fsGroup: 1001 # pulled from running container

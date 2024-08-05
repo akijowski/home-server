@@ -19,6 +19,7 @@ replicas:
 configMapGenerator:
   - name: semaphore-env-vars
     literals:
+      - SEMAPHORE_PORT=3000
       - SEMAPHORE_DB_DIALECT=bolt
       - SEMAPHORE_ADMIN=admin
       - SEMAPHORE_ADMIN_PASSWORD=changeme
