@@ -10,3 +10,6 @@ resources:
 
 patches:
   - path: overlays/production/argocd-cmd-params-cm.yaml
+  - path: overlays/production/argocd-cm.yaml
+  - path: overlays/production/argocd-rbac-cm.yaml
+  - path: overlays/production/argocd-server-cluster-role.yaml

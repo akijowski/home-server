@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+data:
+  policy.web-terminal.csv: |
+    p, role:admin, exec, create, */*, allow
