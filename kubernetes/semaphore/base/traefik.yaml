@@ -29,6 +29,8 @@ spec:
   headers:
     customRequestHeaders:
       X-Forwarded-Proto: "https"
+      Connection: keep-alive, Upgrade
+      Upgrade: WebSocket
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -39,6 +41,13 @@ spec:
     - websecure
   routes:
     - match: Host(`semaphore.mgmt.k8s.kijowski.casa`)
+      priority: 10
+      kind: Rule
+      services:
+        - name: semaphore
+          kind: TraefikService
+    - match: Host(`semaphore.mgmt.k8s.kijowski.casa`) && PathPrefix(`/api/ws`)
+      priority: 11
       middlewares:
         - name: semaphore-headers-ws
       kind: Rule
