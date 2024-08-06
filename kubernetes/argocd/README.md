@@ -14,6 +14,22 @@ Right now, that means setting up an ssh connection to this repo.
 Additional Apps are managed in the [argoapps directory](../argoapps/).
 This App of Apps is deployed with this Kustomization file: [here](./base/apps.yaml).
 
+## Test
+
+Test the Kustomization with:
+
+```shell
+/workspaces/home-server/kubernetes/argocd $ kubectl kustomize | less
+```
+
+## Apply
+
+Apply the Kustomization with:
+
+```shell
+/workspaces/home-server/kubernetes/argocd $ kubectl apply -k .
+```
+
 ## Links
 
 - [ArgoCD Docs: Install with Kustomize](https://argo-cd.readthedocs.io/en/stable/operator-manual/installation/#kustomize)

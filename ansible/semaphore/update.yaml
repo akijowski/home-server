@@ -1,0 +1,14 @@
+# Inspired from: https://github.com/semaphoreui/semaphore/issues/2025
+# Run this as a task within semaphore to update the local roles and collections
+# The requirements.yml should be created as part of the kubernetes deployment
+---
+- name: Install or upgrade Ansible collections and roles
+  hosts: localhost
+  tasks:
+    - name: Install or upgrade collections
+      command: ansible-galaxy collection install --upgrade -r /home/semaphore/requirements.yml
+      ignore_errors: yes
+
+    - name: Install roles
+      command: ansible-galaxy role install --force -r /home/semaphore/requirements.yml
+      ignore_errors: yes

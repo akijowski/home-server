@@ -31,6 +31,10 @@ configMapGenerator:
     files:
       - pip_requirements.txt
 
+  - name: semaphore-ansible-galaxy
+    files:
+      - requirements.yml
+
 images:
   - name: semaphoreui/semaphore
     newTag: v2.10.22

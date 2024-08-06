@@ -53,6 +53,9 @@ spec:
           - name: pip-reqs
             mountPath: /etc/semaphore/requirements.txt
             subPath: pip_requirements.txt
+          - name: ansible-reqs
+            mountPath: /home/semaphore/requirements.yml
+            subPath: requirements.yml
       securityContext:
         fsGroup: 1001 # pulled from running container
       volumes:
@@ -65,3 +68,6 @@ spec:
       - name: pip-reqs
         configMap:
           name: semaphore-pip-requirements
+      - name: ansible-reqs
+        configMap:
+          name: semaphore-ansible-galaxy
