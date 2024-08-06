@@ -1,0 +1,6 @@
+roles:
+  - name: hifis.unattended_upgrades
+  - name: cloudalchemy.coredns
+  - name: xanmanning.k3s
+  # - name: geerlingguy.docker
+  # - name: cloudalchemy.node_exporter
