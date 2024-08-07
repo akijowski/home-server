@@ -3,29 +3,42 @@
 # use -e 'ansible_user=root' to override the default user set in inventory vars
 - name: Ensure default users exist
   hosts:
-    - ubuntu
-    - turingpi_cluster
+    - proxmox_nodes
   debugger: on_failed
   become: true
   tags:
     - init
     - users
-  tasks:
-    - name: Create Ansible Group
-      ansible.builtin.group:
-        name: ansible
+  vars:
+    users:
+      - name: ansible
         system: true
+        comment: Ansible automation user
+      - name: admin
+        system: false
+        comment: Admin user
+  tasks:
+    - name: Create Default Groups
+      ansible.builtin.group:
+        name: "{{ item.name }}"
+        system: "{{ item.system }}"
         state: present
+      loop: "{{ users }}"
+      loop_control:
+        label: "{{ item.name }}"
 
-    - name: Create Ansible User
+    - name: Create Default Users
       ansible.builtin.user:
-        name: ansible
-        group: ansible
+        name: "{{ item.name }}"
+        group: "{{ item.name }}"
         create_home: true
         shell: /bin/bash
-        comment: Ansible automation user
-        system: true
+        comment: "{{ item.comment }}"
+        system: "{{ item.system }}"
         state: present
+      loop: "{{ users }}"
+      loop_control:
+        label: "{{ item.name }}"
 
     - name: Allow Ansible group to have passwordless sudo
       ansible.builtin.copy:
@@ -34,16 +47,19 @@
         mode: '0440'
         validate: '/usr/sbin/visudo -cf %s'
 
-    - name: Add SSH key for Ansible
+    - name: Add SSH key
       ansible.posix.authorized_key:
-        user: ansible
+        user: "{{ item }}"
         state: present
         key: 'https://github.com/akijowski.keys'
+      loop:
+        - ansible
+        - admin
 
+# Note: Proxmox automatically updates packages on a schedule. This may not be necessary
 - name: Update APT packages
   hosts:
-    - ubuntu
-    - turingpi_cluster
+    - proxmox_nodes
   debugger: on_failed
   become: true
   tags:
@@ -59,14 +75,13 @@
         cache_valid_time: 86400 # 1 day
         state: present
       register: upgrade
-      retries: 30 # 5 minutes
-      delay: 10
+      retries: 30 # 10 minutes
+      delay: 20
       until: upgrade is success
 
 - name: Ensure base packages
   hosts:
-    - ubuntu
-    - turingpi_cluster
+    - proxmox_nodes
   debugger: on_failed
   become: true
   tags:
@@ -87,48 +102,6 @@
         name: "{{ apt_default_packages }}"
         state: latest
 
-- name: Ensure base security applied
-  hosts:
-    - ubuntu
-    - turingpi_cluster
-  debugger: on_failed
-  become: true
-  tags:
-    - init
-    - security
-  tasks:
-    - name: Install unattended upgrades
-      ansible.builtin.import_role:
-        name: hifis.unattended_upgrades
-      vars:
-        unattended_automatic_reboot: true
-        unattended_syslog_enable: true
-        unattended_email: "{{ unattended_email }}"
-        unattended_mail_only_on_error: true
-
-    - name: Disable password authentication for root
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        state: present
-        regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin prohibit-password'
-
-    - name: UFW - Allow SSH connections
-      community.general.ufw:
-        rule: allow
-        name: OpenSSH
-      notify:
-        - restart ufw
-
-    - name: UFW - Deny all other incoming traffic by default
-      community.general.ufw:
-        state: enabled
-        policy: deny
-        direction: incoming
-      notify:
-        - restart ufw
-
-  handlers:
-    - name: restart ufw
-      community.general.ufw:
-        state: reloaded
+# - name: Ensure base configuration
+# download helper scripts
+# run helper scripts
