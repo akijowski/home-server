@@ -95,6 +95,10 @@
       ansible.builtin.apt:
         upgrade: true
         state: present
+      register: upgrade
+      retries: 30 # 10 minutes
+      delay: 20
+      until: upgrade is success
 
     - name: Install base packages
       ansible.builtin.apt:
