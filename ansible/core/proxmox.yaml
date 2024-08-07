@@ -4,7 +4,6 @@
 - name: Ensure default users exist
   hosts:
     - proxmox_nodes
-  debugger: on_failed
   become: true
   tags:
     - init
@@ -60,7 +59,6 @@
 - name: Update APT packages
   hosts:
     - proxmox_nodes
-  debugger: on_failed
   become: true
   tags:
     - init
@@ -82,7 +80,6 @@
 - name: Ensure base packages
   hosts:
     - proxmox_nodes
-  debugger: on_failed
   become: true
   tags:
     - init
