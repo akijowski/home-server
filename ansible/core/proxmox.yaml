@@ -17,6 +17,12 @@
         system: false
         comment: Admin user
   tasks:
+    - name: Install sudo from apt
+      ansible.builtin.apt:
+        cache_valid_time: 86400 # 1 day
+        name: sudo
+        state: latest
+
     - name: Create Default Groups
       ansible.builtin.group:
         name: "{{ item.name }}"
