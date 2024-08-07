@@ -28,6 +28,7 @@
   hosts:
     - ubuntu
     - turingpi_cluster
+    - proxmox_nodes
   debugger: on_failed
   become: true
   tags:
@@ -52,6 +53,7 @@
   hosts:
     - ubuntu
     - turingpi_cluster
+    - proxmox_nodes
   debugger: on_failed
   become: true
   tags:

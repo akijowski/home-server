@@ -1,11 +1,11 @@
 turingpi_cluster:
   hosts:
-    tpi0: # RK1 module
+    tpi-0: # RK1 module
       # additional config inventory/group_vars/turingpi_cluster
       tpi_node: 2
       static_ip4: '192.168.50.8/24'
       ansible_host: 192.168.50.8
-    rpi0:
+    rpi-0:
       tpi_node: 3
       static_ip4: '192.168.50.23/24'
       ansible_host: 192.168.50.23

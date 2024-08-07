@@ -1,0 +1,13 @@
+# Email settings
+unattended_email: agkijow@gmail.com
+# Default packages
+apt_default_packages:
+  - curl
+  - wget
+  - fail2ban
+  - vim
+  - unzip
+  - gpg
+  - mailutils
+  - ufw
+  - git
