@@ -52,6 +52,13 @@
         mode: '0440'
         validate: '/usr/sbin/visudo -cf %s'
 
+    - name: Allow Admin group password sudo
+      ansible.builtin.copy:
+        content: "%admin ALL=(ALL:ALL) ALL"
+        dest: /etc/sudoers.d/admin
+        mode: '0440'
+        validate: '/usr/sbin/visudo -cd %s'
+
     - name: Add SSH key
       ansible.posix.authorized_key:
         user: "{{ item }}"
@@ -109,6 +116,38 @@
         name: "{{ apt_default_packages }}"
         state: latest
 
-# - name: Ensure base configuration
-# download helper scripts
-# run helper scripts
+- name: Ensure helper scripts
+  hosts:
+    - proxmox_nodes
+  become: true
+  tags:
+    - init
+    - scripts
+  vars:
+    scripts_dir: "/opt/pvescripts"
+    scripts:
+      - kernel-clean.sh
+      - microcode.sh
+      - post-pve-install.sh
+      - host-backup.sh
+  tasks:
+    - name: Ensure scripts directory
+      ansible.builtin.file:
+        path: "{{ scripts_dir }}"
+        state: directory
+
+    # https://tteck.github.io/Proxmox
+    - name: Download helper scripts
+      ansible.builtin.get_url:
+        url: "https://github.com/tteck/Proxmox/raw/main/misc/kernel-clean.sh"
+        dest: "{{ scripts_dir }}/{{ item }}"
+        mode: '0550'
+        owner: ansible
+        group: ansible
+      register: __script_dl
+      loop: "{{ scripts }}"
+
+    - name: Message
+      ansible.builtin.debug:
+        msg: "Downloaded helper scripts to {{ scripts_dir }}. Run these manually for each host as they require operator input."
+      when: __script_dl is changed
