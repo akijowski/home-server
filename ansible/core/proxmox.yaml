@@ -139,11 +139,11 @@
     # https://tteck.github.io/Proxmox
     - name: Download helper scripts
       ansible.builtin.get_url:
-        url: "https://github.com/tteck/Proxmox/raw/main/misc/kernel-clean.sh"
+        url: "https://github.com/tteck/Proxmox/raw/main/misc/{{ item }}"
         dest: "{{ scripts_dir }}/{{ item }}"
         mode: '0550'
-        owner: ansible
-        group: ansible
+        owner: root
+        group: root
       register: __script_dl
       loop: "{{ scripts }}"
 
