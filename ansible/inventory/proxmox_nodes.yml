@@ -4,3 +4,5 @@ proxmox_nodes:
       ansible_host: 192.168.50.3
     phoebe:
       ansible_host: 192.168.50.6
+    mnemosyne:
+      ansible_host: 192.168.50.9

@@ -138,33 +138,6 @@
       delegate_to: localhost
       check_mode: false
 
-- name: Add DNS Records
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  vars_files:
-    - vars/vars.yml
-    - vars/vault.yml
-  tags:
-    - r53
-
-  tasks:
-    - name: Create Route53 DNS Records
-      amazon.aws.route53:
-        state: present
-        zone: kijowski.casa
-        record: "{{ item.record }}"
-        type: A
-        ttl: 7200
-        value: "{{ item.value }}"
-        wait: false
-        overwrite: true
-        aws_access_key_id: "{{ dns_aws_access_key_id }}"
-        aws_secret_access_key: "{{ dns_aws_secret_access_key }}"
-      loop: "{{ dns_record_sets }}"
-      loop_control:
-        label: "{{ item.record }}"
-
 - name: Install Caddy
   hosts: adguard_pi
   debugger: on_failed
