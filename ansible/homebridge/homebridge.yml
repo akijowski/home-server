@@ -1,19 +1,4 @@
 ---
-- name: Initialize LXC
-  hosts: homebridge
-  debugger: on_failed
-  become: true
-  tags:
-    - init
-
-  tasks:
-    - include_role:
-        name: apt
-    - include_role:
-        name: ssh
-    - include_role:
-        name: ufw
-
 - name: Install Homebridge
   hosts: homebridge
   debugger: on_failed

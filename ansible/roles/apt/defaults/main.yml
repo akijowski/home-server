@@ -1,2 +1,0 @@
-sys_packages: ['curl', 'vim', 'git', 'ufw', 'fail2ban', 'mailutils', 'gpg']
-unattended_email: 'agkijow@gmail.com'

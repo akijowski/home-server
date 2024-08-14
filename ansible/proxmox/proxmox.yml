@@ -42,17 +42,3 @@
         proxmox_node: phoebe
         lxc_ip4_cidr: "192.168.50.15/24"
         lxc_disk: "local-lvm:70"
-
-- name: Install Caddy
-  hosts: proxmox
-  debugger: on_failed
-  become: true
-  tags:
-    - caddy
-
-  tasks:
-    - include_role:
-        name: caddy
-      vars:
-        aws_access_key_id: "{{ hostvars[inventory_hostname].aws_access_key_id }}"
-        aws_secret_access_key: "{{ hostvars[inventory_hostname].aws_secret_access_key }}"
