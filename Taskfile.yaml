@@ -20,6 +20,7 @@ tasks:
     cmds:
       - pipx install --include-deps ansible
       - ./bin/direnv_setup
+      - ./bin/packer_install
 
   terminal:
     desc: open a terminal in the dev container
