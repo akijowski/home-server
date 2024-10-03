@@ -56,7 +56,9 @@
 				"redhat.vscode-yaml",
 				"ms-python.python",
 				"wholroyd.jinja",
-				"ms-kubernetes-tools.vscode-kubernetes-tools"
+				"ms-kubernetes-tools.vscode-kubernetes-tools",
+				"hashicorp.hcl",
+				"hashicorp.terraform"
 			]
 		}
 	}
