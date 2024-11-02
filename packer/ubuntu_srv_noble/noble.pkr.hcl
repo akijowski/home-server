@@ -32,6 +32,15 @@ variable "proxmox_vm_id" {
   type = string
 }
 
+variable "ssh_username" {
+  type    = string
+  default = "admin"
+}
+
+variable "ssh_password" {
+  type = string
+}
+
 # Resource Definiation for the VM Template
 source "proxmox-iso" "ubuntu-server-noble" {
 
@@ -53,10 +62,15 @@ source "proxmox-iso" "ubuntu-server-noble" {
   # iso_file = "local:iso/ubuntu-24.04-live-server-amd64.iso"
   # - or -
   # (Option 2) Download ISO
-  iso_url          = "https://releases.ubuntu.com/24.04.1/ubuntu-24.04.1-live-server-amd64.iso"
-  iso_checksum     = "e240e4b801f7bb68c20d1356b60968ad0c33a41d00d828e74ceb3364a0317be9"
-  iso_storage_pool = "local"
-  unmount_iso      = true
+  # https://www.releases.ubuntu.com/noble/
+  boot_iso {
+    type = "scsi"
+    // iso_url          = "https://www.releases.ubuntu.com/noble/ubuntu-24.04.1-live-server-amd64.iso"
+    iso_file         = "local:iso/ubuntu-24.04.1-live-server-amd64.iso"
+    iso_checksum     = "sha256:e240e4b801f7bb68c20d1356b60968ad0c33a41d00d828e74ceb3364a0317be9"
+    iso_storage_pool = "local"
+    unmount          = true
+  }
 
   # VM System Settings
   qemu_agent = true
@@ -65,18 +79,21 @@ source "proxmox-iso" "ubuntu-server-noble" {
   scsi_controller = "virtio-scsi-pci"
 
   disks {
-    disk_size         = "40G"
-    format            = "raw"
-    storage_pool      = "local-lvm"
-    storage_pool_type = "lvm"
-    type              = "virtio"
+    disk_size    = "40G"
+    format       = "raw"
+    storage_pool = "local-lvm"
+    type         = "virtio"
   }
 
   # VM CPU Settings
-  cores = "1"
+  cores    = "1"
+  sockets  = "1"
+  cpu_type = "host"
 
   # VM Memory Settings
   memory = "2048"
+
+  machine = "q35"
 
   # VM Network Settings
   network_adapters {
@@ -104,19 +121,28 @@ source "proxmox-iso" "ubuntu-server-noble" {
   communicator = "ssh"
 
   # PACKER Autoinstall Settings
-  http_directory = "http"
+  # http_directory = "http"
+  http_content = {
+    "/meta-data" = file("./http/meta-data")
+    "/user-data" = templatefile("./http/user-data", {
+      ssh_username = var.ssh_username
+      ssh_password = var.ssh_password
+    })
+  }
   # (Optional) Bind IP Address and Port
   # http_bind_address       = "0.0.0.0"
   # http_port_min           = 8802
   # http_port_max           = 8802
 
-  ssh_username = "admin"
+  ssh_username = var.ssh_username
 
   # (Option 1) Add your Password here
-  # ssh_password        = "your-password"
+  ssh_password = var.ssh_password
   # - or -
   # (Option 2) Add your Private SSH KEY file here
-  ssh_private_key_file = "/home/vscode/.ssh/github_akijowski_mbp14"
+  // ssh_private_key_file = "/home/vscode/.ssh/github_akijowski_mbp14"
+  # (Option 3) Use the SSH_AUTH_SOCK
+  # ssh_agent_auth = true
 
   # Raise the timeout, when installation takes longer
   ssh_timeout = "30m"

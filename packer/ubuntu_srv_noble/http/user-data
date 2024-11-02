@@ -24,9 +24,10 @@ autoinstall:
     users:
       - name: admin
         groups: [adm, sudo]
-        lock-passwd: false
+        lock_passwd: false
         sudo: ALL=(ALL) NOPASSWD:ALL
         shell: /bin/bash
+        plain_text_password: ${ssh_password}
         # passwd: your-password
         # - or -
         # ssh_authorized_keys:
