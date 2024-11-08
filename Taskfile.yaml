@@ -37,3 +37,22 @@ tasks:
       - ssh:rm
     cmds:
       - 'ssh-keygen -R {{ .IPV4 }}'
+
+  ssh:packer:
+    desc: Create an ssh key pair for Packer use. Packer scripts remove this key from the templates after use.
+    cmds:
+      - |
+        ssh-keygen \
+        -o \
+        -a 100 \
+        -t ed25519 \
+        -f ~/.ssh/packer_id_ed25519 \
+        -C "Packer"
+    status:
+      - test -f ~/.ssh/packer_id_ed25519
+
+  ssh:packer:rm:
+    desc: Remove SSH key pair generated for Packer
+    cmds:
+      - rm -f ~/.ssh/packer_id_ed25519
+      - rm -f ~/.ssh/packer_id_ed25519.pub

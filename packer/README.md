@@ -5,6 +5,9 @@ Currently I am only planning on building VM templates through Proxmox.
 
 This configuration is based off the work of [ChristianLempa](https://github.com/ChristianLempa/boilerplates/tree/main/packer/proxmox) with modifications to meet my requirements.
 
+Additional configuration is based off of [packer-proxmox-template](https://github.com/trfore/packer-proxmox-templates/tree/main).
+I trimmed it down to meet my more limited use case.
+
 ## Formatting
 
 Format packer files
