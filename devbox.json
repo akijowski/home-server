@@ -4,7 +4,8 @@
     "go-task@latest",
     "tenv@latest",
     "ansible@2.16.5",
-    "packer@latest"
+    "packer@latest",
+    "awscli2@latest"
   ],
   "shell": {
     "init_hook": [
