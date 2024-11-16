@@ -14,7 +14,6 @@ source "proxmox-iso" "image" {
   proxmox_url              = var.pve_api_url
   username                 = var.pve_username
   token                    = var.pve_token
-  node                     = "hyperion"
 
   // SSH
   ssh_username              = var.ssh_username
@@ -32,10 +31,11 @@ source "proxmox-iso" "image" {
   qemu_agent = true
 
   // Disks
-  scsi_controller = "virtio-scsi-pci"
+  scsi_controller = "virtio-scsi-single"
   disks {
     type         = "virtio"
-    storage_pool = "local-lvm"
+    io_thread    = true
+    storage_pool = "local-lvm" // All nodes must have this available to store the template
     disk_size    = "20G"
     format       = "raw"
     cache_mode   = "writeback"
@@ -43,7 +43,7 @@ source "proxmox-iso" "image" {
 
   // Cloud-init
   cloud_init              = true
-  cloud_init_storage_pool = "local-lvm"
+  cloud_init_storage_pool = "local-lvm" // All nodes must have this available to store the template
 
   // CPU & Memory
   sockets  = "1"

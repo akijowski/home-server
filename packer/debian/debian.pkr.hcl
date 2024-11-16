@@ -23,7 +23,7 @@ build {
       iso_checksum = var.iso_checksum["debian12"]
     }
     template_name = "debian12-bookworm"
-    vm_id         = var.vm_id["debian12"]
+    vm_id         = var.vm_id >= 0 ? var.vm_id : local.default_vm_ids["debian12"][var.target_node]
   }
 
   provisioner "shell" {

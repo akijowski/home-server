@@ -1,6 +1,20 @@
+locals {
+  boot_iso = {
+    type         = "scsi"
+    storage_pool = "nfs-isos"
+    download_pve = false
+    unmount      = true
+    file         = var.iso_file["ubuntu24"]
+    checksum     = var.iso_checksum["ubuntu24"]
+  }
+}
 build {
   source "proxmox-iso.image" {
-    name         = "ubuntu24-noble"
+    name          = "ubuntu24-noble-hyperion"
+    node          = "hyperion"
+    vm_id         = var.vm_id >= 0 ? var.vm_id : 8000
+    template_name = "ubuntu24-noble"
+
     boot_command = var.boot_cmd_ubuntu22
     boot_wait    = "5s"
     http_content = {
@@ -12,16 +26,68 @@ build {
     }
     // ISO
     boot_iso {
-      type             = "scsi"
-      iso_storage_pool = "nfs-isos"
-      iso_download_pve = false
-      unmount          = true
+      type             = local.boot_iso.type
+      iso_storage_pool = local.boot_iso.storage_pool
+      iso_download_pve = local.boot_iso.download_pve
+      unmount          = local.boot_iso.unmount
       # iso_url          = var.iso_url["ubuntu24"]
-      iso_file     = "nfs-isos:iso/ubuntu-24.04.1-live-server-amd64.iso"
-      iso_checksum = var.iso_checksum["ubuntu24"]
+      iso_file     = local.boot_iso.file
+      iso_checksum = local.boot_iso.checksum
     }
+  }
+
+  source "proxmox-iso.image" {
+    name          = "ubuntu24-noble-phoebe"
+    node          = "phoebe"
+    vm_id         = var.vm_id >= 0 ? var.vm_id : 8001
     template_name = "ubuntu24-noble"
-    vm_id         = var.vm_id["ubuntu24"]
+
+    boot_command = var.boot_cmd_ubuntu22
+    boot_wait    = "5s"
+    http_content = {
+      "/meta-data" = file("configs/meta-data")
+      "/user-data" = templatefile("configs/user-data",
+        {
+          ssh_public_key = chomp(file(var.ssh_public_key_file))
+      })
+    }
+    // ISO
+    boot_iso {
+      type             = local.boot_iso.type
+      iso_storage_pool = local.boot_iso.storage_pool
+      iso_download_pve = local.boot_iso.download_pve
+      unmount          = local.boot_iso.unmount
+      # iso_url          = var.iso_url["ubuntu24"]
+      iso_file     = local.boot_iso.file
+      iso_checksum = local.boot_iso.checksum
+    }
+  }
+
+  source "proxmox-iso.image" {
+    name          = "ubuntu24-noble-mnemosyne"
+    node          = "mnemosyne"
+    vm_id         = var.vm_id >= 0 ? var.vm_id : 8002
+    template_name = "ubuntu24-noble"
+
+    boot_command = var.boot_cmd_ubuntu22
+    boot_wait    = "5s"
+    http_content = {
+      "/meta-data" = file("configs/meta-data")
+      "/user-data" = templatefile("configs/user-data",
+        {
+          ssh_public_key = chomp(file(var.ssh_public_key_file))
+      })
+    }
+    // ISO
+    boot_iso {
+      type             = local.boot_iso.type
+      iso_storage_pool = local.boot_iso.storage_pool
+      iso_download_pve = local.boot_iso.download_pve
+      unmount          = local.boot_iso.unmount
+      # iso_url          = var.iso_url["ubuntu24"]
+      iso_file     = local.boot_iso.file
+      iso_checksum = local.boot_iso.checksum
+    }
   }
 
   provisioner "shell" {

@@ -73,6 +73,14 @@ variable "iso_url" {
   }
 }
 
+variable "iso_file" {
+  type = map(string)
+  default = {
+    "debian12" = ""
+    "ubuntu24" = "nfs-isos:iso/ubuntu-24.04.1-live-server-amd64.iso"
+  }
+}
+
 variable "iso_checksum" {
   type = map(string)
   default = {
@@ -108,13 +116,18 @@ variable "boot_cmd_debian" {
 }
 
 // Image vars
-
-variable vm_id {
-  description = "Static VM IDs for each template"
-  type        = map(number)
-  default = {
-    "debian12"        = 8100
-    "ubuntu24"        = 8000
-    "ubuntu24-podman" = 8010
+variable "target_node" {
+  description = "Target node to create the template"
+  type        = string
+  default     = "hyperion"
+  validation {
+    condition     = contains(["hyperion", "phoebe", "mnemosyne"], var.target_node)
+    error_message = "Must be one of [hyperion, phoebe, mnemosyne]."
   }
+}
+
+variable "vm_id" {
+  description = "The template VM ID. Setting to 0 will use the next available. Setting to -1 will use defaults defined by the source. Only use this with the -only flag to create a single image on a single node"
+  type        = number
+  default     = -1
 }
