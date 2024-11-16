@@ -23,6 +23,7 @@ variable "pve_api_url" {
 }
 
 // SSH Variables //
+// These are used by Packer to provision the template
 variable "ssh_username" {
   description = "SSH Username During Packer Build"
   type        = string
@@ -60,6 +61,18 @@ variable "ssh_public_key_file" {
   sensitive   = true
   validation {
     condition     = can(regex("(?i)PRIVATE", var.ssh_public_key_file)) == false
+    error_message = "ERROR Private SSH Key."
+  }
+}
+
+// This is used in the cloud-init
+variable "ansible_ssh_public_key_file" {
+  description = "Public SSH Key for Ansible user"
+  default     = "~/.ssh/github_akijowski.pub"
+  type        = string
+  sensitive   = true
+  validation {
+    condition     = can(regex("(?i)PRIVATE", var.ansible_ssh_public_key_file)) == false
     error_message = "ERROR Private SSH Key."
   }
 }

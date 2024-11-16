@@ -10,7 +10,7 @@ locals {
 }
 build {
   source "proxmox-iso.image" {
-    name          = "ubuntu24-noble-hyperion"
+    name          = "ubuntu24-hyperion"
     node          = "hyperion"
     vm_id         = var.vm_id >= 0 ? var.vm_id : 8000
     template_name = "ubuntu24-noble"
@@ -21,7 +21,8 @@ build {
       "/meta-data" = file("configs/meta-data")
       "/user-data" = templatefile("configs/user-data",
         {
-          ssh_public_key = chomp(file(var.ssh_public_key_file))
+          ssh_public_key         = chomp(file(var.ssh_public_key_file))
+          ansible_ssh_public_key = chomp(file(var.ansible_ssh_public_key_file))
       })
     }
     // ISO
@@ -37,7 +38,7 @@ build {
   }
 
   source "proxmox-iso.image" {
-    name          = "ubuntu24-noble-phoebe"
+    name          = "ubuntu24-phoebe"
     node          = "phoebe"
     vm_id         = var.vm_id >= 0 ? var.vm_id : 8001
     template_name = "ubuntu24-noble"
@@ -48,7 +49,8 @@ build {
       "/meta-data" = file("configs/meta-data")
       "/user-data" = templatefile("configs/user-data",
         {
-          ssh_public_key = chomp(file(var.ssh_public_key_file))
+          ssh_public_key         = chomp(file(var.ssh_public_key_file))
+          ansible_ssh_public_key = chomp(file(var.ansible_ssh_public_key_file))
       })
     }
     // ISO
@@ -63,32 +65,34 @@ build {
     }
   }
 
-  source "proxmox-iso.image" {
-    name          = "ubuntu24-noble-mnemosyne"
-    node          = "mnemosyne"
-    vm_id         = var.vm_id >= 0 ? var.vm_id : 8002
-    template_name = "ubuntu24-noble"
+# TODO: I think there is a networking problem on this node. We want to use vmbr0
+  # source "proxmox-iso.image" {
+  #   name          = "ubuntu24-mnemosyne"
+  #   node          = "mnemosyne"
+  #   vm_id         = var.vm_id >= 0 ? var.vm_id : 8002
+  #   template_name = "ubuntu24-noble"
 
-    boot_command = var.boot_cmd_ubuntu22
-    boot_wait    = "5s"
-    http_content = {
-      "/meta-data" = file("configs/meta-data")
-      "/user-data" = templatefile("configs/user-data",
-        {
-          ssh_public_key = chomp(file(var.ssh_public_key_file))
-      })
-    }
-    // ISO
-    boot_iso {
-      type             = local.boot_iso.type
-      iso_storage_pool = local.boot_iso.storage_pool
-      iso_download_pve = local.boot_iso.download_pve
-      unmount          = local.boot_iso.unmount
-      # iso_url          = var.iso_url["ubuntu24"]
-      iso_file     = local.boot_iso.file
-      iso_checksum = local.boot_iso.checksum
-    }
-  }
+  #   boot_command = var.boot_cmd_ubuntu22
+  #   boot_wait    = "5s"
+  #   http_content = {
+  #     "/meta-data" = file("configs/meta-data")
+  #     "/user-data" = templatefile("configs/user-data",
+  #       {
+  #         ssh_public_key         = chomp(file(var.ssh_public_key_file))
+  #         ansible_ssh_public_key = chomp(file(var.ansible_ssh_public_key_file))
+  #     })
+  #   }
+  #   // ISO
+  #   boot_iso {
+  #     type             = local.boot_iso.type
+  #     iso_storage_pool = local.boot_iso.storage_pool
+  #     iso_download_pve = local.boot_iso.download_pve
+  #     unmount          = local.boot_iso.unmount
+  #     # iso_url          = var.iso_url["ubuntu24"]
+  #     iso_file     = local.boot_iso.file
+  #     iso_checksum = local.boot_iso.checksum
+  #   }
+  # }
 
   provisioner "shell" {
     inline = [

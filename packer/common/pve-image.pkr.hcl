@@ -15,7 +15,7 @@ source "proxmox-iso" "image" {
   username                 = var.pve_username
   token                    = var.pve_token
 
-  // SSH
+  // SSH (packer)
   ssh_username              = var.ssh_username
   ssh_timeout               = var.ssh_timeout
   ssh_keypair_name          = var.ssh_keypair_name
