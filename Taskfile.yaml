@@ -9,6 +9,10 @@ includes:
     taskfile: k8s.Taskfile.yaml
     aliases:
       - k
+  tf:
+    taskfile: tf.Taskfile.yaml
+    aliases:
+      - t
 
 silent: true
 

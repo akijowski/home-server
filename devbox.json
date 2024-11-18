@@ -5,7 +5,8 @@
     "tenv@latest",
     "ansible@2.16.5",
     "packer@latest",
-    "awscli2@latest"
+    "awscli2@latest",
+    "terraform-docs@latest"
   ],
   "shell": {
     "init_hook": [

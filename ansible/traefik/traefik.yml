@@ -1,0 +1,101 @@
+---
+- name: Traefik Install
+  hosts:
+    - traefik
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Ensure APT is updated
+      ansible.builtin.apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 600
+
+    - name: Ensure system packages are installed
+      ansible.builtin.apt:
+        name:
+          - nfs-common
+          - acl # for become an unprivileged user
+        state: latest
+
+    - name: Ensure Podman is installed
+      ansible.builtin.apt:
+        name:
+          - podman
+        state: latest
+
+    - name: Ensure Traefik group exists
+      ansible.builtin.group:
+        name: "{{ traefik_group_name }}"
+        gid: "{{ traefik_group_id }}"
+        state: present
+
+    - name: Ensure Traefik user exists
+      ansible.builtin.user:
+        name: "{{ traefik_user_name }}"
+        comment: Traefik Podman
+        uid: "{{ traefik_user_id }}"
+        create_home: true
+        group: "{{ traefik_group_name }}"
+        shell: /bin/bash
+        state: present
+
+# https://serverfault.com/a/1105953
+    - name: Ensure Traefik user can use systemd
+      ansible.builtin.command: "loginctl enable-linger {{ traefik_user_name }}"
+      args:
+        creates: "/var/lib/systemd/linger/{{ traefik_user_name }}"
+
+    - name: Ensure Traefik Container
+      block:
+        - name: Pull Traefik Image
+          containers.podman.podman_image:
+            name: "{{ traefik_container_image }}"
+            tag: "{{ traefik_container_tag }}"
+            pull: true
+            state: present
+
+        - name: Create Traefik container
+          containers.podman.podman_container:
+            name: "{{ traefik_container_name }}"
+            image: "{{ traefik_container_image }}:{{ traefik_container_tag }}"
+            state: quadlet
+            # quadlet_file_mode: '0640'
+            quadlet_options:
+              - "AutoUpdate=registry"
+              - "Pull=newer"
+              - |
+                [Unit]
+                Description={{ traefik_container_name }} container via Podman
+                After=local-fs.target
+              - |
+                [Install]
+                WantedBy=multi-user.target default.target
+            ports:
+              - "80:80"
+              - "443:443"
+
+        - name: Let Traefik use ports 80 and 443
+          ansible.posix.sysctl:
+            name: net.ipv4.ip_unprivileged_port_start
+            value: "80"
+            sysctl_set: true
+            reload: true
+            state: present
+          become: true
+          become_user: root
+
+        - name: Reload systemd
+          ansible.builtin.systemd_service:
+            name: "{{ traefik_container_name }}"
+            daemon_reload: true
+            scope: user
+            state: restarted
+            enabled: true
+          environment:
+            XDG_RUNTIME_DIR: "/run/user/{{ traefik_user_id }}"
+            HOME: "/home/{{ traefik_user_name }}"
+      become: true
+      become_user: "{{ traefik_user_name }}"

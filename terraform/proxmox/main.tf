@@ -9,7 +9,7 @@ locals {
       description = "Traefik node. Managed by Terraform"
       target_node = "phoebe"
       vmid        = 0
-      cpu         = 2
+      cpu         = 1
       memory      = 2048
       ip0_ipv4    = "192.168.50.14/24"
       extra_tags  = ["traefik", "ubuntu", "ansible"]

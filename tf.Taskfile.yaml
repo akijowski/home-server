@@ -1,0 +1,13 @@
+version: 3
+
+tasks:
+  fmt:
+    desc: Format Terraform files
+    cmds:
+      - terraform fmt -recursive ./terraform
+  docs:
+    desc: Module documentation
+    aliases:
+      - doc
+    cmds:
+      - terraform-docs -c .terraform-docs.yml ./terraform

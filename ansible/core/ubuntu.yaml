@@ -10,6 +10,7 @@
     - init
     - users
   tasks:
+  # Cloud init images no longer need this
     - name: Create Ansible Group
       ansible.builtin.group:
         name: ansible
