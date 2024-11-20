@@ -6,7 +6,8 @@
     "ansible@2.16.5",
     "packer@latest",
     "awscli2@latest",
-    "terraform-docs@latest"
+    "terraform-docs@latest",
+    "python312Packages.boto3@latest"
   ],
   "shell": {
     "init_hook": [

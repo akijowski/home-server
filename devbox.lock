@@ -225,6 +225,70 @@
         }
       }
     },
+    "python312Packages.boto3@latest": {
+      "last_modified": "2024-11-16T04:25:12Z",
+      "resolved": "github:NixOS/nixpkgs/34a626458d686f1b58139620a8b2793e9e123bba#python312Packages.boto3",
+      "source": "devbox-search",
+      "version": "1.35.30",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/bdrywdsyd5fhg5vfiwvdldqlmyvg3ack-python3.12-boto3-1.35.30",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/ri69lv662dzg9b0cjj2nb7j8z9z7y0q9-python3.12-boto3-1.35.30-dist"
+            }
+          ],
+          "store_path": "/nix/store/bdrywdsyd5fhg5vfiwvdldqlmyvg3ack-python3.12-boto3-1.35.30"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hy1iznzwdg9307qwlm02nwk741g7zcr6-python3.12-boto3-1.35.30",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/p40a1b8jfn03f3d7kydvj5p0xasc3s86-python3.12-boto3-1.35.30-dist"
+            }
+          ],
+          "store_path": "/nix/store/hy1iznzwdg9307qwlm02nwk741g7zcr6-python3.12-boto3-1.35.30"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/v1n5gbv0j6y0bgmgn4chk7y6m7bg73ck-python3.12-boto3-1.35.30",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/07l0a1wk309cd0f7nc8qvz8abkhk5iaw-python3.12-boto3-1.35.30-dist"
+            }
+          ],
+          "store_path": "/nix/store/v1n5gbv0j6y0bgmgn4chk7y6m7bg73ck-python3.12-boto3-1.35.30"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ajvqy7b8a5bpxnp7djah1w6lnb9hj9pn-python3.12-boto3-1.35.30",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/psbmffdyfccvijrj48dml7ds1wnprvs3-python3.12-boto3-1.35.30-dist"
+            }
+          ],
+          "store_path": "/nix/store/ajvqy7b8a5bpxnp7djah1w6lnb9hj9pn-python3.12-boto3-1.35.30"
+        }
+      }
+    },
     "tenv@latest": {
       "last_modified": "2024-10-13T23:44:06Z",
       "resolved": "github:NixOS/nixpkgs/d4f247e89f6e10120f911e2e2d2254a050d0f732#tenv",

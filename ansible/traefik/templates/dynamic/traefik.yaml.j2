@@ -1,0 +1,8 @@
+{{ ansible_managed | comment }}
+http:
+  routers:
+    dashboard-tls:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`traefik.kijowski.casa`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      service: api@internal

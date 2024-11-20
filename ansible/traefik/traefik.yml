@@ -48,6 +48,36 @@
       args:
         creates: "/var/lib/systemd/linger/{{ traefik_user_name }}"
 
+    - name: Ensure directories exists
+      ansible.builtin.file:
+        path: "{{ item }}"
+        owner: "{{ traefik_user_name }}"
+        group: "{{ traefik_group_name }}"
+        mode: '0770'
+        state: directory
+      loop:
+        - "/etc/traefik"
+        - "/etc/traefik/acme"
+        - "/etc/traefik/dynamic"
+
+    - name: Copy static config file
+      ansible.builtin.template:
+        src: templates/config.yaml.j2
+        dest: /etc/traefik/traefik.yaml
+        owner: "{{ traefik_user_name }}"
+        group: "{{ traefik_group_name }}"
+        mode: '0770'
+
+    - name: Copy dynamic config files
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "/etc/traefik/dynamic/{{ item | basename | regex_replace('\\.j2$', '') }}"
+        owner: "{{ traefik_user_name }}"
+        group: "{{ traefik_group_name }}"
+        mode: '0770'
+      with_fileglob:
+        - 'templates/dynamic/*.j2'
+
     - name: Ensure Traefik Container
       block:
         - name: Pull Traefik Image
@@ -73,9 +103,18 @@
               - |
                 [Install]
                 WantedBy=multi-user.target default.target
+            env:
+              AWS_REGION: "us-east-1"
+              AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+              AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+              AWS_HOSTED_ZONE_ID: "{{ aws_hosted_zone_id }}"
             ports:
               - "80:80"
               - "443:443"
+            volumes:
+              - "/etc/traefik/traefik.yaml:/etc/traefik/traefik.yaml"
+              - "/etc/traefik/acme:/etc/traefik/acme"
+              - "/etc/traefik/dynamic:/etc/traefik/dynamic"
 
         - name: Let Traefik use ports 80 and 443
           ansible.posix.sysctl:
