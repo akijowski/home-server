@@ -7,7 +7,8 @@
     "packer@latest",
     "awscli2@latest",
     "terraform-docs@latest",
-    "python312Packages.boto3@latest"
+    "python312Packages.boto3@latest",
+    "python312Packages.paramiko@latest"
   ],
   "shell": {
     "init_hook": [

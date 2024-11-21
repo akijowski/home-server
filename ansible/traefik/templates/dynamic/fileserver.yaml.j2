@@ -1,0 +1,20 @@
+{{ ansible_managed | comment }}
+http:
+  routers:
+    fileserver:
+      rule: "Host(`files.kijowski.casa`)"
+      service: fileserver
+
+  services:
+    fileserver:
+      loadBalancer:
+        serversTransport: fileserver
+        servers:
+        # tkl fileserver does a weird redirect to :10000 after login.
+        # If you just redirect to the base :443 it will complete the login.
+        # I should just get rid of TKL
+          - url: "https://192.168.50.12:12321"
+
+  serversTransports:
+    fileserver:
+      insecureSkipVerify: true

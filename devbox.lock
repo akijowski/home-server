@@ -289,6 +289,70 @@
         }
       }
     },
+    "python312Packages.paramiko@latest": {
+      "last_modified": "2024-11-16T04:25:12Z",
+      "resolved": "github:NixOS/nixpkgs/34a626458d686f1b58139620a8b2793e9e123bba#python312Packages.paramiko",
+      "source": "devbox-search",
+      "version": "3.5.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/pp7z1l4cqss9ps73fhgj4qafs97qhb07-python3.12-paramiko-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/58hi882dx1bdmwwjdng3pkgbxpislc42-python3.12-paramiko-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/pp7z1l4cqss9ps73fhgj4qafs97qhb07-python3.12-paramiko-3.5.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/bikv81gzynqg7g8ywiykkmk2v224mmj7-python3.12-paramiko-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/ddsxy1dc83p5zma3jwdg118jp2q99ik8-python3.12-paramiko-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/bikv81gzynqg7g8ywiykkmk2v224mmj7-python3.12-paramiko-3.5.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/bq70p3av70gg5ydnnbhf6risia55k8nr-python3.12-paramiko-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/zzwirbszfl0xar282xw4hq932vlrc23z-python3.12-paramiko-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/bq70p3av70gg5ydnnbhf6risia55k8nr-python3.12-paramiko-3.5.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/z5l72yagriqwh5xy2i8gzzipbak7db8j-python3.12-paramiko-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/gg7nw4vwmc0pzwbmqriixkz30z9wdahx-python3.12-paramiko-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/z5l72yagriqwh5xy2i8gzzipbak7db8j-python3.12-paramiko-3.5.0"
+        }
+      }
+    },
     "tenv@latest": {
       "last_modified": "2024-10-13T23:44:06Z",
       "resolved": "github:NixOS/nixpkgs/d4f247e89f6e10120f911e2e2d2254a050d0f732#tenv",
