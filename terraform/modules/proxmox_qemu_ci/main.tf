@@ -34,7 +34,7 @@ resource "proxmox_vm_qemu" "this" {
   # cipassword = var.ci_password
   # sshkeys = var.ci_ssh_keys
   #   cicustom  = "user=nfs-isos:snippets/user_data_vm-${var.vmid}.yml"
-  ipconfig0 = "gw=192.168.50.1,ip=${var.ip0_ipv4},ip6=dhcp"
+  ipconfig0 = "ip=${var.ip0_ipv4},gw=192.168.50.1,ip6=dhcp"
 
   disks {
     ide {
