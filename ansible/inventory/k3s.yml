@@ -3,25 +3,39 @@
 # common config -> group_vars/k3s_cluster
 k3s_cluster:
   hosts:
-    kube-0:
-      ansible_host: 192.168.50.7
+    pve-k3s0:
+      ansible_host: 192.168.50.20
       k3s_control_node: true
       # file names must be kabab-case: https://docs.k3s.io/installation/packaged-components#file-naming-requirements
       # available traefik helm options: https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
       k3s_server_manifests_templates:
+        - 'manifests/cluster-upgrade.yaml.j2'
         - 'manifests/dns-secrets.yaml.j2'
         - 'manifests/traefik-env.yaml.j2'
         - 'manifests/traefik-config.yaml.j2'
-        # - 'manifests/k8s-dashboard.yaml.j2'
       k3s_server_manifests_urls:
-        - url: 'https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.70.0/stripped-down-crds.yaml'
+        - url: 'https://github.com/rancher/system-upgrade-controller/releases/download/v0.14.2/system-upgrade-controller.yaml'
+          filename: system-upgrade-controller.yaml
+        - url: 'https://github.com/rancher/system-upgrade-controller/releases/download/v0.14.2/crd.yaml'
+          filename: system-upgrade-controller-crd.yaml
+        - url: 'https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.78.1/stripped-down-crds.yaml'
           filename: prometheus-operator.yaml
       k3s_server:
+        flannel-backend: 'wireguard-native'
         node-label:
-          - "NodeLocation=TrueNAS"
-        # disable:
-        #   - kube-dashboard
-    # kube-1:
+          - "NodeLocation=Hyperion"
+          - "NodeFamily=Ubuntu"
+          - "NodeArch=AMD64"
+
+    pve-k3s1:
+      ansible_host: 192.168.50.21
+      k3s_control_node: false
+      k3s_agent:
+        with-node-id: true
+        node-label:
+          - "NodeLocation=Mnemosyne"
+          - "NodeFamily=Ubuntu"
+          - "NodeArch=AMD64"
     #   ansible_host: 192.168.50.8 # TPi RK1
     #   k3s_agent:
     #     with-node-id: true

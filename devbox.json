@@ -8,7 +8,10 @@
     "awscli2@latest",
     "terraform-docs@latest",
     "python312Packages.boto3@latest",
-    "python312Packages.paramiko@latest"
+    "python312Packages.paramiko@latest",
+    "kubectl@latest",
+    "kubecm@latest",
+    "k9s@latest"
   ],
   "shell": {
     "init_hook": [

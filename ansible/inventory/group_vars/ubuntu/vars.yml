@@ -8,3 +8,5 @@ apt_default_packages:
   - mailutils
   - ufw
   - git
+  # included growpart to expand partitions
+  - cloud-guest-utils

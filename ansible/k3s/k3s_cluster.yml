@@ -15,11 +15,11 @@
           - wireguard # for wireguard-native CNI
         update_cache: true
     # https://docs.k3s.io/installation/requirements?os=pi#operating-systems
-    - name: Install rpi kernal patches
-      ansible.builtin.apt:
-        name:
-          - linux-modules-extra-raspi
-      when: is_raspberry_pi
+    # - name: Install rpi kernal patches
+    #   ansible.builtin.apt:
+    #     name:
+    #       - linux-modules-extra-raspi
+    #   when: is_raspberry_pi
 
     - name: Is UFW Installed
       ansible.builtin.command: which ufw
@@ -67,23 +67,29 @@
         # If needed at some point
         # https://stackoverflow.com/a/58665099
 
+        # fun getting the group names:
+        # https://stackoverflow.com/a/65716389
         - name: Copy file
           become: true
           ansible.builtin.fetch:
             src: /etc/rancher/k3s/k3s.yaml
-            dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube/{{ group_names | last }}_{{ inventory_hostname }}.yaml"
+            dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube/{{ group_names | select('match', '^k3s.*$') | first }}_{{ inventory_hostname }}.yaml"
             flat: yes
 
         - name: Add controller IP
           delegate_to: 127.0.0.1
           ansible.builtin.replace:
-            path: "/home/vscode/.kube/{{ group_names | last }}_{{ inventory_hostname }}.yaml"
+            path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube/{{ group_names | select('match', '^k3s.*$') | first }}_{{ inventory_hostname }}.yaml"
             regexp: '(?P<proto>http(s?)://)(?P<uri>\d{0,3}.\d{0,3}.\d{0,3}.\d{0,3})(?P<port>:\d+)$'
             replace: "\\g<proto>{{ controller_ip }}\\g<port>"
 
         - name: Update context name
           delegate_to: 127.0.0.1
           ansible.builtin.replace:
-            path: "/home/vscode/.kube/{{ group_names | last }}_{{ inventory_hostname }}.yaml"
+            path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube/{{ group_names | select('match', '^k3s.*$') | first }}_{{ inventory_hostname }}.yaml"
             regexp: 'default\b$'
-            replace: "{{ group_names | last }}"
+            replace: "{{ group_names | select('match', '^k3s.*$') | first }}"
+
+        - name: Flatten to config file
+          delegate_to: 127.0.0.1
+          ansible.builtin.command: ../../bin/merge_k8s_config

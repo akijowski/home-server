@@ -2,9 +2,11 @@
 
 set -eou pipefail
 
-CONFIGS="$HOME/.kube/config:$HOME/.kube/k3s.config:$HOME/.kube/k3s_mgmt_cluster_rpi-0.yaml"
+# Find files with name in the ~/.kube directory. Print out the path with a ':' then remove the trailing ':'
+CONFIGS="$HOME/.kube/config:$(find ~/.kube -type f -name '*_cluster*.yaml' -printf "%p:" | sed 's/:$//')"
 
 function merge() {
+    echo "Using $CONFIGS"
     KUBECONFIG="$CONFIGS" kubectl config view --flatten --merge > "$HOME/.kube/config"
 }
 
