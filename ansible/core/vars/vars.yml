@@ -15,7 +15,5 @@ dns_record_sets:
     value: "192.168.50.7"
   - record: "*.kijowski.casa"
     value: "192.168.50.14"
-  - record: homebridge.kijowski.casa
-    value: "192.168.50.15"
   - record: "*.mgmt.k8s.kijowski.casa"
     value: "192.168.50.23"

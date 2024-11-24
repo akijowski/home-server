@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+http:
+  routers:
+    homebridge:
+      rule: "Host(`homebridge.kijowski.casa`)"
+      service: homebridge
+
+  services:
+    homebridge:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.50.15:8581"

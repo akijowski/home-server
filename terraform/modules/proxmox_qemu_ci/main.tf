@@ -67,4 +67,10 @@ resource "proxmox_vm_qemu" "this" {
     id   = 0
     type = "socket"
   }
+
+  lifecycle {
+    ignore_changes = [
+      disks
+    ]
+  }
 }

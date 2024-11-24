@@ -6,7 +6,12 @@ locals {
   vms = {
     traefik0 = {
       name        = "traefik0"
-      description = "Traefik node. Managed by Terraform"
+      description = <<-EOF
+        # Traefik node.
+        Managed by Terraform.
+
+        https://traefik.kijowski.casa/dashboard/
+EOF
       target_node = "phoebe"
       vmid        = 0
       cpu         = 1
@@ -14,9 +19,27 @@ locals {
       ip0_ipv4    = "192.168.50.14/24"
       extra_tags  = ["traefik", "ubuntu", "ansible"]
     }
+    homebridge0 = {
+      name        = "homebridge0"
+      description = <<-EOF
+        # Homebridge for Apple HomeKit.
+        Managed by Terraform.
+
+        https://homebridge.kijowski.casa
+EOF
+      target_node = "phoebe"
+      vmid        = 0
+      cpu         = 1
+      memory      = 1024 # 1 GiB
+      ip0_ipv4    = "192.168.50.15/24"
+      extra_tags  = ["homebridge", "ubuntu", "ansible"]
+    }
     k3s0 = {
       name        = "k3s0"
-      description = "k3s node. Primary. Managed by Terraform"
+      description = <<-EOF
+        # k3s node. Primary.
+        Managed by Terraform.
+EOF
       target_node = "hyperion"
       vmid        = 0
       cpu         = 2
@@ -26,10 +49,13 @@ locals {
     }
     k3s1 = {
       name        = "k3s1"
-      description = "k3s node. Managed by Terraform"
+      description = <<-EOF
+        # k3s node.
+        Managed by Terraform.
+EOF
       target_node = "mnemosyne"
       vmid        = 0
-      cpu         = 8 # vroom
+      cpu         = 8     # vroom
       memory      = 12288 # 12 GiB
       ip0_ipv4    = "192.168.50.21/24"
       extra_tags  = ["k3s", "ubuntu", "ansible"]

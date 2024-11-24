@@ -85,14 +85,14 @@
         name: "{{ apt_default_packages }}"
         state: latest
 
-- name: Ensure base security applied
+- name: Ensure Unattended Upgrades
   hosts:
     - ubuntu
     - turingpi_cluster
   become: true
   tags:
     - init
-    - security
+    - unattended
   tasks:
     - name: Install unattended upgrades
       ansible.builtin.import_role:
@@ -103,6 +103,15 @@
         unattended_email: "{{ unattended_email }}"
         unattended_mail_only_on_error: true
 
+- name: Ensure base security applied
+  hosts:
+    - ubuntu
+    - turingpi_cluster
+  become: true
+  tags:
+    - init
+    - security
+  tasks:
     - name: Disable password authentication for root
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
