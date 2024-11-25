@@ -14,3 +14,5 @@ spec:
   destinations:
     - namespace: semaphore
       server: https://kubernetes.default.svc
+    - namespace: longhorn-system
+      server: https://kubernetes.default.svc
