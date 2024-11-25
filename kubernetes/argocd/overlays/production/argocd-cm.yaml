@@ -3,4 +3,6 @@ kind: ConfigMap
 metadata:
   name: argocd-cm
 data:
+  url: "https://argocd.mgmt.k8s.kijowski.casa"
+  statusbadge.url: "https://argocd.mgmt.k8s.kijowski.casa/"
   exec.enabled: "true"
