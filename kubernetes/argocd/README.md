@@ -30,6 +30,13 @@ Apply the Kustomization with:
 /workspaces/home-server/kubernetes/argocd $ kubectl apply -k .
 ```
 
+## Adding External Cluster
+
+Use the `argocd` to quickly add external clusters
+[CLI Docs](https://argo-cd.readthedocs.io/en/stable/user-guide/commands/argocd_cluster_add/)
+
+[Main Docs - without the CLI](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#clusters)
+
 ## Links
 
 - [ArgoCD Docs: Install with Kustomize](https://argo-cd.readthedocs.io/en/stable/operator-manual/installation/#kustomize)

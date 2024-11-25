@@ -11,7 +11,8 @@
     "python312Packages.paramiko@latest",
     "kubectl@latest",
     "kubecm@latest",
-    "k9s@latest"
+    "k9s@latest",
+    "argocd@latest"
   ],
   "shell": {
     "init_hook": [
