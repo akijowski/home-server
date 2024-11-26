@@ -5,11 +5,12 @@ namespace: semaphore
 
 commonLabels:
   app: semaphore
-  app.kubernetes.io/name: semaphore
   app.kubernetes.io/part-of: semaphore
 
 resources:
-  - base/deployment.yaml
+  - base/service.yaml
+  - base/storage.yaml
+  - base/stateful.yaml
   - base/traefik.yaml
 
 replicas:
@@ -37,4 +38,4 @@ configMapGenerator:
 
 images:
   - name: semaphoreui/semaphore
-    newTag: v2.10.22
+    newTag: v2.10.43

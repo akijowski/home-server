@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: semaphore
+  labels:
+    app.kubernetes.io/name: semaphore
+    app.kubernetes.io/component: server
+spec:
+  serviceName: semaphore
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: semaphore
+  template:
+    metadata:
+      labels:
+        app: semaphore
+        app.kubernetes.io/name: semaphore
+        app.kubernetes.io/component: server
+    spec:
+      containers:
+        - name: semaphore
+          image: semaphoreui/semaphore:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 3000
+              name: web
+          envFrom:
+            - configMapRef:
+                name: semaphore-env-vars
+          volumeMounts:
+            - name: semaphore-home
+              mountPath: /home/semaphore
+            - name: semaphore-temp
+              mountPath: /tmp/semaphore
+            - name: semaphore-etc
+              mountPath: /etc/semaphore
+            - name: pip-reqs
+              mountPath: /etc/semaphore/requirements.txt
+              subPath: pip_requirements.txt
+            - name: ansible-reqs
+              mountPath: /home/semaphore/requirements.yml
+              subPath: requirements.yml
+      securityContext:
+        fsGroup: 1001 # pulled from running container
+
+      restartPolicy: Always
+
+      volumes:
+        - name: semaphore-home
+          persistentVolumeClaim:
+            claimName: semaphore-home
+        - name: semaphore-temp
+          persistentVolumeClaim:
+            claimName: semaphore-temp
+        - name: semaphore-etc
+          persistentVolumeClaim:
+            claimName: semaphore-etc
+        - name: pip-reqs
+          configMap:
+            name: semaphore-pip-requirements
+        - name: ansible-reqs
+          configMap:
+            name: semaphore-ansible-galaxy
