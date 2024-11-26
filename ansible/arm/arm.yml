@@ -1,115 +1,133 @@
 ---
-- name: Ansible Setup
-  hosts: arm
-  debugger: on_failed
-  become: true
-  # need ask-become-pass flag (-K)
-  remote_user: adam
-  tags:
-    - prep
-
-  tasks:
-  - name: Create Ansible Group
-    ansible.builtin.group:
-      name: ansible
-      system: true
-      state: present
-
-  - name: Create Ansible User
-    ansible.builtin.user:
-      name: ansible
-      group: ansible
-      create_home: true
-      shell: /bin/bash
-      comment: Ansible automation user
-      system: true
-      state: present
-
-  - name: Allow Ansible group to have passwordless sudo
-    ansible.builtin.copy:
-      content: "%ansible ALL=(ALL:ALL) NOPASSWD:ALL"
-      dest: /etc/sudoers.d/ansible
-      mode: '0440'
-      validate: '/usr/sbin/visudo -cf %s'
-
-  - name: Add SSH key for Ansible
-    ansible.posix.authorized_key:
-      user: ansible
-      state: present
-      key: 'https://github.com/akijowski.keys'
-
-- name: ARM Init
-  hosts: arm
+- name: Install ARM Prequisites
+  hosts: arm0
   debugger: on_failed
   become: true
   tags:
-    - init
+    - pre
 
   tasks:
-    - name: Upgrade packages
+    - name: Update apt
       ansible.builtin.apt:
-        autoclean: true
-        autoremove: true
+        upgrade: yes
+        update_cache: yes
         cache_valid_time: 600
-        update_cache: true
-        upgrade: 'yes'
-        state: present
 
-    - name: Install basic packages
+    - name: Ensure system packages are installed
       ansible.builtin.apt:
         name:
-          - curl
-          - vim
-          - git
-          - fail2ban
-          - gpg
-          - mailutils
-          - unzip
-          - wget
+          - nfs-common
+          - lsscsi
+          - acl # for become an unprivileged user
         state: latest
 
-    - name: Install unattended_upgrades
-      ansible.builtin.import_role:
-        name: hifis.unattended_upgrades
-      vars:
-        unattended_automatic_reboot: true
-        unattended_syslog_enable: true
-        unattended_mail: "{{ unattended_email }}"
-        unattended_mail_only_on_error: true
+    - name: Ensure Podman is installed
+      ansible.builtin.apt:
+        name:
+          - podman
+        state: latest
 
-- name: ARM Install
-  hosts: arm
+    - name: Ensure ARM Users and Groups
+      block:
+        - name: Ensure ARM group exists
+          ansible.builtin.group:
+            name: "{{ arm_group_name }}"
+            gid: "{{ arm_group_id }}"
+            state: present
+
+        - name: Ensure ARM user exists
+          ansible.builtin.user:
+            name: "{{ arm_user_name }}"
+            comment: ARM Podman
+            uid: "{{ arm_user_id }}"
+            create_home: true
+            group: "{{ arm_group_name }}"
+            groups:
+              - cdrom
+              - video
+            append: true
+            shell: /bin/bash
+            state: present
+
+    - name: Ensure Directories
+      block:
+        - name: "Ensure ARM directories exist"
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            mode: '0775'
+            owner: "{{ arm_user_name }}"
+            group: "{{ arm_group_name }}"
+          loop:
+            - "{{ arm_base_dir }}"
+            - "{{ arm_music_dir }}"
+            - "{{ arm_logs_dir }}"
+            - "{{ arm_media_dir }}"
+            - "{{ arm_config_dir }}"
+
+        - name: Ensure NFS mounts
+          ansible.posix.mount:
+            src: "{{ item.host }}:{{ item.src }}"
+            path: "{{ item.dest }}"
+            opts: rw,hard,vers=4
+            state: mounted
+            fstype: nfs
+          loop: "{{ nfs_mounts }}"
+
+# Run the ARM Container as root so we can properly map files to the container
+# Otherwise we would have to fix the issues subuids and subgids
+- name: Install ARM Container
+  hosts: arm0
   debugger: on_failed
   become: true
   tags:
     - install
 
   tasks:
-    - name: Update apt
-      apt:
-        upgrade: yes
-        update_cache: yes
-        cache_valid_time: 600
+    - name: Pull ARM Image
+      containers.podman.podman_image:
+        name: "{{ arm_container_image }}"
+        tag: "{{ arm_container_tag }}"
+        pull: true
+        state: present
 
-    # - name: Install Docker
-    #   ansible.builtin.include_role:
-    #     name: geerlingguy.docker
-    #   vars:
-    #     docker_edition: 'ce'
-    #     docker_packages:
-    #         - "docker-{{ docker_edition }}"
-    #         - "docker-{{ docker_edition }}-cli"
-    #         - "docker-{{ docker_edition }}-rootless-extras"
-    #     docker_packages_state: present
-    #     docker_install_compose: false
+    - name: Create ARM Container
+      containers.podman.podman_container:
+        name: "{{ arm_container_name }}"
+        image: "{{ arm_container_image }}:{{ arm_container_tag }}"
+        state: quadlet
+        # quadlet_file: '0640'
+        quadlet_options:
+          - "AutoUpdate=registry"
+          - "Pull=newer"
+          - |
+            [Unit]
+            Description={{ arm_container_name }} container via Podman
+            After=local-fs.target
+          - |
+            [Install]
+            WantedBy=multi-user.target default.target
+        ports:
+          - "8080:8080"
+        volume:
+          - "{{ arm_base_dir }}:/home/arm"
+          - "{{ arm_music_dir }}:/home/arm/music"
+          - "{{ arm_logs_dir }}:/home/arm/logs"
+          - "{{ arm_media_dir }}:/home/arm/media"
+          - "{{ arm_config_dir }}:/etc/arm/config"
+        env:
+          ARM_UID: "{{ arm_user_id }}"
+          ARM_GID: "{{ arm_group_id }}"
+        privileged: true
+        device:
+          - "/dev/sr0:/dev/sr0"
+          - "/dev/sr1:/dev/sr1"
+          - "/dev/sr2:/dev/sr2"
+          - "/dev/sr3:/dev/sr3"
 
-    - name: Install ARM
-      ansible.builtin.include_role:
-        name: arm
-
-    - name: Install Caddy
-      ansible.builtin.include_role:
-        name: caddy
-      vars:
-        aws_access_key_id: "{{ hostvars[inventory_hostname].aws_access_key_id }}"
-        aws_secret_access_key: "{{ hostvars[inventory_hostname].aws_secret_access_key }}"
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        name: "{{ arm_container_name }}"
+        daemon_reload: true
+        state: restarted
+        enabled: true

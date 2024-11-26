@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+http:
+  routers:
+    arm:
+      rule: "Host(`arm.kijowski.casa`)"
+      service: arm
+
+  services:
+    arm:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.50.13:8080"

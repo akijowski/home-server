@@ -12,7 +12,7 @@ dns_record_sets:
   - record: truenas.kijowski.casa
     value: "192.168.50.4"
   - record: "*.k8s.kijowski.casa"
-    value: "192.168.50.7"
+    value: "192.168.50.20"
   - record: "*.kijowski.casa"
     value: "192.168.50.14"
   - record: "*.mgmt.k8s.kijowski.casa"

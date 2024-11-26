@@ -4,6 +4,21 @@ provider "proxmox" {
 
 locals {
   vms = {
+    arm0 = {
+      name        = "arm0"
+      description = <<-EOF
+        # Automatic Ripping Machine
+        Managed by Terraform.
+
+        https://arm.kijowski.casa
+EOF
+      target_node = "hyperion"
+      vmid        = 0
+      cpu         = 2
+      memory      = 6144 # 6 GiB
+      ip0_ipv4    = "192.168.50.13/24"
+      extra_tags  = ["arm", "ubuntu", "ansible"]
+    }
     traefik0 = {
       name        = "traefik0"
       description = <<-EOF

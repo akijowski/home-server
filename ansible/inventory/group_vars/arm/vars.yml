@@ -1,0 +1,24 @@
+arm_user_name: arm
+arm_group_name: arm
+arm_user_id: 1400
+arm_group_id: 1400
+
+arm_base_dir: /var/lib/arm
+arm_music_dir: /var/lib/arm/music
+arm_logs_dir: /var/lib/arm/logs
+arm_media_dir: /var/lib/arm/media
+arm_config_dir: /etc/arm/config
+
+arm_port: 8080
+
+arm_container_image: 'docker.io/automaticrippingmachine/automatic-ripping-machine'
+arm_container_tag: '2.10.0'
+arm_container_name: arm-rippers
+
+nfs_mounts:
+  - host: '192.168.50.4'
+    src: /mnt/tank1600/autoripm/media
+    dest: "{{ arm_media_dir }}"
+  - host: '192.168.50.4'
+    src: /mnt/tank1600/autoripm/config
+    dest: "{{ arm_config_dir }}"

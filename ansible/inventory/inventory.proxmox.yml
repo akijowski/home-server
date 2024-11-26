@@ -12,6 +12,7 @@ keyed_groups:
 groups:
   ubuntu: "'ubuntu' in (proxmox_tags_parsed|list)"
   traefik: "'traefik' in (proxmox_tags_parsed|list)"
+  arm: "'arm' in (proxmox_tags_parsed|list)"
   # if you use <name>.lan you can parse it like so to make a group (for group_vars) of <name>
   # plex: "'plex' in (proxmox_tags_parsed|list)"
 
