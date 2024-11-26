@@ -6,4 +6,4 @@ More info can be found [at the project repo](https://github.com/traefik/whoami)
 
 ## Links
 
-- https://whoami.k8s.home.kijowski.io
+- https://whoami.k8s.kijowski.casa

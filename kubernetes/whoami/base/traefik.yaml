@@ -3,7 +3,6 @@ apiVersion: traefik.io/v1alpha1
 kind: TraefikService
 metadata:
   name: whoami
-  namespace: whoami
 
 spec:
   weighted:
@@ -17,7 +16,6 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: whoami-redirect-https
-  namespace: whoami
 spec:
   redirectScheme:
     scheme: https
@@ -27,7 +25,6 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: whoami-tls
-  namespace: whoami
   labels:
     app: whoami
     app.kijowski.io/name: whoami
@@ -48,7 +45,6 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: whoami
-  namespace: whoami
   labels:
     app: whoami
     app.kijowski.io/name: whoami
