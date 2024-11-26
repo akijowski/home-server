@@ -32,7 +32,7 @@ spec:
     - '*'
   destinations:
     - namespace: '*'
-      server: https://192.168.50.20:6443
+      server: https://k8s.kijowski.casa:6443
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
