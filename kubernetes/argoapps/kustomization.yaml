@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - base/app-projects.yaml
   - base/apps-mgmt.yaml
+  - base/apps-main.yaml
