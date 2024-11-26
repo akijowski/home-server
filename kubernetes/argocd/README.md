@@ -37,6 +37,11 @@ Use the `argocd` to quickly add external clusters
 
 [Main Docs - without the CLI](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#clusters)
 
+The k3s clusters include TLS SANs for access:
+
+- [DNS entries](../../ansible/core/dns.yml)
+- [k3s config](../../ansible/inventory/k3s.yml)
+
 ## Links
 
 - [ArgoCD Docs: Install with Kustomize](https://argo-cd.readthedocs.io/en/stable/operator-manual/installation/#kustomize)

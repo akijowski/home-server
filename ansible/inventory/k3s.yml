@@ -22,6 +22,10 @@ k3s_cluster:
           filename: prometheus-operator.yaml
       k3s_server:
         flannel-backend: 'wireguard-native'
+        # Additional hostnames or IP addresses to include in the TLS cert for the management port (6443)
+        tls-san:
+          - "cluster.k8s.kijowski.casa"
+          - "k8s.kijowski.casa"
         node-label:
           - "NodeLocation=Hyperion"
           - "NodeFamily=Ubuntu"
@@ -62,6 +66,10 @@ k3s_mgmt_cluster:
           filename: system-upgrade-controller-crd.yaml
       k3s_server:
         flannel-backend: 'wireguard-native'
+        # Additional hostnames or IP addresses to include in the TLS cert for the management port (6443)
+        tls-san:
+          - "cluster.mgmt.k8s.kijowski.casa"
+          - "mgmt.k8s.kijowski.casa"
         node-label:
           - "NodeLocation=TuringPi"
           - "NodeFamily=CM4"

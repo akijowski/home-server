@@ -137,6 +137,7 @@
         state: directory
 
     # https://tteck.github.io/Proxmox
+    # TODO: update to https://github.com/community-scripts/ProxmoxVE :(
     - name: Download helper scripts
       ansible.builtin.get_url:
         url: "https://github.com/tteck/Proxmox/raw/main/misc/{{ item }}"

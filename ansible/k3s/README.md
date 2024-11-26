@@ -16,6 +16,9 @@ This Ansible role seemed better than the "official" Ansible role.
 At the time, the official role did not look easy to import in to my playbooks.
 Also, the role seemed to have only occasional support compared to this actively maintained role.
 
+> Note: You must run the clusters separately to prevent the Ansible Role from trying to combine the two clusters.
+> The way to do this is with the `--limit` flag to choose either `k3s_cluster` or `k3s_mgmt_cluster`.
+
 ## How it is used
 
 K3s is used as the Kubernetes cluster for my entire homelab.

@@ -12,6 +12,7 @@
       ansible.builtin.apt:
         name:
           - nfs-common
+          - lsscsi
           - wireguard # for wireguard-native CNI
         update_cache: true
     # https://docs.k3s.io/installation/requirements?os=pi#operating-systems
