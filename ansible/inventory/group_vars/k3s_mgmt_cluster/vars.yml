@@ -9,3 +9,5 @@ aws_access_key_id: "{{ vault_aws_access_key_id }}" # ACMEKijowskiCasa
 aws_secret_access_key: "{{ vault_aws_secret_access_key }}"
 aws_dns_email: agkijow@gmail.com
 aws_hosted_zone_id: Z04339162XE6R6IN7WK59 # kijowski.casa
+# Kubeconfig cluster vars
+kubeconfig_hostname: mgmt.k8s.kijowski.casa

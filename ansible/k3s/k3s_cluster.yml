@@ -82,7 +82,8 @@
           ansible.builtin.replace:
             path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.kube/{{ group_names | select('match', '^k3s.*$') | first }}_{{ inventory_hostname }}.yaml"
             regexp: '(?P<proto>http(s?)://)(?P<uri>\d{0,3}.\d{0,3}.\d{0,3}.\d{0,3})(?P<port>:\d+)$'
-            replace: "\\g<proto>{{ controller_ip }}\\g<port>"
+            # replace: "\\g<proto>{{ controller_ip }}\\g<port>"
+            replace: "\\g<proto>{{ kubeconfig_hostname }}\\g<port>"
 
         - name: Update context name
           delegate_to: 127.0.0.1

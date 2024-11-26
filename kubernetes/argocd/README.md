@@ -35,6 +35,10 @@ Apply the Kustomization with:
 Use the `argocd` to quickly add external clusters
 [CLI Docs](https://argo-cd.readthedocs.io/en/stable/user-guide/commands/argocd_cluster_add/)
 
+```bash
+argocd cluster add k3s_cluster --name main-cluster --upsert
+```
+
 [Main Docs - without the CLI](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#clusters)
 
 The k3s clusters include TLS SANs for access:
