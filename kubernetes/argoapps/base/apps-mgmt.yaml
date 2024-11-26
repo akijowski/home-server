@@ -46,7 +46,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: longhorn
+  name: longhorn-ui
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
