@@ -3,12 +3,10 @@ apiVersion: traefik.io/v1alpha1
 kind: TraefikService
 metadata:
   name: tdarr-server
-  namespace: tdarr
   labels:
     app: tdarr-server
     app.kubernetes.io/name: tdarr-server
     app.kubernetes.io/component: network
-    app.kubernetes.io/part-of: tdarr
 
 spec:
   weighted:
@@ -22,12 +20,10 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: tdarr-redirect-https
-  namespace: tdarr
   labels:
     app: tdarr-server
     app.kubernetes.io/name: tdarr-server
     app.kubernetes.io/component: network
-    app.kubernetes.io/part-of: tdarr
 spec:
   redirectScheme:
     scheme: https
@@ -38,12 +34,10 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: tdarr-server-tls
-  namespace: tdarr
   labels:
     app: tdarr-server
     app.kubernetes.io/name: tdarr-server
     app.kubernetes.io/component: network
-    app.kubernetes.io/part-of: tdarr
 spec:
   entryPoints:
     - websecure
@@ -62,12 +56,10 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: tdarr-server
-  namespace: tdarr
   labels:
     app: tdarr-server
     app.kubernetes.io/name: tdarr-server
     app.kubernetes.io/component: network
-    app.kubernetes.io/part-of: tdarr
 spec:
   entryPoints:
     - web

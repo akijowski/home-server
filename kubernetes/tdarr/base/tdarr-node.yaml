@@ -3,12 +3,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tdarr-node
-  namespace: tdarr
   labels:
     app: tdarr-node
     app.kubernetes.io/name: tdarr-node
     app.kubernetes.io/component: node
-    app.kubernetes.io/part-of: tdarr
 spec:
   selector:
     app: tdarr-node
@@ -22,12 +20,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: tdarr-node
-  namespace: tdarr
   labels:
     app: tdarr-node
     app.kubernetes.io/name: tdarr-node
     app.kubernetes.io/component: node
-    app.kubernetes.io/part-of: tdarr
 spec:
   serviceName: tdarr-node
   replicas: 1
@@ -41,11 +37,10 @@ spec:
         app: tdarr-node
         app.kubernetes.io/name: tdarr-node
         app.kubernetes.io/component: node
-        app.kubernetes.io/part-of: tdarr
     spec:
       containers:
         - name: tdarr-node
-          image: ghcr.io/haveagitgat/tdarr_node:2.22.01
+          image: ghcr.io/haveagitgat/tdarr_node:latest
           imagePullPolicy: Always
           resources:
             limits:
@@ -116,12 +111,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: tdarr-node-env
-  namespace: tdarr
   labels:
     app: tdarr-node
     app.kubernetes.io/name: tdarr-node-env
     app.kubernetes.io/component: config
-    app.kubernetes.io/part-of: tdarr
 data:
   TZ: "America/Denver"
   PUID: "1400"

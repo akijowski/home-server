@@ -12,7 +12,8 @@
     "kubectl@latest",
     "kubecm@latest",
     "k9s@latest",
-    "argocd@latest"
+    "argocd@latest",
+    "kustomize@latest"
   ],
   "shell": {
     "init_hook": [

@@ -3,194 +3,103 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: tdarr-arm-raw-pv
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-arm-raw-pv
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   capacity:
     storage: 1Ti
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  mountOptions:
-    - hard
-    - nfsvers=4.1
   nfs:
     path: /mnt/tank0400/autoripm/media
-    server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: tdarr-cache
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-cache
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   capacity:
     storage: 1Ti
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  mountOptions:
-    - hard
-    - nfsvers=4.1
   nfs:
     path: /mnt/tank0400/tdarr/cache
-    server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: tdarr-server
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-server
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   capacity:
     storage: 1Ti
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  mountOptions:
-    - hard
-    - nfsvers=4.1
   nfs:
     path: /mnt/tank0400/tdarr/server
-    server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: plex-media-movies
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: plex-media-movies
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   capacity:
     storage: 4Ti
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  mountOptions:
-    - hard
-    - nfsvers=4.1
   nfs:
     path: /mnt/tank1600/plex/libraries/video/movies
-    server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: plex-media-uhd-movies
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: plex-media-uhd-movies
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   capacity:
     storage: 4Ti
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  mountOptions:
-    - hard
-    - nfsvers=4.1
   nfs:
     path: /mnt/tank1600/plex/libraries/video/uhd-movies
-    server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: plex-media-tv
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: plex-media-tv
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   capacity:
     storage: 4Ti
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  mountOptions:
-    - hard
-    - nfsvers=4.1
   nfs:
     path: /mnt/tank1600/plex/libraries/video/tv-shows
-    server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: tdarr-config
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-config
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   capacity:
     storage: 5Mi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  mountOptions:
-    - hard
-    - nfsvers=4.1
   nfs:
     path: /mnt/tank0400/tdarr/config
-    server: 192.168.50.4
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: tdarr-arm-raw-pvc
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-arm-raw-pvc
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   resources:
     requests:
       storage: 1Ti
-  volumeMode: Filesystem
-  storageClassName: ""
-  accessModes:
-    - ReadWriteMany
   volumeName: tdarr-arm-raw-pv
 
 ---
@@ -198,19 +107,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: tdarr-cache
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-cache
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   resources:
     requests:
       storage: 1Ti
-  volumeMode: Filesystem
-  storageClassName: ""
-  accessModes:
-    - ReadWriteMany
   volumeName: tdarr-cache
 
 ---
@@ -218,19 +120,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: tdarr-server
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-server
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   resources:
     requests:
       storage: 1Ti
-  volumeMode: Filesystem
-  storageClassName: ""
-  accessModes:
-    - ReadWriteMany
   volumeName: tdarr-server
 
 ---
@@ -238,19 +133,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: plex-media-movies
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: plex-media-movies
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   resources:
     requests:
       storage: 4Ti
-  volumeMode: Filesystem
-  storageClassName: ""
-  accessModes:
-    - ReadWriteMany
   volumeName: plex-media-movies
 
 ---
@@ -258,19 +146,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: plex-media-uhd-movies
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: plex-media-uhd-movies
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   resources:
     requests:
       storage: 4Ti
-  volumeMode: Filesystem
-  storageClassName: ""
-  accessModes:
-    - ReadWriteMany
   volumeName: plex-media-uhd-movies
 
 ---
@@ -278,19 +159,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: plex-media-tv
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: plex-media-tv
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   resources:
     requests:
       storage: 4Ti
-  volumeMode: Filesystem
-  storageClassName: ""
-  accessModes:
-    - ReadWriteMany
   volumeName: plex-media-tv
 
 ---
@@ -298,19 +172,12 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: tdarr-config
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: tdarr-config
-    app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   resources:
     requests:
       storage: 5Mi
-  volumeMode: Filesystem
-  storageClassName: ""
-  accessModes:
-    - ReadWriteMany
   volumeName: tdarr-config
 
 ---
@@ -318,11 +185,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nfs-debug
-  namespace: tdarr
   labels:
     app.kubernetes.io/name: nfs-debug
     app.kubernetes.io/component: storage
-    app.kubernetes.io/part-of: tdarr
 spec:
   revisionHistoryLimit: 3
   selector:

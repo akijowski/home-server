@@ -1,0 +1,12 @@
+# Base PVC Resource
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unused
+  labels:
+    app.kubernetes.io/component: storage
+spec:
+  volumeMode: Filesystem
+  storageClassName: ""
+  accessModes:
+    - ReadWriteMany
