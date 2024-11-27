@@ -102,6 +102,15 @@ spec:
           persistentVolumeClaim:
             claimName: plex-media-tv
 
+      # Require the node on an agent node when scheduling
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: 'node-role.kubernetes.io/control-plane'
+                    operator: DoesNotExist
+
       # Any filesystem mounted to the pod will be owned by this group
       securityContext:
         fsGroup: 1400
