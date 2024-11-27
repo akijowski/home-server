@@ -1,9 +1,15 @@
 #unattended upgrades
 unattended_email: agkijow@gmail.com
-# nfs role
-truenas_ipv4: '192.168.50.4'
+# plex
+plex_user_id: 1800
+plex_group_id: 1800
 plex_libraries_root_dir: '/var/lib/plex/libraries'
 plex_metadata_nfs_root_dir: '/opt/plex/metadata'
+# metadata should be local and preferably on an SSD for performance
+# TODO: related support link
+plex_metadata_ssd_root_dir: '/mnt/ssd/plexmetadata'
+# nfs role
+truenas_ipv4: '192.168.50.4'
 nfs_mounts:
   - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank1600/plex/metadata'

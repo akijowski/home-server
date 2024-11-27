@@ -1,7 +1,5 @@
 plex_user_name: plex
-plex_user_id: 1800
 plex_group_name: plex
-plex_group_id: 1800
 plex_additional_groups: []
 
 # https://support.plex.tv/articles/202915258-where-is-the-plex-media-server-data-directory-located/

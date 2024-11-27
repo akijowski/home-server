@@ -6,8 +6,9 @@ set -eou pipefail
 
 function main() {
     # use rsync to copy from local ssd to nfs-backed storage
+    # I need to clean this up a lot
     rm -f /var/log/rsync_plex_metadata.log
-    rsync --archive --stats --log-file=/var/log/rsync_plex_metadata.log /mnt/ssd/plexmediaserver/ {{ plex_metadata_nfs_root_dir }}/
+    rsync --archive --stats --log-file=/var/log/rsync_plex_metadata.log {{ plex_metadata_ssd_root_dir }}/ {{ plex_metadata_nfs_root_dir }}/
 }
 
 main "$@"

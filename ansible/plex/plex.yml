@@ -1,66 +1,10 @@
 ---
-- name: Initialize LXC
+- name: Install Plex
   hosts: plex
   debugger: on_failed
   become: true
   tags:
-    - init
-
-  tasks:
-    - name: Update packages
-      ansible.builtin.apt:
-        upgrade: yes
-        state: present
-
-    - name: Install packages
-      ansible.builtin.apt:
-        update_cache: yes
-        cache_valid_time: 86400 # 1 day
-        name:
-          - curl
-          - wget
-          - fail2ban
-          - vim
-          - unzip
-          - gpg
-          - mailutils
-          - ufw
-          - git
-        state: latest
-
-    - name: Install unattended upgrades
-      ansible.builtin.import_role:
-        name: hifis.unattended_upgrades
-      vars:
-        unattended_automatic_reboot: true
-        unattended_syslog_enable: true
-        unattended_mail: "{{ unattended_email }}"
-        unattended_mail_only_on_error: true
-
-    - name: Disable password authentication for root
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        state: present
-        regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin prohibit-password'
-
-    - name: UFW - Allow SSH connections
-      community.general.ufw:
-        rule: allow
-        name: OpenSSH
-
-    - name: UFW - Deny all other incoming traffic by default
-      community.general.ufw:
-        state: enabled
-        policy: deny
-        direction: incoming
-
-- name: Preconfigure the host
-  hosts: plex
-  debugger: on_failed
-  become: true
-  tags:
-    - pre_config
+    - install
 
   tasks:
     - name: Install additional packages
@@ -68,7 +12,6 @@
         update_cache: yes
         name:
           - nfs-common
-          - rsync
         state: latest
 
     - name: Mount NFS directories
@@ -82,16 +25,45 @@
 
     - name: Create Plex ssd metadata directory
       ansible.builtin.file:
-        path: /mnt/ssd/plexmediaserver
+        path: "{{ plex_metadata_ssd_root_dir }}"
         state: directory
 
+    # Make sure to seed the metadata from the NFS at least once otherwise plex will not start (often with permission denied)
     - name: Create symlink to Plex metadata directory
       ansible.builtin.file:
-        src: /mnt/ssd/plexmediaserver
+        src: "{{ plex_metadata_ssd_root_dir }}"
         path: /var/lib/plexmediaserver
         state: link
-        owner: 1800
-        group: 1800
+        owner: "{{ plex_user_id }}"
+        group: "{{ plex_group_id }}"
+
+    - ansible.builtin.import_role:
+        name: akijowski.plex
+      vars:
+        # plex_user_id: "{{ plex_user_id }}"
+        # plex_group_id: "{{ plex_group_id }}"
+        plex_additional_dirs:
+        # Make sure the ownership permissions are set on these directories
+          - "{{ plex_libraries_root_dir }}/audio/music"
+          - "{{ plex_libraries_root_dir }}/video/movies"
+          - "{{ plex_libraries_root_dir }}/video/9round"
+          - "{{ plex_libraries_root_dir }}/video/tv-shows"
+          - "{{ plex_libraries_root_dir }}/video/uhd-movies"
+
+- name: Sync metadata from SSD to NFS
+  hosts: plex
+  debugger: on_failed
+  become: true
+  tags:
+    - sync
+
+  tasks:
+    - name: Ensure additional packages
+      ansible.builtin.apt:
+        update_cache: yes
+        name:
+          - rsync
+        state: latest
 
     - name: Create rsync script directory
       ansible.builtin.file:
@@ -100,7 +72,7 @@
 
     - name: Copy rsync script
       ansible.builtin.template:
-        src: conf/sync_metadata.sh.j2
+        src: templates/sync_metadata.sh.j2
         dest: /etc/plex_metadata_sync/sync.sh
         mode: '0774'
 
@@ -120,33 +92,14 @@
   tasks:
     - name: Proceed?
       ansible.builtin.pause:
-        prompt: This will overwrite data from the NFS storage pool, specify 'Y' to proceed
+        prompt: This will overwrite data from the NFS storage pool (it could take a while), specify 'Y' to proceed
       register: seed_metadata
 
     - name: Seed Plex metadata from NFS
       ansible.builtin.copy:
-        src: '{{ plex_metadata_nfs_root_dir }}/'
+        src: "{{ plex_metadata_nfs_root_dir }}/"
         remote_src: true
-        dest: /mnt/ssd/plexmediaserver/
-        owner: 1800
-        group: 1800
-      when: seed_metadata.user_input == Y
-
-- name: Install Plex
-  hosts: plex
-  debugger: on_failed
-  become: true
-  tags:
-    - install
-
-  tasks:
-    - ansible.builtin.import_role:
-        name: akijowski.plex
-      vars:
-        plex_additional_dirs:
-        # Make sure the ownership permissions are set on these directories
-          - /var/lib/plex/libraries/audio/music
-          - /var/lib/plex/libraries/video/movies
-          - /var/lib/plex/libraries/video/9round
-          - /var/lib/plex/libraries/video/tv-shows
-          - /var/lib/plex/libraries/video/uhd-movies
+        dest: "{{ plex_metadata_ssd_root_dir }}/"
+        owner: "{{ plex_user_id }}"
+        group: "{{ plex_group_id }}"
+      when: seed_metadata.user_input == "Y"

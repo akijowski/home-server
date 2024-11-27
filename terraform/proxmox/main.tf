@@ -75,6 +75,21 @@ EOF
       ip0_ipv4    = "192.168.50.21/24"
       extra_tags  = ["k3s", "ubuntu", "ansible"]
     }
+    plex0 = {
+      name = "plex0"
+      description = <<-EOF
+        # Plexmediaserver
+        Managed by Terraform.
+
+        https://plex.tv
+EOF
+      target_node = "hyperion"
+      vmid = 0
+      cpu = 3
+      memory = 6144 # 6 GiB
+      ip0_ipv4 = "192.168.50.11/24"
+      extra_tags = ["plex", "ubuntu", "ansible"]
+    }
   }
 }
 

@@ -8,3 +8,9 @@
   ansible.builtin.assert:
     that: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     msg: "This module only works with Debian and Ubuntu releases"
+
+- name: Assert variables are defined
+  ansible.builtin.assert:
+    that:
+      - plex_user_id is defined
+      - plex_group_id is defined
