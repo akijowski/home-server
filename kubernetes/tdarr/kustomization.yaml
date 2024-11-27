@@ -24,6 +24,7 @@ patches:
 
 images:
   - name: ghcr.io/haveagitgat/tdarr
+  # Also set the StatefulSet image
     newTag: '2.27.02'
 
 replicas:
