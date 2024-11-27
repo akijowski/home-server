@@ -1,7 +1,0 @@
-version: 3
-
-tasks:
-  update-ssh:
-    desc: update the ssh hosts-file for plex
-    cmds:
-      - ssh-keyscan -H 192.168.11.5 >> ~/.ssh/known_hosts

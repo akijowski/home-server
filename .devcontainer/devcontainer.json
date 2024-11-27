@@ -1,68 +1,16 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-	"name": "Home-Server",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
-	// set to vscode so that we can mount in to the vscode home dir
-	"remoteUser": "vscode",
-	"runArgs": [
-		// make sure podman maps properly in a rootless container.  Not needed for Docker.
-		"--userns=keep-id:uid=1000,gid=1000",
-		"--name=home_server_devcontainer"
-		// "--env-file=${localWorkspaceFolder}/container.env"
-	],
-	"postCreateCommand": "task devcontainer:postcreate",
-	"postStartCommand": "task ansible:install",
-	// "updateRemoteUserUID": true,
-	"mounts": [
-		// https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
-		"type=bind,src=${localEnv:HOME}/.1password,dst=${containerEnv:HOME}/.1password",
-		"type=bind,src=${localEnv:HOME}/.ssh,dst=${containerEnv:HOME}/.ssh",
-		"type=bind,src=${localEnv:HOME}/.kube,dst=${containerEnv:HOME}/.kube"
-	],
-	"containerEnv": {
-		"SSH_AUTH_SOCK": "${containerEnv:HOME}/.1password/agent.sock",
-		"ANSIBLE_ROLES_PATH": "/root/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:${containerWorkspaceFolder}/ansible/roles",
-		"ANSIBLE_VAULT_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.vault_pass.txt",
-		"ANSIBLE_BECOME_PASSWORD_FILE": "${containerWorkspaceFolder}/ansible/.secrets/.become_pass.txt"
-	},
-	"shutdownAction": "stopContainer",
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {
-		"ghcr.io/devcontainers-contrib/features/direnv:1": {},
-		"ghcr.io/devcontainers-contrib/features/go-task:1": {},
-        "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-            "minikube": "none"
-        },
-		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
-			// space separated list
-			"plugins": "kubectl"
-		},
-		"ghcr.io/dhoeric/features/k9s:1": {}
-	},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
-
-	// Configure tool-specific properties.
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"redhat.vscode-yaml",
-				"ms-python.python",
-				"wholroyd.jinja",
-				"ms-kubernetes-tools.vscode-kubernetes-tools",
-				"hashicorp.hcl",
-				"hashicorp.terraform"
-			]
-		}
-	}
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+  "name": "Devbox Remote Container",
+  "build": {
+    "dockerfile": "./Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "jetpack-io.devbox"
+      ]
+    }
+  },
+  "remoteUser": "devbox"
 }

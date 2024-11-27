@@ -1,7 +1,7 @@
 ---
 plugin: community.general.proxmox
 
-validate_certs: false
+validate_certs: true
 want_facts: true
 
 keyed_groups:
