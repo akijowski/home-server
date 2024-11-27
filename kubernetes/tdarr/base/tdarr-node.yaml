@@ -44,8 +44,8 @@ spec:
           imagePullPolicy: Always
           resources:
             limits:
-              memory: "6Gi"
-              cpu: "12"
+              memory: "4Gi"
+              cpu: "6"
           ports:
             - containerPort: 8266
               name: node

@@ -161,9 +161,7 @@ spec:
               preference:
                 matchExpressions:
                   - key: 'node-role.kubernetes.io/control-plane'
-                    operator: In
-                    values:
-                      - 'true'
+                    operator: Exists
 
 ---
 apiVersion: v1
