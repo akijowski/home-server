@@ -5,3 +5,20 @@ namespace: monitoring
 
 resources:
   - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.78.2/bundle.yaml
+
+# Add node selectors to keep the operator on the control-plane node
+patches:
+  - target:
+      kind: Deployment
+      name: prometheus-operator
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: prometheus-operator
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              kubernetes.io/os: linux
+              node-role.kubernetes.io/control-plane: true
