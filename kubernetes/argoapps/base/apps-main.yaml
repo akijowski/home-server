@@ -38,3 +38,23 @@ spec:
     path: kubernetes/whoami
     repoURL: git@github.com:akijowski/home-server.git
     targetRevision: HEAD
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-operator
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  destination:
+    namespace: monitoring
+    name: main-cluster
+  project: cluster
+  source:
+    path: kubernetes/prometheus-op
+    repoURL: git@github.com:akijowski/home-server.git
+    targetRevision: HEAD

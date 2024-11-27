@@ -18,8 +18,6 @@ k3s_cluster:
           filename: system-upgrade-controller.yaml
         - url: 'https://github.com/rancher/system-upgrade-controller/releases/download/v0.14.2/crd.yaml'
           filename: system-upgrade-controller-crd.yaml
-        - url: 'https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.78.1/stripped-down-crds.yaml'
-          filename: prometheus-operator.yaml
       k3s_server:
         flannel-backend: 'wireguard-native'
         # Additional hostnames or IP addresses to include in the TLS cert for the management port (6443)
