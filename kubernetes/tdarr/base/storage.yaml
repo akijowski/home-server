@@ -9,7 +9,7 @@ spec:
   capacity:
     storage: 1Ti
   nfs:
-    path: /mnt/tank0400/autoripm/media
+    path: /mnt/tank1600/autoripm/media
 
 ---
 apiVersion: v1
