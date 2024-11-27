@@ -1,3 +1,0 @@
-#!/usr/bin/env zsh
-
-kubectl get secret admin -n kube-dashboard -o jsonpath={".data.token"} | base64 -d
