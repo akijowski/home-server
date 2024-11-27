@@ -21,4 +21,4 @@ patches:
           spec:
             nodeSelector:
               kubernetes.io/os: linux
-              node-role.kubernetes.io/control-plane: true
+              node-role.kubernetes.io/control-plane: "true"
