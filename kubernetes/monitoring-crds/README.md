@@ -1,12 +1,16 @@
-# Prometheus Operator
+# Monitoring Operators
 
-Kubernetes Operator for Prometheus.
+Kubernetes Operator for Monitoring:
+
+- Prometheus
+- Grafana
 
 ## Project
 
 - [Site](https://prometheus.io/docs/introduction/overview/)
 - [Repo](https://github.com/prometheus-operator/prometheus-operator)
 - [Operator Getting Started](https://prometheus-operator.dev/docs/prologue/introduction/)
+- [Grafana Operator](https://grafana.github.io/grafana-operator/docs/)
 
 ## How it is used
 

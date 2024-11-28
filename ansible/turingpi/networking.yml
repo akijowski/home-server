@@ -36,6 +36,10 @@
       notify:
         - netplan apply
 
+    - name: "Set hostname for {{ inventory_hostname }}"
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
   handlers:
     - name: netplan apply
       ansible.builtin.command: netplan apply
