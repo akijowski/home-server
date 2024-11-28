@@ -21,6 +21,16 @@ patches:
     target:
       kind: PersistentVolumeClaim
       version: v1
+  - target:
+      kind: StatefulSet
+      name: tdarr-node
+    patch: |-
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: tdarr-node
+      spec:
+        replicas: 2
 
 images:
   - name: ghcr.io/haveagitgat/tdarr

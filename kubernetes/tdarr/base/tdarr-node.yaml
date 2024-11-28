@@ -34,7 +34,7 @@ spec:
   template:
     metadata:
       labels:
-        app: tdarr-node
+        app: tdarr-node # used for affinity
         app.kubernetes.io/name: tdarr-node
         app.kubernetes.io/component: node
     spec:
@@ -103,6 +103,7 @@ spec:
             claimName: plex-media-tv
 
       # Require the node on an agent node when scheduling
+      # Prevent tdarr from being scheduled on the same node
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -110,6 +111,15 @@ spec:
               - matchExpressions:
                   - key: 'node-role.kubernetes.io/control-plane'
                     operator: DoesNotExist
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - tdarr-node
+              topologyKey: "kubernetes.io/hostname"
 
       # Any filesystem mounted to the pod will be owned by this group
       securityContext:
