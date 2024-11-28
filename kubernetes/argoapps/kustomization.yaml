@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - base/app-projects.yaml
-  - base/apps-mgmt.yaml
-  - base/apps-main.yaml
+  - app-projects/project-cluster.yaml
+  - app-projects/project-mgmt.yaml
+  - resources/apps-mgmt
+  - resources/apps-main

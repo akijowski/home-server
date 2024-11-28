@@ -1,0 +1,22 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-operator
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      # https://www.arthurkoziel.com/fixing-argocd-crd-too-long-error/
+      - ServerSideApply=true
+  destination:
+    namespace: monitoring
+    name: main-cluster
+  project: cluster
+  source:
+    path: kubernetes/prometheus-op
+    repoURL: git@github.com:akijowski/home-server.git
+    targetRevision: HEAD
