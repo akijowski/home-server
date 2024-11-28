@@ -5,6 +5,7 @@ namespace: monitoring-crds
 
 resources:
   - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.78.2/bundle.yaml
+  - https://github.com/grafana/grafana-operator/releases/download/v5.15.1/kustomize-cluster_scoped.yaml
 
 # Add node selectors to keep the operator on the control-plane node
 patches:
@@ -22,3 +23,14 @@ patches:
             nodeSelector:
               kubernetes.io/os: linux
               node-role.kubernetes.io/control-plane: "true"
+
+  # https://github.com/kubernetes-sigs/kustomize/issues/1593#issuecomment-1470553193
+  # Delete the namespace, argo will make it for us
+  - target:
+      kind: Namespace
+    patch: |-
+      $patch: delete
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring-crds
