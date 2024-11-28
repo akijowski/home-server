@@ -13,10 +13,10 @@ spec:
       # https://www.arthurkoziel.com/fixing-argocd-crd-too-long-error/
       - ServerSideApply=true
   destination:
-    namespace: monitoring
+    namespace: monitoring-crds
     name: main-cluster
   project: cluster
   source:
-    path: kubernetes/prometheus-op
+    path: kubernetes/monitoring-crds
     repoURL: git@github.com:akijowski/home-server.git
     targetRevision: HEAD
