@@ -13,7 +13,7 @@ spec:
   destination:
     namespace: monitoring
     name: main-cluster
-  project: cluster
+  project: monitoring
   source:
     path: kubernetes/monitoring
     repoURL: git@github.com:akijowski/home-server.git

@@ -1,0 +1,21 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: monitoring
+  namespace: argocd
+  # Finalizer that ensures that project is not deleted until it is not referenced by any application
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Monitoring Applications
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: 'monitoring,monitoring-crds'
+      server: https://k8s.kijowski.casa:6443
+    - namespace: 'monitoring,monitoring-crds'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

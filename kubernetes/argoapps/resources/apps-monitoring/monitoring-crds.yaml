@@ -15,7 +15,7 @@ spec:
   destination:
     namespace: monitoring-crds
     name: main-cluster
-  project: cluster
+  project: monitoring
   source:
     path: kubernetes/monitoring-crds
     repoURL: git@github.com:akijowski/home-server.git

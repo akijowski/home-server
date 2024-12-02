@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - app-projects/project-cluster.yaml
   - app-projects/project-mgmt.yaml
+  - app-projects/project-monitoring.yaml
   - resources/apps-mgmt
   - resources/apps-main
