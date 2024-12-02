@@ -40,3 +40,11 @@ images:
 replicas:
   - name: tdarr-server
     count: 1
+
+configMapGenerator:
+  - name: startup-scripts
+    behavior: create
+    options:
+      disableNameSuffixHash: true
+    files:
+      - update-ffmpeg.sh

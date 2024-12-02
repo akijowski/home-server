@@ -62,6 +62,9 @@ spec:
               mountPath: /app/configs
             - name: logs
               mountPath: /app/logs
+            - name: startup-scripts
+              mountPath: /custom-cont-init.d/update-ffmpeg.sh
+              subPath: update-ffmpeg.sh
             - name: nfs-raw-media
               mountPath: /media
             - name: nfs-cache
@@ -79,6 +82,13 @@ spec:
           emptyDir: {}
         - name: config
           emptyDir: {}
+        - name: startup-scripts
+          configMap:
+            name: startup-scripts
+            defaultMode: 0770
+            items:
+              - key: update-ffmpeg.sh
+                path: update-ffmpeg.sh
 
         - name: nfs-cache
           persistentVolumeClaim:

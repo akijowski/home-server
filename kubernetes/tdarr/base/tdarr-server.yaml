@@ -97,6 +97,9 @@ spec:
               mountPath: /app/configs
             - name: logs
               mountPath: /app/logs
+            - name: startup-scripts
+              mountPath: /custom-cont-init.d/update-ffmpeg.sh
+              subPath: update-ffmpeg.sh
             - name: nfs-raw-media
               mountPath: /media
             - name: nfs-cache
@@ -123,6 +126,14 @@ spec:
         #     items:
         #       - key: Tdarr_Server_Config.json
         #         path: Tdarr_Server_Config.json
+        - name: startup-scripts
+          configMap:
+            name: startup-scripts
+            defaultMode: 0770
+            items:
+              - key: update-ffmpeg.sh
+                path: update-ffmpeg.sh
+
         - name: nfs-raw-media
           persistentVolumeClaim:
             claimName: tdarr-arm-raw-pvc
