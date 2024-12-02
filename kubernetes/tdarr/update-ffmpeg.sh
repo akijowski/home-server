@@ -43,8 +43,8 @@ function download_arm64() {
     deb_file="jellyfin-ffmpeg7_$nonsemver-jammy_arm64.deb"
     dl_url="https://github.com/$JELLYFIN_GITHUB_REPO/releases/download/$JELLYFIN_FFMPEG_LATEST/$deb_file"
     logf "downloading: $dl_url"
-    wget "$dl_url"
-    apt install -y "./$deb_file"
+    wget -q "$dl_url"
+    apt install -yq "./$deb_file"
     logf "cleaning up $deb_file"
     rm -rf "./$deb_file"
 }
@@ -56,8 +56,8 @@ function download_amd64() {
     deb_file="jellyfin-ffmpeg7_$nonsemver-jammy_amd64.deb"
     dl_url="https://github.com/$JELLYFIN_GITHUB_REPO/releases/download/$JELLYFIN_FFMPEG_LATEST/$deb_file"
     logf "downloading: $dl_url"
-    wget "$dl_url"
-    apt install -y "./$deb_file"
+    wget -q "$dl_url"
+    apt install -yq "./$deb_file"
     logf "cleaning up $deb_file"
     rm -rf "./$deb_file"
 }
@@ -74,8 +74,8 @@ function download_latest() {
 function link_binaries() {
     logf "setting symlinks"
     jf="/usr/lib/jellyfin-ffmpeg/ffmpeg"
-    ln -sv "$jf" "/usr/local/bin/ffmpeg"
-    ln -sv "$jf" "/usr/local/bin/tdarr-ffmpeg"
+    ln -sfv "$jf" "/usr/local/bin/ffmpeg"
+    ln -sfv "$jf" "/usr/local/bin/tdarr-ffmpeg"
 }
 
 function main() {
