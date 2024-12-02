@@ -24,7 +24,7 @@ function ensure_required_apps() {
         logf "wget is required by not installed. Exiting."
         exit 1
     fi
-    if [-z "$(command -v sed)" ]; then
+    if [ -z "$(command -v sed)" ]; then
         logf "sed is required by not installed. Exiting."
         exit 1
     fi
@@ -43,7 +43,7 @@ function download_arm64() {
     deb_file="jellyfin-ffmpeg7_$nonsemver-jammy_arm64.deb"
     dl_url="https://github.com/$JELLYFIN_GITHUB_REPO/releases/download/$JELLYFIN_FFMPEG_LATEST/$deb_file"
     logf "downloading: $dl_url"
-    wget "dl_url"
+    wget "$dl_url"
     apt install -y "./$deb_file"
     logf "cleaning up $deb_file"
     rm -rf "./$deb_file"
@@ -56,7 +56,7 @@ function download_amd64() {
     deb_file="jellyfin-ffmpeg7_$nonsemver-jammy_amd64.deb"
     dl_url="https://github.com/$JELLYFIN_GITHUB_REPO/releases/download/$JELLYFIN_FFMPEG_LATEST/$deb_file"
     logf "downloading: $dl_url"
-    wget "dl_url"
+    wget "$dl_url"
     apt install -y "./$deb_file"
     logf "cleaning up $deb_file"
     rm -rf "./$deb_file"
@@ -64,7 +64,7 @@ function download_amd64() {
 
 # TODO: refactor
 function download_latest() {
-    if [ uname -m | grep -q aarch64 ]; then
+    if uname -m | grep -q aarch64; then
         download_arm64
     else
         download_amd64
