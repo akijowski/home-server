@@ -5,5 +5,5 @@ This directory manages the [App of Apps](https://argo-cd.readthedocs.io/en/stabl
 These resources are created:
 
 - Namespaces
-- AppProjects (mgmt and main)
+- AppProjects (mgmt, main, monitoring)
 - Applications

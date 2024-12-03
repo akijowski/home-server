@@ -7,3 +7,4 @@ resources:
   - app-projects/project-monitoring.yaml
   - resources/apps-mgmt
   - resources/apps-main
+  - resources/apps-monitoring
