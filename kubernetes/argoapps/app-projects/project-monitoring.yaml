@@ -12,9 +12,13 @@ spec:
   sourceRepos:
     - '*'
   destinations:
-    - namespace: 'monitoring,monitoring-crds'
+    - namespace: 'monitoring'
       server: https://k8s.kijowski.casa:6443
-    - namespace: 'monitoring,monitoring-crds'
+    - namespace: 'monitoring-crds'
+      server: https://k8s.kijowski.casa:6443
+    - namespace: 'monitoring'
+      server: https://kubernetes.default.svc
+    - namespace: 'monitoring-crds'
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
