@@ -45,6 +45,6 @@ configMapGenerator:
   - name: startup-scripts
     behavior: create
     options:
-      disableNameSuffixHash: true
+      disableNameSuffixHash: false # this will force pod restarts on config changes
     files:
       - update-ffmpeg.sh
