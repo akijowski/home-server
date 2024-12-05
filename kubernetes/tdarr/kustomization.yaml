@@ -30,7 +30,7 @@ patches:
       metadata:
         name: tdarr-node
       spec:
-        replicas: 2
+        replicas: 1
 
 images:
   - name: ghcr.io/haveagitgat/tdarr
