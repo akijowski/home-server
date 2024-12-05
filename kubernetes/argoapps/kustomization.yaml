@@ -5,6 +5,8 @@ resources:
   - app-projects/project-cluster.yaml
   - app-projects/project-mgmt.yaml
   - app-projects/project-monitoring.yaml
+  - app-projects/project-storage.yaml
   - resources/apps-mgmt
   - resources/apps-main
   - resources/apps-monitoring
+  - resources/apps-storage
