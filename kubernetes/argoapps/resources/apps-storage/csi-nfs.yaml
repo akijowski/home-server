@@ -16,7 +16,7 @@ spec:
   project: storage
   source:
     chart: csi-driver-nfs
-    repoUrl: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+    repoURL: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
     targetRevision: v4.9.0
     helm:
       releaseName: csi-driver-nfs
@@ -25,3 +25,40 @@ spec:
           value: "true"
         - name: "controller.runOnControlPlane"
           value: "true"
+      values: |
+        externalSnapshotter:
+          enabled: true
+        controller:
+          runOnControlPlane: true
+        storageClass:
+          create: true
+          name: nfs-csi
+          parameters:
+            server: '192.168.50.4'
+            share: /mnt/tank1600/k3s/pvs
+            csi.storage.k8s.io/provisioner-secret-name: "csi-nfs-delete"
+            csi.storage.k8s.io/provisioner-secret-namespace: "storage"
+          reclaimPolicy: Delete
+          volumeBindingMode: Immediate
+          mountOptions:
+            - nfsvers=4.1
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: storage-extras
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  destination:
+    namespace: storage
+    name: main-cluster
+  project: storage
+  source:
+    path: kubernetes/storage
+    repoURL: git@github.com:akijowski/home-server.git
+    targetRevision: HEAD

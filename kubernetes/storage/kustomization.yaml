@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: storage
+
+# https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/docs/driver-parameters.md#provide-mountoptions-for-deletevolume
+secretGenerator:
+  - name: csi-nfs-delete
+    options:
+      disableNameSuffixHash: true
+    literals:
+      - mountOptions=nfsvers=4,soft
