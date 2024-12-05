@@ -28,8 +28,6 @@ spec:
       values: |
         externalSnapshotter:
           enabled: true
-        controller:
-          runOnControlPlane: true
         storageClass:
           create: true
           name: nfs-csi
