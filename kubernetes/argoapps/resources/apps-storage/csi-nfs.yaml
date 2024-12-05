@@ -20,11 +20,6 @@ spec:
     targetRevision: v4.9.0
     helm:
       releaseName: csi-driver-nfs
-      parameters:
-        - name: "externalSnapshotter.enabled"
-          value: "true"
-        - name: "controller.runOnControlPlane"
-          value: "true"
       values: |
         externalSnapshotter:
           enabled: true
