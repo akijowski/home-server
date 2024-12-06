@@ -19,7 +19,6 @@ spec:
           name: influxdb
           ports:
             - containerPort: 8086
-              portName: data
               name: influxdb
           envFrom:
             - configMapRef:

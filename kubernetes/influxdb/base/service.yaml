@@ -9,7 +9,7 @@ spec:
   ports:
     - name: influxdb
       port: 8086
-      targetPort: data
+      targetPort: influxdb
   selector:
       app: influxdb
   type: ClusterIP
