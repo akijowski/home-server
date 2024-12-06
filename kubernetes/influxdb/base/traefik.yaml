@@ -1,0 +1,35 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: TraefikService
+metadata:
+  name: influxdb
+  labels:
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/component: network
+
+spec:
+  weighted:
+    services:
+      - name: influxdb
+        kind: Service
+        port: data
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: influxdb-tls
+  labels:
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/component: network
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`influxdb.k8s.kijowski.casa`)
+      kind: Rule
+      services:
+        - name: influxdb
+          kind: TraefikService
+
+  tls:
+    certResolver: aws-dns
