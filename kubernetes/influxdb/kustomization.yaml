@@ -27,7 +27,7 @@ configMapGenerator:
   - name: influxdb-env
     literals:
       - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_ORG_NAME=kijowski
-      - DOCKER_INFLUXDB_INIT_BUCKET_NAME=admin
+      - DOCKER_INFLUXDB_INIT_ORG=kijowski
+      - DOCKER_INFLUXDB_INIT_BUCKET=admin
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=changeme
