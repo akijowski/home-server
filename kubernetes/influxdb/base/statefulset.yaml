@@ -27,6 +27,8 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/influxdb2
               name: data
+            - mountPath: /etc/influxdb2
+              name: config
   volumeClaimTemplates:
       - metadata:
           name: data
@@ -36,4 +38,13 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 10G
+              storage: 20G
+      - metadata:
+          name: config
+        spec:
+          storageClassName: nfs-csi
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5G
