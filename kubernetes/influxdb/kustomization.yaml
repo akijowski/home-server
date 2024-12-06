@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: database
+
+labels:
+  - pairs:
+      app: influxdb
+    includeSelectors: true
+    includeTemplates: true
+  - pairs:
+      app.kubernetes.io/part-of: influxdb
+
+replicas:
+  - name: influxdb
+    count: 1
+
+images:
+  - name: influxdb
+    newTag: '2.0.6'
+
+resources:
+  - base/statefulset.yaml
+  - base/service.yaml
+
+configMapGenerator:
+  - name: influxdb-env
+    literals:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_ORG_NAME=kijowski
+      - DOCKER_INFLUXDB_INIT_BUCKET_NAME=admin
+      - DOCKER_INFLUXDB_INIT_ADMIN_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_ADMIN_PASSWORD=changeme

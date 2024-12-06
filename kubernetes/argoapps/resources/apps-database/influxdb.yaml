@@ -1,0 +1,20 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: influxdb
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  destination:
+    namespace: database
+    name: main-cluster
+  project: storage
+  source:
+    path: kubernetes/influxdb
+    repoURL: git@github.com:akijowski/home-server.git
+    targetRevision: HEAD

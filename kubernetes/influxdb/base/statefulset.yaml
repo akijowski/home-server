@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/name: influxdb
+  name: influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {}
+  serviceName: influxdb
+  template:
+    metadata:
+      labels: {}
+    spec:
+      containers:
+        - image: influxdb:latest
+          name: influxdb
+          ports:
+            - containerPort: 8086
+              portName: data
+              name: influxdb
+          envFrom:
+            - configMapRef:
+                name: influxdb-env
+          volumeMounts:
+            - mountPath: /var/lib/influxdb2
+              name: data
+  volumeClaimTemplates:
+      - metadata:
+          name: data
+        spec:
+          storageClassName: nfs-csi
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10G
