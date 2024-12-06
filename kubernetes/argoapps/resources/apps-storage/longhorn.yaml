@@ -10,7 +10,7 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
-  project: mgmt
+  project: storage
   sources:
     - chart: longhorn
       repoURL: https://charts.longhorn.io/

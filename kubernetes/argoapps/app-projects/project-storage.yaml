@@ -14,6 +14,8 @@ spec:
   destinations:
     - namespace: '*'
       server: https://k8s.kijowski.casa:6443
+    - namespace: '*'
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
