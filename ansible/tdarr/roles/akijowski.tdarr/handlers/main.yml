@@ -1,0 +1,20 @@
+- name: Reload tdarr
+  become: true
+  # become_user: "{{ tdarr_user_name }}"
+  ansible.builtin.systemd_service:
+    name: "{{ tdarr_container_name }}"
+    daemon_reload: true
+    # scope: user
+    state: restarted
+    enabled: true
+  # environment:
+  #   XDG_RUNTIME_DIR: "/run/user/{{ tdarr_user_id }}"
+  #   HOME: "/home/{{ tdarr_user_name }}"
+
+- name: Reload tdarr node
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ tdarr_container_name }}-node"
+    daemon_reload: true
+    state: restarted
+    enabled: true

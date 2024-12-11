@@ -1,0 +1,10 @@
+---
+- ansible.builtin.import_tasks: preflight.yml
+  become: true
+  tags:
+    - tdarr_install
+
+- ansible.builtin.import_tasks: install.yml
+  become: true
+  tags:
+    - tdarr_install

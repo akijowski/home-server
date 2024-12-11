@@ -1,0 +1,15 @@
+---
+- ansible.builtin.import_tasks: ensure_user_group_dir.yml
+
+- ansible.builtin.import_tasks: ensure_dependencies.yml
+
+- name: Ensure scripts are copied
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ tdarr_scripts_dir }}/{{ item | basename | replace('.j2', '') }}"
+    mode: 0770
+  loop: "{{ tdarr_scripts_templates }}"
+  when:
+    - tdarr_scripts_templates | length > 0
+
+- ansible.builtin.import_tasks: ensure_container.yml

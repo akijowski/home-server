@@ -1,0 +1,19 @@
+tdarr_user_name: tdarr
+tdarr_group_name: tdarr
+tdarr_additional_groups: []
+
+tdarr_scripts_templates: []
+
+tdarr_cache_dir: /opt/tdarr/cache
+tdarr_config_dir: /opt/tdarr/config
+tdarr_scripts_dir: /etc/tdarr/scripts
+tdarr_server_dir: /opt/tdarr/server
+
+tdarr_container_name: tdarr
+tdarr_container_image: ghcr.io/haveagitgat/tdarr
+tdarr_container_image_node: ghcr.io/haveagitgat/tdarr_node
+tdarr_container_tag: latest
+tdarr_container_port_ui: 8265
+tdarr_container_port_node: 8266
+# [{"src": "host path", "dest": "container path"}]
+tdarr_container_extra_volumes: []

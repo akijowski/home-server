@@ -1,0 +1,80 @@
+#! /bin/bash
+
+#
+# This script updates the ffmpeg used by tdarr to the latest from jellyfin
+# Inspired by: https://github.com/HaveAGitGat/Tdarr/issues/1101
+#
+{{ ansible_managed | comment }}
+
+set -eou pipefail
+
+LOG_PREFIX="[update-ffmpeg]"
+JELLYFIN_GITHUB_REPO="jellyfin/jellyfin-ffmpeg"
+JELLYFIN_DEB_PREFIX="jellyfin-ffmpeg7"
+
+FFMPEG_LATEST_V=""
+
+function logf() {
+    echo "$LOG_PREFIX $1"
+}
+
+function ensure_required_apps() {
+    if [ -z "$(command -v jq)" ]; then
+        logf "jq is required but not installed. Exiting."
+        exit 1
+    fi
+    if [ -z "$(command -v wget)" ]; then
+        logf "wget is required but not installed. Exiting."
+        exit 1
+    fi
+    if [ -z "$(command -v sed)" ]; then
+        logf "sed is required but not installed. Exiting."
+        exit 1
+    fi
+}
+
+function get_latest_tag() {
+    logf "getting latest tag"
+    FFMPEG_LATEST_V=$(wget -q -O- "https://api.github.com/repos/${JELLYFIN_GITHUB_REPO}/releases/latest" | jq -r .tag_name)
+    logf "found $FFMPEG_LATEST_V"
+}
+
+function download_install_deb() {
+    deb_file="$1"
+
+    dl_url="https://github.com/$JELLYFIN_GITHUB_REPO/releases/download/$FFMPEG_LATEST_V/$deb_file"
+    logf "downloading $dl_url"
+    wget --no-verbose "$dl_url"
+
+    logf "installing $deb_file"
+    apt install -y -q "./$deb_file"
+    logf "removing $deb_file"
+    rm -rf "./$deb_file"
+}
+
+function download_latest() {
+    nonsemver=$(echo "$FFMPEG_LATEST_V" | sed -e 's/v//')
+    deb_file="${JELLYFIN_DEB_PREFIX}_$nonsemver-jammy_amd64.deb"
+    if uname -m | grep -q aarch64; then
+        logf "using arm64 install"
+        deb_file="${JELLYFIN_DEB_PREFIX}_$nonsemver-jammy_arm64.deb"
+    fi
+
+    download_install_deb "$deb_file"
+}
+
+function link_binaries() {
+    logf "setting symlinks"
+    jf="/usr/lib/jellyfin-ffmpeg/ffmpeg"
+    ln -sfv "$jf" "/usr/local/bin/ffmpeg"
+    ln -sfv "$jf" "/usr/local/bin/tdarr-ffmpeg"
+}
+
+function main() {
+    ensure_required_apps
+    get_latest_tag
+    download_latest
+    link_binaries
+}
+
+main "$@"

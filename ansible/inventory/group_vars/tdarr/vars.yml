@@ -1,0 +1,29 @@
+tdarr_user_id: 1400
+tdarr_group_id: 1400
+# nfs role
+truenas_ipv4: '192.168.50.4'
+tdarr_nfs_share_base_dir: /opt/tdarr
+nfs_mounts:
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank0400/tdarr/cache'
+    dest_path: '{{ tdarr_nfs_share_base_dir }}/cache'
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank0400/tdarr/config'
+    dest_path: '{{ tdarr_nfs_share_base_dir }}/config'
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank0400/tdarr/server'
+    dest_path: '{{ tdarr_nfs_share_base_dir }}/server'
+
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank1600/autoripm/media'
+    dest_path: '/opt/arm/media'
+
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank1600/plex/libraries/video/movies'
+    dest_path: '/opt/plex/movies'
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank1600/plex/libraries/video/uhd-movies'
+    dest_path: '/opt/plex/uhd-movies'
+  - host: '{{ truenas_ipv4 }}'
+    source_path: '/mnt/tank1600/plex/libraries/video/tv-shows'
+    dest_path: '/opt/plex/tv-shows'

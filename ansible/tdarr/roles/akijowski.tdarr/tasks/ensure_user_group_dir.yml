@@ -1,0 +1,43 @@
+---
+- name: Ensure Tdarr Group exists
+  ansible.builtin.group:
+    name: "{{ tdarr_group_name }}"
+    gid: "{{ tdarr_group_id }}"
+    state: present
+
+- name: Ensure Tdarr User exists
+  ansible.builtin.user:
+    name: "{{ tdarr_user_name }}"
+    uid: "{{ tdarr_user_id }}"
+    group: "{{ tdarr_group_name }}"
+    comment: tdarr media transcode
+    shell: /usr/sbin/nologin
+    append: true
+    groups: "{{ tdarr_additional_groups }}"
+    state: present
+
+- name: Ensure Tdarr directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ tdarr_user_name }}"
+    group: "{{ tdarr_group_name }}"
+  loop:
+    - "{{ tdarr_cache_dir }}"
+    - "{{ tdarr_config_dir }}"
+    - "{{ tdarr_scripts_dir }}"
+    - "{{ tdarr_server_dir }}"
+
+# - name: Ensure Tdarr extra directories ownership
+#   ansible.builtin.file:
+#     path: "{{ item.src }}"
+#     state: directory
+#     owner: "{{ tdarr_user_name }}"
+#     group: "{{ tdarr_group_name }}"
+#   loop: "{{ tdarr_additional_mounts }}"
+
+# https://serverfault.com/a/1105953
+- name: Ensure Tdarr user can use systemd
+  ansible.builtin.command: "loginctl enable-linger {{ tdarr_user_name }}"
+  args:
+    creates: "/var/lib/systemd/linger/{{ tdarr_user_name }}"

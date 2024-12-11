@@ -90,6 +90,36 @@ EOF
       ip0_ipv4 = "192.168.50.11/24"
       extra_tags = ["plex", "ubuntu", "ansible"]
     }
+    tdarr0 = {
+      name = "tdarr0"
+      description = <<-EOF
+        # Tdarr
+        Managed by Terraform.
+
+        https://docs.tdarr.io/docs/welcome/what
+EOF
+      target_node = "hyperion"
+      vmid = 0
+      cpu = 3
+      memory = 3072 # 3 GiB
+      ip0_ipv4 = "192.168.50.36/24"
+      extra_tags = ["tdarr", "ubuntu", "ansible"]
+    }
+    tdarr1 = {
+      name = "tdarr1"
+      description = <<-EOF
+        # Tdarr
+        Managed by Terraform.
+
+        https://docs.tdarr.io/docs/welcome/what
+EOF
+      target_node = "mnemosyne"
+      vmid = 0
+      cpu = 3
+      memory = 3072 # 3 GiB
+      ip0_ipv4 = "192.168.50.37/24"
+      extra_tags = ["tdarr", "ubuntu", "ansible"]
+    }
   }
 }
 

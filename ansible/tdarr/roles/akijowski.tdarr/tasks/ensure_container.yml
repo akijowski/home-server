@@ -1,0 +1,115 @@
+---
+- name: Ensure base container volumes
+  ansible.builtin.set_fact:
+    tdarr_container_volumes:
+      - "{{ tdarr_cache_dir }}:/temp"
+      - "{{ tdarr_config_dir }}:/app/configs"
+      - "{{ tdarr_scripts_dir }}:/custom-cont-init.d"
+      - "{{ tdarr_server_dir }}:/app/server"
+
+- name: Add extra container volumes
+  ansible.builtin.set_fact:
+    tdarr_container_volumes: "{{ tdarr_container_volumes + [item.src + ':' + item.dest | string] }}"
+  loop: "{{ tdarr_container_extra_volumes }}"
+  when:
+    - tdarr_container_extra_volumes | length > 0
+
+- name: Pull Tdarr Image (Primary)
+  # become: true
+  # become_user: "{{ tdarr_user_name }}"
+  containers.podman.podman_image:
+    name: "{{ tdarr_container_image }}"
+    tag: "{{ tdarr_container_tag }}"
+    pull: true
+    state: present
+  when:
+    - hostvars[inventory_hostname].tdarr_primary_node is defined
+    - hostvars[inventory_hostname].tdarr_primary_node
+
+- name: Pull Tdarr Node Image
+  # become: true
+  # become_user: "{{ tdarr_user_name }}"
+  containers.podman.podman_image:
+    name: "{{ tdarr_container_image_node }}"
+    tag: "{{ tdarr_container_tag }}"
+    pull: true
+    state: present
+  when:
+    - hostvars[inventory_hostname].tdarr_primary_node is not defined
+
+- name: Create Tdarr Container (Primary)
+  # become: true
+  # become_user: "{{ tdarr_user_name }}"
+  containers.podman.podman_container:
+    name: "{{ tdarr_container_name }}"
+    image: "{{ tdarr_container_image }}:{{ tdarr_container_tag }}"
+    state: quadlet
+    # quadlet_file: '0640'
+    quadlet_options:
+      - "AutoUpdate=registry"
+      - "Pull=newer"
+      - |
+        [Unit]
+        Description={{ tdarr_container_name }} container via Podman
+        After=local-fs.target
+      - |
+        [Install]
+        WantedBy=multi-user.target default.target
+    ports:
+      - "{{ tdarr_container_port_ui }}:{{ tdarr_container_port_ui }}"
+      - "{{ tdarr_container_port_node }}:{{ tdarr_container_port_node }}"
+    volume: "{{ tdarr_container_volumes }}"
+    env:
+      TZ: "UTC"
+      PUID: "{{ tdarr_user_id }}"
+      PGID: "{{ tdarr_group_id }}"
+      UMASKSET: "002"
+      serverIP: "0.0.0.0"
+      serverPort: "{{ tdarr_container_port_node }}"
+      webUIPort: "{{ tdarr_container_port_ui }}"
+      internalNode: "true"
+      inContainer: "true"
+      ffmpegVersion: "7"
+      nodeName: "{{ inventory_hostname }}"
+  when:
+    - hostvars[inventory_hostname].tdarr_primary_node is defined
+    - hostvars[inventory_hostname].tdarr_primary_node
+  notify:
+    - "Reload tdarr"
+
+
+- name: Create Tdarr Node Container
+  # become: true
+  # become_user: "{{ tdarr_user_name }}"
+  containers.podman.podman_container:
+    name: "{{ tdarr_container_name }}-node"
+    image: "{{ tdarr_container_image_node }}:{{ tdarr_container_tag }}"
+    state: quadlet
+    # quadlet_file: '0640'
+    quadlet_options:
+      - "AutoUpdate=registry"
+      - "Pull=newer"
+      - |
+        [Unit]
+        Description={{ tdarr_container_name }} node container via Podman
+        After=local-fs.target
+      - |
+        [Install]
+        WantedBy=multi-user.target default.target
+    ports:
+      - "{{ tdarr_container_port_node }}:{{ tdarr_container_port_node }}"
+    volume: "{{ tdarr_container_volumes }}"
+    env:
+      TZ: "UTC"
+      PUID: "{{ tdarr_user_id }}"
+      PGID: "{{ tdarr_group_id }}"
+      UMASKSET: "002"
+      serverIP: "192.168.50.36" # TODO: Update this properly
+      serverPort: "{{ tdarr_container_port_node }}"
+      inContainer: "true"
+      ffmpegVersion: "7"
+      nodeName: "{{ inventory_hostname }}"
+  when:
+    - hostvars[inventory_hostname].tdarr_primary_node is not defined
+  notify:
+    - "Reload tdarr node"

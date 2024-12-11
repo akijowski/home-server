@@ -1,0 +1,41 @@
+---
+- name: Install Tdarr
+  hosts: tdarr
+  debugger: on_failed
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Install additional packages
+      ansible.builtin.apt:
+        update_cache: yes
+        name:
+          - nfs-common
+        state: latest
+
+    - name: Mount NFS directories
+      ansible.posix.mount:
+        src: "{{ item.host }}:{{ item.source_path}}"
+        path: "{{ item.dest_path }}"
+        opts: vers=4
+        state: mounted
+        fstype: nfs
+      loop: "{{ nfs_mounts }}"
+
+    - ansible.builtin.import_role:
+        name: akijowski.tdarr
+      vars:
+        tdarr_container_tag: '2.27.02'
+        tdarr_scripts_templates:
+          - 'templates/update-ffmpeg.sh.j2'
+        # src is the host location, dest is where they will be mounted in tdarr container
+        tdarr_container_extra_volumes:
+          - src: /opt/arm/media
+            dest: /media
+          - src: /opt/plex/movies
+            dest: /opt/plex/libraries/movies
+          - src: /opt/plex/uhd-movies
+            dest: /opt/plex/libraries/uhd-movies
+          - src: /opt/plex/tv-shows
+            dest: /opt/plex/libraries/tv-shows

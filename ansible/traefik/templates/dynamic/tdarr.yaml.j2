@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+http:
+  routers:
+    tdarr:
+      rule: "Host(`tdarr.kijowski.casa`)"
+      service: tdarr
+
+  services:
+    tdarr:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.50.36:8265"
