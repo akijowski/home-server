@@ -1,0 +1,21 @@
+apt_keyring_hashicorp: /etc/apt/keyrings/hashicorp.asc
+apt_keyring_dir: "{{ apt_keyring_hashicorp | dirname }}"
+
+# These are made by nomad through apt install
+nomad_user_name: nomad
+nomad_group_name: nomad
+
+nomad_config_dir: "/etc/nomad.d"
+nomad_data_dir: "/opt/nomad/data"
+
+nomad_version: '1.9*'
+
+nomad_port: 4646
+
+cni_plugin_version: latest
+# cni_plugin_checksum: ''
+cni_plugin_arch_map:
+  armv7l: arm
+  x86_64: amd64
+cni_plugin_arch: "{{ cni_plugin_arch_map[ansible_architecture] }}"
+cni_plugin_tar: "cni-plugins-{{ ansible_system | lower }}-{{ cni_plugin_arch }}-v{{ cni_plugin_version }}.tgz"

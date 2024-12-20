@@ -3,17 +3,17 @@
   "packages": [
     "go-task@latest",
     "tenv@latest",
-    "ansible@2.16.5",
+    "ansible@2.17.6",
     "packer@latest",
     "awscli2@latest",
     "terraform-docs@latest",
     "python312Packages.boto3@latest",
-    "python312Packages.paramiko@latest",
     "kubectl@latest",
     "kubecm@latest",
     "k9s@latest",
     "argocd@latest",
-    "kustomize@latest"
+    "kustomize@latest",
+    "ansible-lint@latest"
   ],
   "shell": {
     "init_hook": [

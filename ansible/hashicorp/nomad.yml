@@ -1,0 +1,29 @@
+---
+- name: Install Nomad
+  hosts: nomad
+  debugger: on_failed
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Update apt
+      ansible.builtin.apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 600
+
+    - name: Install additional packages
+      ansible.builtin.apt:
+        name:
+          - nfs-common
+          - acl # for become an unprivileged user
+          - podman
+          - wget
+          - gpg
+          - coreutils
+          - ca-certificates
+        state: latest
+
+    - ansible.builtin.import_role:
+        name: akijowski.nomad

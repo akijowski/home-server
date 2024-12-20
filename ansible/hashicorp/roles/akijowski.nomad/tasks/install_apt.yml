@@ -1,0 +1,48 @@
+---
+- name: Ensure apt requirements
+  ansible.builtin.apt:
+    name:
+      - wget
+      - gpg
+      - coreutils
+    state: latest
+
+- name: Ensure apt keyring directory
+  ansible.builtin.file:
+    path: "{{ apt_keyring_dir }}"
+    mode: 0755
+    owner: root
+    group: root
+    state: directory
+
+# TODO: update?
+- name: Ensure Hashicorp APT key
+  ansible.builtin.get_url:
+    url: "https://apt.releases.hashicorp.com/gpg"
+    dest: "{{ apt_keyring_hashicorp }}"
+    mode: 0644
+    force: true
+
+- name: Ensure Hashicorp APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by={{ apt_keyring_hashicorp }}] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    filename: hashicorp
+    state: present
+    update_cache: true
+
+- name: Ensure Nomad is installed with APT
+  ansible.builtin.apt:
+    name: "nomad={{ nomad_version }}"
+    state: present
+
+# Nomad starts on install which complicates configuration changes
+- name: Ensure Nomad is Reset
+  block:
+    - name: Stop Nomad
+      ansible.builtin.systemd_service:
+        name: nomad
+        state: stopped
+    - name: Remove default Nomad state
+      ansible.builtin.file:
+        path: /opt/nomad/data
+        state: absent

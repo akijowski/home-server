@@ -1,0 +1,19 @@
+---
+- name: Ensure APT is updated
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 600
+
+- name: Ensure APT dependencies
+  ansible.builtin.apt:
+    name:
+      - podman
+    state: latest
+
+- name: Ensure drivers
+  ansible.builtin.apt:
+    name:
+      - "{{ item }}"
+    state: latest
+  loop:
+    - nomad-driver-podman

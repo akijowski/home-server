@@ -1,0 +1,48 @@
+---
+- name: Ensure Nomad directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: 0755
+    owner: "{{ nomad_user_name }}"
+    group: "{{ nomad_group_name }}"
+    state: directory
+  with_items:
+    - "{{ nomad_config_dir }}"
+    - "{{ nomad_data_dir }}"
+
+# TODO
+- name: Ensure client IPs for server config
+  ansible.builtin.set_fact:
+    nomad_server_ips: "{{ nomad_server_list | map(attribute='ansible_host') | map('tojson') | join(',') }}"
+  loop:
+    - nomad_server_list
+
+- name: Ensure Nomad configurations
+  block:
+    - name: Ensure common configuration
+      ansible.builtin.template:
+        src: "nomad.hcl.j2"
+        dest: "{{ nomad_config_dir }}/nomad.hcl"
+        mode: 0644
+        owner: "{{ nomad_user_name }}"
+        group: "{{ nomad_group_name }}"
+
+    - name: Ensure server configuration
+      ansible.builtin.template:
+        src: "server.hcl.j2"
+        dest: "{{ nomad_config_dir }}/server.hcl"
+        mode: 0644
+        owner: "{{ nomad_user_name }}"
+        group: "{{ nomad_group_name }}"
+      when: nomad_server | default(False)
+
+    - name: Ensure client configuration
+      ansible.builtin.template:
+        src: "client.hcl.j2"
+        dest: "{{ nomad_config_dir }}/client.hcl"
+        mode: 0644
+        owner: "{{ nomad_user_name }}"
+        group: "{{ nomad_group_name }}"
+      when: nomad_client | default(False)
+  notify:
+    - reload nomad

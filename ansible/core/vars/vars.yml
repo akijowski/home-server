@@ -23,3 +23,6 @@ dns_record_sets:
     # For direct cluster access on the managmement port
   - record: "mgmt.k8s.kijowski.casa"
     value: "192.168.50.23"
+    # Nomad Client addresses
+  - record: "nomad.kijowski.casa"
+    value: "192.168.50.32"

@@ -1,0 +1,12 @@
+---
+- name: restart nomad
+  ansible.builtin.systemd_service:
+    name: nomad
+    state: restarted
+  when: not nomad_started.changed
+
+- name: reload nomad
+  ansible.builtin.systemd_service:
+    name: nomad
+    state: reloaded
+  when: not nomad_started.changed

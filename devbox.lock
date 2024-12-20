@@ -1,67 +1,131 @@
 {
   "lockfile_version": "1",
   "packages": {
-    "ansible@2.16.5": {
-      "last_modified": "2024-08-14T11:41:26Z",
-      "resolved": "github:NixOS/nixpkgs/0cb2fd7c59fed0cd82ef858cbcbdb552b9a33465#ansible",
+    "ansible-lint@latest": {
+      "last_modified": "2024-11-28T07:51:56Z",
+      "resolved": "github:NixOS/nixpkgs/226216574ada4c3ecefcbbec41f39ce4655f78ef#ansible-lint",
       "source": "devbox-search",
-      "version": "2.16.5",
+      "version": "24.9.2",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/02s5np60gwcxw0i5a0jg0cmrbr5pjzps-python3.12-ansible-core-2.16.5",
+              "path": "/nix/store/ilaf4hb1iz5dkkdb236ihzg6spwv3xn5-ansible-lint-24.9.2",
               "default": true
             },
             {
               "name": "dist",
-              "path": "/nix/store/wxvb0wwna3g1j9bv8pygjvg720r15r4v-python3.12-ansible-core-2.16.5-dist"
+              "path": "/nix/store/id906gwhi4hq4sm80wsgy72pr7ny9mkz-ansible-lint-24.9.2-dist"
             }
           ],
-          "store_path": "/nix/store/02s5np60gwcxw0i5a0jg0cmrbr5pjzps-python3.12-ansible-core-2.16.5"
+          "store_path": "/nix/store/ilaf4hb1iz5dkkdb236ihzg6spwv3xn5-ansible-lint-24.9.2"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/w0lkcssbrjqsvvr4mhp6p4mlvdby53va-python3.12-ansible-core-2.16.5",
+              "path": "/nix/store/pnl4rfphggypyiagaxhfkpgyi58lnbnr-ansible-lint-24.9.2",
               "default": true
             },
             {
               "name": "dist",
-              "path": "/nix/store/1bdw679708nmxrnkg75j4jqkczr2vbg4-python3.12-ansible-core-2.16.5-dist"
+              "path": "/nix/store/9ag50nmyc0jpbr6bly7zgr94gzq27mwk-ansible-lint-24.9.2-dist"
             }
           ],
-          "store_path": "/nix/store/w0lkcssbrjqsvvr4mhp6p4mlvdby53va-python3.12-ansible-core-2.16.5"
+          "store_path": "/nix/store/pnl4rfphggypyiagaxhfkpgyi58lnbnr-ansible-lint-24.9.2"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/jsywz4809lqb60cj9bh7d8rfkvwqzjrr-python3.12-ansible-core-2.16.5",
+              "path": "/nix/store/5rmj5qw1lizkr40x5lg4y8s0n32qhc17-ansible-lint-24.9.2",
               "default": true
             },
             {
               "name": "dist",
-              "path": "/nix/store/706ciyh5m4m343w8mkd2kfzjxgh34kaz-python3.12-ansible-core-2.16.5-dist"
+              "path": "/nix/store/0wamgr1kw1xy91949wyd92n3yx6xrhq5-ansible-lint-24.9.2-dist"
             }
           ],
-          "store_path": "/nix/store/jsywz4809lqb60cj9bh7d8rfkvwqzjrr-python3.12-ansible-core-2.16.5"
+          "store_path": "/nix/store/5rmj5qw1lizkr40x5lg4y8s0n32qhc17-ansible-lint-24.9.2"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/a5k2lpbxj419kzn2pyz55gql35pbg8xx-python3.12-ansible-core-2.16.5",
+              "path": "/nix/store/bq1wqf10kfgab172jmpf34jawlalnf87-ansible-lint-24.9.2",
               "default": true
             },
             {
               "name": "dist",
-              "path": "/nix/store/n0rw7a0w51xsilmiwhv4n2cdp8ib1ncs-python3.12-ansible-core-2.16.5-dist"
+              "path": "/nix/store/7wcy3jy4clgj60i82b5965db0pc3l60c-ansible-lint-24.9.2-dist"
             }
           ],
-          "store_path": "/nix/store/a5k2lpbxj419kzn2pyz55gql35pbg8xx-python3.12-ansible-core-2.16.5"
+          "store_path": "/nix/store/bq1wqf10kfgab172jmpf34jawlalnf87-ansible-lint-24.9.2"
+        }
+      }
+    },
+    "ansible@2.17.6": {
+      "last_modified": "2024-12-03T12:40:06Z",
+      "resolved": "github:NixOS/nixpkgs/566e53c2ad750c84f6d31f9ccb9d00f823165550#ansible",
+      "source": "devbox-search",
+      "version": "2.17.6",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/n3a42671y8x2hmw1kj2h9x131k5z27l0-python3.12-ansible-core-2.17.6",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/yvzwww35ry6gr1vb8j7lsfjm8hhy4k4f-python3.12-ansible-core-2.17.6-dist"
+            }
+          ],
+          "store_path": "/nix/store/n3a42671y8x2hmw1kj2h9x131k5z27l0-python3.12-ansible-core-2.17.6"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/b7ny510blkywlg8xdz4nb5mmhgxfdz3c-python3.12-ansible-core-2.17.6",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/5rgmrnpm26yayszw4fy8idga7jj8z8sa-python3.12-ansible-core-2.17.6-dist"
+            }
+          ],
+          "store_path": "/nix/store/b7ny510blkywlg8xdz4nb5mmhgxfdz3c-python3.12-ansible-core-2.17.6"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/240zxxvbkrv9hbq76p9hx09kv2g2gy5a-python3.12-ansible-core-2.17.6",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/lm8hrjfxfrvnvm987ajzmjc116vmblfz-python3.12-ansible-core-2.17.6-dist"
+            }
+          ],
+          "store_path": "/nix/store/240zxxvbkrv9hbq76p9hx09kv2g2gy5a-python3.12-ansible-core-2.17.6"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/qa1l5ydbij9hlz65ndd7kv9cxnkcz979-python3.12-ansible-core-2.17.6",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/frcfadw6rrq9ncvacccvgzw92agkaxl0-python3.12-ansible-core-2.17.6-dist"
+            }
+          ],
+          "store_path": "/nix/store/qa1l5ydbij9hlz65ndd7kv9cxnkcz979-python3.12-ansible-core-2.17.6"
         }
       }
     },
@@ -562,70 +626,6 @@
             }
           ],
           "store_path": "/nix/store/ajvqy7b8a5bpxnp7djah1w6lnb9hj9pn-python3.12-boto3-1.35.30"
-        }
-      }
-    },
-    "python312Packages.paramiko@latest": {
-      "last_modified": "2024-11-16T04:25:12Z",
-      "resolved": "github:NixOS/nixpkgs/34a626458d686f1b58139620a8b2793e9e123bba#python312Packages.paramiko",
-      "source": "devbox-search",
-      "version": "3.5.0",
-      "systems": {
-        "aarch64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/pp7z1l4cqss9ps73fhgj4qafs97qhb07-python3.12-paramiko-3.5.0",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/58hi882dx1bdmwwjdng3pkgbxpislc42-python3.12-paramiko-3.5.0-dist"
-            }
-          ],
-          "store_path": "/nix/store/pp7z1l4cqss9ps73fhgj4qafs97qhb07-python3.12-paramiko-3.5.0"
-        },
-        "aarch64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/bikv81gzynqg7g8ywiykkmk2v224mmj7-python3.12-paramiko-3.5.0",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/ddsxy1dc83p5zma3jwdg118jp2q99ik8-python3.12-paramiko-3.5.0-dist"
-            }
-          ],
-          "store_path": "/nix/store/bikv81gzynqg7g8ywiykkmk2v224mmj7-python3.12-paramiko-3.5.0"
-        },
-        "x86_64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/bq70p3av70gg5ydnnbhf6risia55k8nr-python3.12-paramiko-3.5.0",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/zzwirbszfl0xar282xw4hq932vlrc23z-python3.12-paramiko-3.5.0-dist"
-            }
-          ],
-          "store_path": "/nix/store/bq70p3av70gg5ydnnbhf6risia55k8nr-python3.12-paramiko-3.5.0"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/z5l72yagriqwh5xy2i8gzzipbak7db8j-python3.12-paramiko-3.5.0",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/gg7nw4vwmc0pzwbmqriixkz30z9wdahx-python3.12-paramiko-3.5.0-dist"
-            }
-          ],
-          "store_path": "/nix/store/z5l72yagriqwh5xy2i8gzzipbak7db8j-python3.12-paramiko-3.5.0"
         }
       }
     },

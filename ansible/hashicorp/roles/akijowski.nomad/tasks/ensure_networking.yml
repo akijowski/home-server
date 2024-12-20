@@ -1,0 +1,19 @@
+---
+# https://developer.hashicorp.com/nomad/docs/install/production/requirements#bridge-networking-and-iptables
+- name: Ensure bridge module
+  community.general.modprobe:
+    name: bridge
+    state: present
+
+# Maybe Ubuntu/Debian is fine?
+# - name: Ensure iptables are configured
+#   ansible.posix.sysctl:
+#     name: "{{ item }}"
+#     value: '1'
+#     state: present
+#     sysctl_set: true
+#     reload: true
+#   loop:
+#     - 'net.bridge.bridge-nf-call-arptables'
+#     - 'net.bridge.bridge-nf-call-ip6tables'
+#     - 'net.bridge.bridge-nf-call-iptables'

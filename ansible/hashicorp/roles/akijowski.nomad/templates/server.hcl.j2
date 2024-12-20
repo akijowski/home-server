@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+
+server {
+  enabled          = true
+  bootstrap_expect = {{ nomad_client_list | length }}
+}
+
+ui {
+  enabled = true
+}

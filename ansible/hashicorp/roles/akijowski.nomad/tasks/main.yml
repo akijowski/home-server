@@ -1,0 +1,39 @@
+---
+- ansible.builtin.import_tasks: preflight.yml
+
+- ansible.builtin.import_tasks: install_apt.yml
+  when:
+    - ansible_architecture == 'x86_64'
+    - ansible_distribution in ["Debian", "Ubuntu"]
+
+- ansible.builtin.import_tasks: ensure_networking.yml
+
+- ansible.builtin.import_tasks: ensure_cni.yml
+  when:
+    - nomad_client is defined
+    - nomad_client | bool
+
+- ansible.builtin.import_tasks: ensure_task_drivers.yml
+
+- ansible.builtin.import_tasks: ensure_configs.yml
+
+- name: Start Nomad
+  ansible.builtin.systemd_service:
+    name: nomad
+    state: started
+    enabled: true
+    daemon_reload: true
+  register: nomad_started
+
+- name: Wait for Nomad port
+  ansible.builtin.wait_for:
+    port: "{{ nomad_port }}"
+    state: started
+
+- name: Restart Nomad if there are changes
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for Nomad port
+  ansible.builtin.wait_for:
+    port: "{{ nomad_port }}"
+    state: started
