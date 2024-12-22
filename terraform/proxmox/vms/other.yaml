@@ -1,0 +1,22 @@
+---
+plex:
+  - target_node: ${tmpl_node_hyperion}
+    description: |-
+      # Plexmediaserver
+
+      https://plex.tv
+    tags:
+      - plex
+      - ubuntu
+      - ansible
+    ipv4_addr: '192.168.50.11/24'
+    cores: 3
+    memory: 6144 # 6 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 50
+      virtio1:
+        datastore_id: ssdstorage
+        interface: virtio1
+        size: 100

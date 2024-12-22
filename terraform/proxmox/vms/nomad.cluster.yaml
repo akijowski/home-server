@@ -1,0 +1,39 @@
+---
+nomadclient:
+  - target_node: ${tmpl_node_hyperion}
+    description: |-
+      # Nomad Client
+
+      This one does the work
+
+      https://developer.hashicorp.com/nomad
+    tags:
+      - nomad
+      - client
+      - ubuntu
+      - ansible
+    ipv4_addr: '192.168.50.32/24'
+    cores: 3
+    memory: 6144 # 6 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 20
+nomadserver:
+  - target_node: ${tmpl_node_phoebe}
+    description: |-
+      # Nomad Server
+
+      https://developer.hashicorp.com/nomad
+    tags:
+      - nomad
+      - server
+      - ubuntu
+      - ansible
+    ipv4_addr: '192.168.50.31/24'
+    cores: 1
+    memory: 1024 # 1 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 20

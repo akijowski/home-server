@@ -1,0 +1,30 @@
+---
+k3s:
+  - target_node: ${tmpl_node_hyperion}
+    description: |-
+      # k3s Node. Primary
+    tags:
+      - k3s
+      - ubuntu
+      - ansible
+    ipv4_addr: '192.168.50.20/24'
+    cores: 2
+    memory: 8192 # 8 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 30
+  - target_node: ${tmpl_node_mnemosyne}
+    description: |-
+      # k3s Node.
+    tags:
+      - k3s
+      - ubuntu
+      - ansible
+    ipv4_addr: '192.168.50.21/24'
+    cores: 8
+    memory: 12288 # 12 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 30

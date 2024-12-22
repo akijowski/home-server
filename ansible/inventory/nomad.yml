@@ -1,9 +1,9 @@
 # common config -> group_vars/nomad
 nomad:
   hosts:
-    nomad0:
+    nomadsrv0:
       ansible_host: 192.168.50.31
       nomad_server: true
-    nomad1:
+    nomadcl0:
       ansible_host: 192.168.50.32
       nomad_client: true
