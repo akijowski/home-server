@@ -102,3 +102,4 @@ ssl
 
 !*example.env
 .env
+.ansible_token.yaml

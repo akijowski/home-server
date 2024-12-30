@@ -629,6 +629,70 @@
         }
       }
     },
+    "python312Packages.hvac@latest": {
+      "last_modified": "2024-12-23T21:10:33Z",
+      "resolved": "github:NixOS/nixpkgs/de1864217bfa9b5845f465e771e0ecb48b30e02d#python312Packages.hvac",
+      "source": "devbox-search",
+      "version": "2.3.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/cp60dw4a09g4ab4cyll3whc2cdi36gsl-python3.12-hvac-2.3.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/3g176qrqqsi9y2kqdwz27bw4dds31v76-python3.12-hvac-2.3.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/cp60dw4a09g4ab4cyll3whc2cdi36gsl-python3.12-hvac-2.3.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/d4bxl75rxmlyvdbrh0h9mqyjdswac114-python3.12-hvac-2.3.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/vk57gsr3nbjbcl4gf1nq94qqr6d8y5f0-python3.12-hvac-2.3.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/d4bxl75rxmlyvdbrh0h9mqyjdswac114-python3.12-hvac-2.3.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/9d3ml392fia51r098inlwzbb4y9madk7-python3.12-hvac-2.3.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/8paf0la33lmji3nij2dkfaay5xaizn5x-python3.12-hvac-2.3.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/9d3ml392fia51r098inlwzbb4y9madk7-python3.12-hvac-2.3.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/77367nnbyx1aqbrf2azlmz1v9l36nx5d-python3.12-hvac-2.3.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/mgjkd1mgc92nwpl89cqwcbinkzx4b6bm-python3.12-hvac-2.3.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/77367nnbyx1aqbrf2azlmz1v9l36nx5d-python3.12-hvac-2.3.0"
+        }
+      }
+    },
     "tenv@latest": {
       "last_modified": "2024-10-13T23:44:06Z",
       "resolved": "github:NixOS/nixpkgs/d4f247e89f6e10120f911e2e2d2254a050d0f732#tenv",
@@ -722,6 +786,54 @@
             }
           ],
           "store_path": "/nix/store/i2mpr1h76lwflwx39ckabdkqaxf9bidw-terraform-docs-0.19.0"
+        }
+      }
+    },
+    "vault@latest": {
+      "last_modified": "2024-12-23T21:10:33Z",
+      "resolved": "github:NixOS/nixpkgs/de1864217bfa9b5845f465e771e0ecb48b30e02d#vault",
+      "source": "devbox-search",
+      "version": "1.18.3",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/l5kmxmjk2w6ivfljzysf43rvvgzqi3n3-vault-1.18.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/l5kmxmjk2w6ivfljzysf43rvvgzqi3n3-vault-1.18.3"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/5gfyxajdzacrca4qrcbdjjyz01rr6h2x-vault-1.18.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/5gfyxajdzacrca4qrcbdjjyz01rr6h2x-vault-1.18.3"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/jlcmb2dy2a8m3rql9s5fa21yzxglyh5m-vault-1.18.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/jlcmb2dy2a8m3rql9s5fa21yzxglyh5m-vault-1.18.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/dqzjn5bpryxqxzdai45iwvhv37nqrkjn-vault-1.18.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/dqzjn5bpryxqxzdai45iwvhv37nqrkjn-vault-1.18.3"
         }
       }
     }

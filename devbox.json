@@ -13,7 +13,9 @@
     "k9s@latest",
     "argocd@latest",
     "kustomize@latest",
-    "ansible-lint@latest"
+    "ansible-lint@latest",
+    "python312Packages.hvac@latest",
+    "vault@latest"
   ],
   "shell": {
     "init_hook": [

@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+TKN_ALIAS=ansible
+TKN_PERIOD=72h
+TKN_DISPLAY_NAME="ansible service token"
+TKN_METADATA="description=For use by ansible playbooks"
+FILE_OUT="../.ansible_token.yaml"
+
+# https://developer.hashicorp.com/vault/docs/commands/token/create
+function create() {
+    # create a periodic token for Ansible
+    vault token create \
+        -role=ansible \
+        -entity-alias="$TKN_ALIAS" \
+        -policy=ansible \
+        -display-name="$TKN_DISPLAY_NAME" \
+        -metadata="$TKN_METADATA" \
+        -renewable \
+        -period="$TKN_PERIOD" \
+        -type="service" \
+        -format="yaml" 2>&1 | tee "$FILE_OUT"
+}
+
+# https://developer.hashicorp.com/vault/docs/commands/token/renew
+function renew() {
+    token_id="$1"
+    if [[ -z "$token_id" ]]; then
+        echo -n "token ID is required"
+        exit 1
+    fi
+    vault token renew \
+        "$token_id" \
+        -format="yaml"
+}
+
+# https://developer.hashicorp.com/vault/docs/commands/token/revoke
+function revoke() {
+    token_id="$1"
+    if [[ -z "$token_id" ]]; then
+        echo -n "token ID is required"
+        exit 1
+    fi
+    vault token revoke \
+        "$token_id"
+}
+
+function main() {
+    cmd="$1"
+
+    case "$cmd" in
+        create)
+            create
+            ;;
+        renew)
+            renew "$2"
+            ;;
+        revoke)
+            revoke "$2"
+            ;;
+        *)
+            echo -n "unknown command: $cmd"
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
