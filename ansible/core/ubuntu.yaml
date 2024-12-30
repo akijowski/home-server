@@ -165,3 +165,46 @@
     - name: restart ufw
       community.general.ufw:
         state: reloaded
+
+- name: Partition Drive
+  hosts:
+    - ubuntu
+  become: true
+  tags:
+    - partition
+  tasks:
+    - name: Ensure parted is installed
+      ansible.builtin.apt:
+        name:
+          - parted
+        state: latest
+
+    - name: Proceed?
+      ansible.builtin.pause:
+        prompt: "This will completely format {{ dev_path }}! Continue? 'Y' to proceed."
+      register: do_format
+
+    - name: "Partition device {{ dev_path }}"
+      community.general.parted:
+        device: "{{ dev_path }}"
+        number: 1
+        label: gpt
+        name: "{{ dev_name }}"
+        fs_type: ext4
+        state: present
+      when: do_format.user_input == "Y"
+
+    - name: "Format {{ dev_path }}"
+      community.general.filesystem:
+        dev: "{{ dev_path + '1' }}"
+        fstype: ext4
+        state: present
+      when: do_format.user_input == "Y"
+
+    - name: "Mount {{ dev_path }} to {{ mnt_path }}"
+      ansible.posix.mount:
+        src: "{{ dev_path + '1' }}"
+        fstype: ext4
+        path: "{{ mnt_path }}"
+        state: mounted
+      when: do_format.user_input == "Y"

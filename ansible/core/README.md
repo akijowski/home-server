@@ -8,6 +8,18 @@ Playbooks to run common or core tasks based on OS distro.
 ansible-playbook -i ./inventory [--limit <host>] core/ubuntu.yaml --tags init [--list-hosts] [--list-tasks] [--extra-vars 'ansible_user=ubuntu']
 ```
 
+### Partition Drive
+
+Simple play to format a block device with GPT and ext4 and then mount it to a path.
+
+- `dev_path` the block device to partition
+- `dev_name` using gpt a name is required
+- `mnt_path` where to mount the filesystem
+
+```bash
+ansible-playbook -i ./inventory [--limit <host>] core/ubuntu.yaml --tags partition [--extra-vars 'dev_path=/dev/vdb' --extra-vars 'dev_name=virtio1' --extra-vars 'mnt_path=/mnt/path']
+```
+
 ## Proxmox
 
 ```bash
