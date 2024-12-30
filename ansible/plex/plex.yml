@@ -18,8 +18,9 @@
       ansible.posix.mount:
         src: "{{ item.host }}:{{ item.source_path}}"
         path: "{{ item.dest_path }}"
-        opts: rw,hard,vers=4
-        state: mounted
+        opts: "{{ item.opts }}"
+        state: "{{ item.state }}"
+        boot: "{{ item.boot }}"
         fstype: nfs
       loop: "{{ nfs_mounts }}"
 

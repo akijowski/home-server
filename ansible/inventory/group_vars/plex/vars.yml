@@ -10,24 +10,44 @@ plex_metadata_nfs_root_dir: '/opt/plex/metadata'
 plex_metadata_ssd_root_dir: '/mnt/ssd/plexmetadata'
 # nfs role
 truenas_ipv4: '192.168.50.4'
+# default NFS mount options: https://linux.die.net/man/5/nfs
+mount_opts: "defaults,bg,intr,_netdev,retry=5"
 nfs_mounts:
   - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank1600/plex/metadata'
     dest_path: '{{ plex_metadata_nfs_root_dir }}'
+    opts: "{{ mount_opts }}"
+    state: mounted
+    boot: true
 
   - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank1600/plex/libraries/video/movies'
     dest_path: '{{ plex_libraries_root_dir }}/video/movies'
+    opts: "{{ mount_opts }}"
+    state: mounted
+    boot: true
   - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank1600/plex/libraries/video/9round'
     dest_path: '{{ plex_libraries_root_dir }}/video/9round'
+    opts: "{{ mount_opts }}"
+    state: mounted
+    boot: true
   - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank1600/plex/libraries/audio/music'
     dest_path: '{{ plex_libraries_root_dir }}/audio/music'
+    opts: "{{ mount_opts }}"
+    state: mounted
+    boot: true
 
   - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank1600/plex/libraries/video/tv-shows'
     dest_path: '{{ plex_libraries_root_dir }}/video/tv-shows'
+    opts: "{{ mount_opts }}"
+    state: mounted
+    boot: true
   - host: '{{ truenas_ipv4 }}'
     source_path: '/mnt/tank1600/plex/libraries/video/uhd-movies'
     dest_path: '{{ plex_libraries_root_dir }}/video/uhd-movies'
+    opts: "{{ mount_opts }}"
+    state: mounted
+    boot: true
