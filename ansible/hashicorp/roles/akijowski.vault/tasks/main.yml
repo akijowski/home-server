@@ -1,0 +1,21 @@
+---
+- ansible.builtin.import_tasks: preflight.yml
+
+- ansible.builtin.import_tasks: install_apt.yml
+  when:
+    - ansible_architecture == 'x86_64'
+    - ansible_distribution in ["Debian", "Ubuntu"]
+
+- ansible.builtin.import_tasks: ensure_configs.yml
+
+- name: Start Vault
+  ansible.builtin.systemd_service:
+    name: vault
+    state: started
+    enabled: true
+  register: vault_started
+
+- name: Wait for Vault port
+  ansible.builtin.wait_for:
+    port: 8200
+    state: started

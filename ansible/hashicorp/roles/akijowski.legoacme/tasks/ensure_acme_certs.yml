@@ -1,0 +1,69 @@
+---
+
+- name: Ensure certs directory exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: 0744
+    owner: root
+    group: root
+    state: directory
+  loop:
+    - /etc/lego
+    - /etc/lego/certs
+
+- name: Ensure lego env file
+  ansible.builtin.template:
+    dest: /etc/lego/lego.env
+    src: acme-lego.env.j2
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Ensure lego post-install hook
+  ansible.builtin.template:
+    dest: "{{ lego_run_hook }}"
+    src: "{{ lego_hook_script }}"
+    mode: 0700
+    owner: root
+    group: root
+  when: lego_hook_script | length > 0
+
+- name: Ensure lego systemd unit
+  ansible.builtin.template:
+    dest: /etc/systemd/system/acme-lego-renew.service
+    src: acme-lego-renew.service.j2
+    mode: 0740
+    owner: root
+    group: root
+
+- name: Ensure lego systemd timer
+  ansible.builtin.template:
+    dest: /etc/systemd/system/acme-lego-renew.timer
+    src: acme-lego-renew.timer.j2
+    mode: 0740
+    owner: root
+    group: root
+
+- name: Ensure timer is enabled
+  ansible.builtin.systemd_service:
+    name: acme-lego-renew.timer
+    daemon_reload: true
+    state: started
+    enabled: true
+
+- name: Check for existing certs
+  ansible.builtin.find:
+    paths: /etc/lego/certs/
+    file_type: any
+    hidden: true
+  register: lego_certs_found
+
+- name: Run lego for the first time
+  ansible.builtin.command: "/usr/bin/lego {{ lego_systemd_cmd_prefix }} run --run-hook={{ lego_run_hook }}"
+  environment:
+    AWS_REGION: us-east-1
+    AWS_HOSTED_ZONE_ID: "{{ aws_hosted_zone_id }}"
+    AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+    AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+  when:
+    - lego_certs_found.matched == 0

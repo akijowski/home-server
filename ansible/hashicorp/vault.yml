@@ -1,0 +1,66 @@
+---
+- name: Install Vault
+  hosts: vault
+  debugger: on_failed
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Update apt
+      ansible.builtin.apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 600
+
+    - name: Install additional packages
+      ansible.builtin.apt:
+        name:
+          - nfs-common
+          - acl # for become an unprivileged user
+          - podman
+          - wget
+          - gpg
+          - coreutils
+          - ca-certificates
+        state: latest
+
+    - ansible.builtin.import_role:
+        name: akijowski.legoacme
+      vars:
+        lego_staging: false
+        lego_acme_email: "agkijow@gmail.com"
+        lego_acme_domains:
+          - "{{ vault_fqdn }}"
+        lego_hook_script: 'templates/acme-post-install.sh.j2'
+
+    - ansible.builtin.import_role:
+        name: akijowski.vault
+
+- name: Initialize Vault
+  hosts: vault
+  debugger: on_failed
+  become: true
+  tags:
+    - init
+
+  tasks:
+    - name: Check Vault status
+      ansible.builtin.command: vault status
+      register: vault_status_raw
+      changed_when: false
+      failed_when: vault_status_raw.rc == 1
+      environment:
+        VAULT_ADDR: 'https://127.0.0.1:8200'
+        VAULT_SKIP_VERIFY: 'true'
+        VAULT_FORMAT: 'json'
+
+    - ansible.builtin.set_fact:
+        vault_status_json: "{{ vault_status_raw.stdout | from_json }}"
+
+# This will output the seal and recovery keys to the local filesystem.
+# Then you can store those some place safe and not commit them
+    - ansible.builtin.import_tasks: vault_init.yml
+      when:
+        - vault_status_json is defined
+        - not vault_status_json.initialized

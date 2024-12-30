@@ -1,0 +1,10 @@
+aws_access_key_id: "{{ vault_aws_access_key_id }}"
+aws_secret_access_key: "{{ vault_aws_secret_access_key }}"
+aws_hosted_zone_id: "{{ vault_aws_hosted_zone_id }}"
+# used by vault itself
+hashi_vault_aws_access_key_id: "{{ vault_hashi_vault_aws_access_key_id }}"
+hashi_vault_aws_secret_access_key: "{{ vault_hashi_vault_aws_secret_access_key }}"
+
+vault_kms_unseal: true
+vault_kms_unseal_key_id: "alias/vault/unseal-20241229215022265500000001"
+vault_fqdn: vault.kijowski.casa

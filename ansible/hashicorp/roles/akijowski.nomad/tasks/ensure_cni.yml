@@ -1,4 +1,6 @@
 ---
+# https://developer.hashicorp.com/nomad/docs/networking/cni
+# Needed to create bridge networks for workloads (and eventual Consul mesh)
 - name: Create CNI plugins directory
   ansible.builtin.file:
     path: "/opt/cni/bin"

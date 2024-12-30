@@ -1,0 +1,23 @@
+---
+- name: Initialize Vault
+  ansible.builtin.command: vault operator init
+  environment:
+    VAULT_ADDR: 'https://127.0.0.1:8200'
+    VAULT_SKIP_VERIFY: 'true'
+    VAULT_FORMAT: 'json'
+  register: vault_init_raw
+
+- ansible.builtin.set_fact:
+    vault_init_json: "{{ vault_init_raw.stdout | from_json }}"
+  when: vault_init_raw is defined and vault_init_raw.stdout is defined
+
+- name: Store unseal keys and root token on local filesystem
+  become: false
+  ansible.builtin.copy:
+    content: |
+      {{ vault_init_json }}
+    dest: "{{ playbook_dir }}/vault.json"
+    mode: 0400
+  delegate_to: localhost
+  when:
+    - vault_init_json is defined

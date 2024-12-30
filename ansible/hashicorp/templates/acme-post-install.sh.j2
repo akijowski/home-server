@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+{{ ansible_managed | comment }}
+
+set -eou pipefail
+
+# copy certificates to a directory controlled by Vault
+vault_cert_dir="{{ vault_tls_dir }}"
+
+# TODO: make this more robust
+
+# our Vault server only runs on {{ lego_acme_domains | join(' ') }} domain
+if [ "$LEGO_CERT_DOMAIN" = "{{ lego_acme_domains | first }}" ]; then
+  echo "Copying $LEGO_CERT_PATH to $vault_cert_dir"
+  install -o vault -g vault -m 0644 "$LEGO_CERT_PATH" "$vault_cert_dir"
+  install -o vault -g vault -m 0640 "$LEGO_CERT_KEY_PATH"  "$vault_cert_dir"
+
+  systemctl restart vault
+fi

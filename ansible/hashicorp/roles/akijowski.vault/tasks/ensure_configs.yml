@@ -1,0 +1,53 @@
+---
+- name: Ensure Vault directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: 0740
+    owner: "{{ vault_user_name }}"
+    group: "{{ vault_group_name }}"
+    state: directory
+  with_items:
+    - "{{ vault_config_dir }}"
+    - "{{ vault_data_dir }}"
+    - "{{ vault_raft_dir }}"
+    - "{{ vault_log_dir }}"
+    - "{{ vault_tls_dir }}"
+
+- name: Ensure Vault configurations
+  block:
+    - name: Ensure configs
+      ansible.builtin.template:
+        src: "vault.hcl.j2"
+        dest: "{{ vault_config_dir }}/vault.hcl"
+        mode: 0640
+        owner: "{{ vault_user_name }}"
+        group: "{{ vault_group_name }}"
+
+    - name: Ensure envfile
+      ansible.builtin.template:
+        src: "vault.env.j2"
+        dest: "{{ vault_config_dir }}/vault.env"
+        mode: 0640
+        owner: "{{ vault_user_name }}"
+        group: "{{ vault_group_name }}"
+  notify:
+    - reload vault
+
+- name: Create Vault log file audit
+  ansible.builtin.file:
+    path: "{{ vault_log_file }}"
+    mode: 0640
+    owner: "{{ vault_user_name }}"
+    group: "{{ vault_group_name }}"
+    # ensures idempotence
+    access_time: preserve
+    modification_time: preserve
+    state: touch
+
+- name: Set up logrotate for file audit
+  ansible.builtin.template:
+    src: "logrotate-vault.j2"
+    dest: "/etc/logrotate.d/vault"
+    mode: 0644
+    owner: root
+    group: root

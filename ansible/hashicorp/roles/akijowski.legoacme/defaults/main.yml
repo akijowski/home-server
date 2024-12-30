@@ -1,0 +1,15 @@
+lego_version: latest
+lego_arch_map:
+  armv7l: arm
+  x86_64: amd64
+lego_arch: "{{ lego_arch_map[ansible_architecture] }}"
+lego_tar: "lego_v{{ lego_version }}_{{ ansible_system | lower }}_{{ lego_arch }}.tar.gz"
+
+lego_staging: true
+lego_server: "https://acme{{ lego_staging | ansible.builtin.ternary('-staging', '') }}-v02.api.letsencrypt.org/directory"
+lego_certs_dir: /etc/lego/certs
+lego_run_hook: /etc/lego/acme-post-install.sh
+lego_domains_cmd: "{{ ['--domains'] | product(lego_acme_domains | map('tojson')) | map('join', '=') | list | join(' ') }}"
+# lego cmd is prepended
+lego_systemd_cmd_prefix: "--path {{ lego_certs_dir }} --accept-tos --server={{ lego_server }} --email={{ lego_acme_email }} {{ lego_domains_cmd }} --dns=route53"
+lego_systemd_cmd_renew: "{{ lego_systemd_cmd_prefix }} renew --renew-hook={{ lego_run_hook }}"

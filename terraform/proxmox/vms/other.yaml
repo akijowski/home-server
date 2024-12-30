@@ -20,3 +20,23 @@ plex:
         datastore_id: ssdstorage
         interface: virtio1
         size: 100
+vault:
+  - target_node: ${tmpl_node_mnemosyne}
+    description: |-
+      # Hashicorp Vault
+
+      https://developer.hashicorp.com/vault
+    tags:
+      - vault
+      - ubuntu
+      - ansible
+    ipv4_addr: '192.168.50.16/24'
+    cores: 1
+    memory: 2048 # 2 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 20
+      virtio1:
+        interface: virtio1
+        size: 10

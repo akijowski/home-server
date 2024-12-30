@@ -1,0 +1,48 @@
+---
+# https://go-acme.github.io/lego/
+- name: Ensure lego version is latest
+  ansible.builtin.set_fact:
+    lego_version: "{{ (lookup('ansible.builtin.url', 'https://api.github.com/repos/go-acme/lego/releases/latest', split_lines=False) | from_json).get('tag_name') | replace('v', '') }}"
+  when: "lego_version == 'latest'"
+
+- name: Check lego release metadata
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/go-acme/lego/releases/tags/v{{ lego_version }}"
+    return_content: true
+  register: lego_release
+
+- name: Get browser download URL
+  ansible.builtin.set_fact:
+    lego_url: "{{ item.browser_download_url }}"
+  loop: "{{ lego_release.json.assets }}"
+  when: "lego_tar == item.name"
+  no_log: true
+
+- name: Checksum metadata
+  ansible.builtin.uri:
+    url: "https://github.com/go-acme/lego/releases/download/v{{ lego_version }}/lego_{{ lego_version }}_checksums.txt"
+    return_content: true
+  register: lego_checksums
+
+- name: Get checksum
+  ansible.builtin.set_fact:
+    lego_checksum: "{{ item.split(' ') | first }}"
+  loop: "{{ lego_checksums.content.split('\n') }}"
+  when: "lego_tar == item | split(' ') | last"
+  no_log: true
+
+- name: Download lego
+  ansible.builtin.get_url:
+    url: "{{ lego_url }}"
+    dest: "/tmp/lego-{{ lego_version }}.tar.gz"
+    checksum: "sha256:{{ lego_checksum }}"
+
+- name: Install lego
+  ansible.builtin.unarchive:
+    src: "/tmp/lego-{{ lego_version }}.tar.gz"
+    dest: /usr/bin
+    remote_src: true
+    keep_newer: true
+    owner: root
+    group: root
+    mode: 0755

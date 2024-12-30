@@ -1,6 +1,9 @@
 ---
 plugin: community.general.proxmox
 
+# in memory cache
+cache: true
+
 validate_certs: true
 want_facts: true
 

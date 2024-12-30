@@ -1,0 +1,42 @@
+{{ ansible_managed | comment }}
+# https://developer.hashicorp.com/vault/docs/configuration
+
+ui = true
+
+api_addr = {% raw %}"https://{{ GetInterfaceIP \"eth0\" }}:8200"
+{% endraw %}
+cluster_addr = {% raw %}"https://{{ GetInterfaceIP \"eth0\" }}:8201"
+{% endraw %}
+
+# Disabled for raft storage
+disable_mlock = true
+
+storage "raft" {
+  path    = "{{ vault_data_dir }}"
+  node_id = "{{ ansible_hostname }}"
+}
+
+{% if vault_kms_unseal | default(False) %}
+# https://developer.hashicorp.com/vault/docs/configuration/seal/awskms
+seal "awskms" {
+  region = "{{ vault_kms_unseal_region | default('us-east-1') }}"
+  kms_key_id = "{{ vault_kms_unseal_key_id }}"
+}
+{% endif %}
+
+listener "tcp" {
+  address       = "0.0.0.0:8200"
+  tls_cert_file = "/opt/vault/tls/{{ vault_fqdn }}.crt"
+  tls_key_file  = "/opt/vault/tls/{{ vault_fqdn }}.key"
+
+  tls_require_and_verify_client_cert = false
+
+  telemetry {
+    unauthenticated_metrics_access = true
+  }
+}
+
+telemetry {
+  disable_hostname = true
+  prometheus_retention_time = "12h"
+}
