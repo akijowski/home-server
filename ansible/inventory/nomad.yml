@@ -4,6 +4,9 @@ nomad:
     nomadsrv0:
       ansible_host: 192.168.50.31
       nomad_server: true
+      # Nomad has a unique naming structure for TLS
+      nomad_tls_fqdn: 'server.global.nomad'
     nomadcl0:
       ansible_host: 192.168.50.32
       nomad_client: true
+      nomad_tls_fqdn: 'client.global.nomad'

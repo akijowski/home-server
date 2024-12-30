@@ -7,6 +7,7 @@ nomad_group_name: nomad
 
 nomad_config_dir: "/etc/nomad.d"
 nomad_data_dir: "/opt/nomad/data"
+nomad_tls_dir: "/opt/nomad/tls"
 
 nomad_version: '1.9*'
 

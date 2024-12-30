@@ -106,7 +106,8 @@ locals {
 
   pve_vms = merge(
     yamldecode(templatefile("${path.module}/vms/k3s.cluster.yaml", local.tmpl_vars)),
-    yamldecode(templatefile("${path.module}/vms/other.yaml", local.tmpl_vars))
+    yamldecode(templatefile("${path.module}/vms/other.yaml", local.tmpl_vars)),
+    yamldecode(templatefile("${path.module}/vms/nomad.cluster.yaml", local.tmpl_vars))
   )
 
   # map each group of vms to {group}{idx} for hostname (unless override). E.g. plex0 => {...vm info...}

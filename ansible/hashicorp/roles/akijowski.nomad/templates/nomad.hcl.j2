@@ -11,6 +11,7 @@ ui {
 }
 
 {% if nomad_cluster_tls | default(False) %}
+# https://developer.hashicorp.com/nomad/tutorials/transport-security/security-enable-tls
 tls {
   http = true
   rpc = true
@@ -20,7 +21,7 @@ tls {
   key_file = "{{ nomad_tls_dir }}/key.pem"
 
   verify_server_hostname = true
-  # false to allow consul healthcheck
+  # false to allow external http access without the Vault CA
   verify_https_client = false
 }
 {% endif %}

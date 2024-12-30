@@ -25,5 +25,15 @@
           - ca-certificates
         state: latest
 
+    - name: Mount NFS directories
+      ansible.posix.mount:
+        src: "{{ item.host }}:{{ item.source_path}}"
+        path: "{{ item.dest_path }}"
+        opts: "{{ item.opts }}"
+        state: "{{ item.state }}"
+        boot: "{{ item.boot }}"
+        fstype: nfs
+      loop: "{{ nfs_mounts }}"
+
     - ansible.builtin.import_role:
         name: akijowski.nomad

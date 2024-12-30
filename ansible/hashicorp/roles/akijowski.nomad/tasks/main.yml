@@ -8,12 +8,14 @@
 
 - ansible.builtin.import_tasks: ensure_networking.yml
 
-- ansible.builtin.import_tasks: ensure_cni.yml
+- ansible.builtin.include_tasks: ensure_cni.yml
   when:
     - nomad_client is defined
     - nomad_client | bool
 
 - ansible.builtin.import_tasks: ensure_task_drivers.yml
+
+- ansible.builtin.import_tasks: ensure_tls.yml
 
 - ansible.builtin.import_tasks: ensure_configs.yml
 

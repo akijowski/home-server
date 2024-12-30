@@ -1,6 +1,6 @@
 locals {
   local_domains = ["localhost"]
-  nomad_domains = ["nomad.kijowski.casa"]
+  nomad_domains = ["nomad", "nomad.kijowski.casa"]
 }
 
 resource "vault_pki_secret_backend_role" "nomad_server" {

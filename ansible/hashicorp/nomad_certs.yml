@@ -1,0 +1,112 @@
+---
+# I am keeping this playbook separate so that I can create and rotate certs independently
+- name: Generate Certs
+  hosts: nomad
+  # debugger: on_failed
+  become: true
+  tags:
+    - certs
+  vars:
+    nomad_tls_dir: /opt/nomad/tls
+
+  tasks:
+# Prevent creating multiple certs. The directory must be empty before issuing new ones
+    - name: Check for existing certs
+      ansible.builtin.find:
+        paths: "{{ nomad_tls_dir }}"
+        file_type: any
+        hidden: true
+      register: tls_certs_found
+
+    - ansible.builtin.fail:
+        msg: To prevent creating duplicate certificates, the directory must be emptied before proceeding
+      when:
+        - tls_certs_found.matched > 0
+
+    # TLS for Nomad: https://developer.hashicorp.com/nomad/tutorials/transport-security/security-enable-tls
+    - name: Login to Vault
+      delegate_to: 127.0.0.1
+      become: false
+      community.hashi_vault.vault_login:
+        auth_method: token
+        # token set via ANSIBLE_HASHI_VAULT_TOKEN
+        # oddly, according to the docs, this should not need a direct lookup
+        token: "{{ lookup('env', 'ANSIBLE_HASHI_VAULT_TOKEN') }}"
+        token_validate: true
+      register: vault_login
+
+    - name: Generate Server Certs
+      block:
+        - name: Generate Server Certs
+          delegate_to: 127.0.0.1
+          become: false
+          community.hashi_vault.vault_pki_generate_certificate:
+            engine_mount_point: pki_int
+            role_name: nomad-server
+            common_name: "{{ nomad_tls_fqdn }}"
+            ttl: '8760h' # 1 year
+            alt_names:
+              - "localhost"
+              - "{{ inventory_hostname_short }}.nomad.kijowski.casa"
+            auth_method: token
+            token: "{{ vault_login.login.auth.client_token }}"
+          register: vault_certs_server
+
+        - name: Set cert facts
+          ansible.builtin.set_fact:
+            vault_pki_ca_chain: "{{ vault_certs_server.data.data.ca_chain | join('\n') }}"
+            vault_pki_cert: "{{ vault_certs_server.data.data.certificate }}"
+            vault_pki_key: "{{ vault_certs_server.data.data.private_key }}"
+          when:
+            - vault_certs_server is defined
+      when:
+        - nomad_server is defined
+        - nomad_server | bool
+
+    - name: Generate Client Certs
+      block:
+        - name: Generate Client Certs
+          delegate_to: 127.0.0.1
+          become: false
+          community.hashi_vault.vault_pki_generate_certificate:
+            engine_mount_point: pki_int
+            role_name: nomad-client
+            common_name: "{{ nomad_tls_fqdn }}"
+            ttl: '8760h'
+            alt_names:
+              - "localhost"
+              - "{{ inventory_hostname_short }}.nomad.kijowski.casa"
+            auth_method: token
+            token: "{{ vault_login.login.auth.client_token }}"
+          register: vault_certs_client
+
+        - name: Set cert facts
+          ansible.builtin.set_fact:
+            vault_pki_ca_chain: "{{ vault_certs_client.data.data.ca_chain | join('\n') }}"
+            vault_pki_cert: "{{ vault_certs_client.data.data.certificate }}"
+            vault_pki_key: "{{ vault_certs_client.data.data.private_key }}"
+          when:
+            - vault_certs_client is defined
+      when:
+        - nomad_client is defined
+        - nomad_client | bool
+
+    - name: Ensure TLS directory
+      ansible.builtin.file:
+        path: "{{ nomad_tls_dir }}"
+        state: directory
+
+    - name: Copy certs to remote
+      ansible.builtin.copy:
+        content: "{{ item.content }}"
+        dest: "{{ item.path }}"
+        mode: "0640"
+      no_log: true
+      with_items:
+      # These file names are dictated by the nomad config
+        - content: "{{ vault_pki_ca_chain }}"
+          path: "{{ nomad_tls_dir }}/ca.crt"
+        - content: "{{ vault_pki_cert }}"
+          path: "{{ nomad_tls_dir }}/cert.crt"
+        - content: "{{ vault_pki_key }}"
+          path: "{{ nomad_tls_dir }}/key.pem"

@@ -6,11 +6,11 @@ path "${pki_int_root}/issue/auth" {
   capabilities = ["create", "update"]
 }
 
-path "${pki_int_root}/issue/server" {
+path "${pki_int_root}/issue/nomad-server" {
   capabilities = ["create", "update"]
 }
 
-path "${pki_int_root}/issue/client" {
+path "${pki_int_root}/issue/nomad-client" {
   capabilities = ["create", "update"]
 }
 

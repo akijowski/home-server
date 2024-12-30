@@ -1,0 +1,25 @@
+---
+- name: Check for existing certs
+  ansible.builtin.find:
+    paths: "{{ nomad_tls_dir }}"
+    file_type: any
+    hidden: true
+  register: tls_certs_found
+
+# This triggers the template config
+- name: Set TLS facts
+  ansible.builtin.set_fact:
+    nomad_cluster_tls: true
+  when:
+    - tls_certs_found.matched > 0
+
+- name: Ensure TLS file ownership
+  ansible.builtin.file:
+    path: "{{ nomad_tls_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ nomad_user_name }}"
+    group: "{{ nomad_group_name }}"
+    mode: '0640'
+  when:
+    - nomad_cluster_tls | default(False)
