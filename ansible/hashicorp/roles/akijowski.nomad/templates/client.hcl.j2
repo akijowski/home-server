@@ -3,4 +3,34 @@
 client {
   enabled = true
   servers = [{{ nomad_server_ips }}]
+
+  reserved = {
+    cpu = 250 # 250 MHz
+  }
+
+  options = {
+    "user.checked_drivers" = "exec,raw_exec,qemu,java"
+    "user.denylist" = "root,ubuntu"
+  }
+
+  meta = {
+    "hostname" = "{{ inventory_hostname_short }}"
+  }
+
+  {% for h in nomad_client_host_volumes | default([]) %}
+host_volume "{{ h.name }}" {
+    path = "{{ h.path }}"
+    read_only = {{ h.read_only | default('false') }}
+  }
+
+  {% endfor %}
 }
+
+{% if nomad_usb_plugin_enabled | default(False) %}
+# https://gitlab.com/CarbonCollins/nomad-usb-device-plugin#configuration
+plugin "{{ usb_plugin_name }}" {
+  config {
+    enabled = true
+  }
+}
+{% endif %}

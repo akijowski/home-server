@@ -1,0 +1,40 @@
+---
+proxmox:
+  records:
+    - '192.168.50.3'
+    - '192.168.50.6'
+    - '192.168.50.9'
+hyperion:
+  records:
+    - '192.168.50.3'
+phoebe:
+  records:
+    - '192.168.50.6'
+mnemosyne:
+  records:
+    - '192.168.50.9'
+truenas:
+  records:
+    - '192.168.50.4'
+k8s-wild:
+  prefix: '*.k8s'
+  records:
+    - '192.168.50.20'
+k8s:
+  records:
+    - '192.168.50.20'
+mgmt-wild:
+  prefix: '*.mgmt'
+  records:
+    - '192.168.50.23'
+mgmt:
+  records:
+    - '192.168.50.23'
+vault:
+  records:
+    - '192.168.50.16'
+# Traefik running on Nomad server
+local-wild:
+  prefix: '*'
+  records:
+    - '192.168.50.32'

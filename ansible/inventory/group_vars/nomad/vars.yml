@@ -51,3 +51,20 @@ nfs_mounts:
     opts: "{{ mount_opts }}"
     state: mounted
     boot: true
+
+# Set these on all nomad hosts (they'll only be used by clients)
+nomad_client_host_volumes:
+  - name: plex-movies
+    path: "{{ plex_libraries_root_dir }}/video/movies"
+  - name: plex-tv-shows
+    path: "{{ plex_libraries_root_dir }}/video/tv-shows"
+  - name: plex-uhd-movies
+    path: "{{ plex_libraries_root_dir }}/video/uhd-movies"
+  - name: arm-media
+    path: "/mnt/arm/media"
+  - name: tdarr-cache
+    path: "/mnt/tdarr/cache"
+  - name: tdarr-config
+    path: "/mnt/tdarr/config"
+  - name: tdarr-server
+    path: "/mnt/tdarr/server"

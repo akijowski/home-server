@@ -46,3 +46,5 @@
       ansible.builtin.file:
         path: /opt/nomad/data
         state: absent
+  when:
+    - nomad_force_reset | default(False)

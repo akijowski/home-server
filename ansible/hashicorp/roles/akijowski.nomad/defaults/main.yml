@@ -13,10 +13,25 @@ nomad_version: '1.9*'
 
 nomad_port: 4646
 
+# On initial install set to true so that the default nomad install is stopped and cleared properly
+nomad_force_reset: false
+
+# [{name: foo, path: /path, read_only: false}]
+nomad_client_host_volumes: []
+
 cni_plugin_version: latest
 # cni_plugin_checksum: ''
 cni_plugin_arch_map:
-  armv7l: arm
+  armv7l: armv7
   x86_64: amd64
 cni_plugin_arch: "{{ cni_plugin_arch_map[ansible_architecture] }}"
 cni_plugin_tar: "cni-plugins-{{ ansible_system | lower }}-{{ cni_plugin_arch }}-v{{ cni_plugin_version }}.tgz"
+
+usb_plugin_version: '0.4.0'
+usb_plugin_arch_map:
+  armv7l: arm
+  x86_64: amd64
+usb_plugin_arch: "{{ usb_plugin_arch_map[ansible_architecture] }}"
+usb_plugin_binary: "nomad-usb-device-plugin-{{ ansible_system | lower }}-{{ usb_plugin_arch }}-{{ usb_plugin_version }}"
+# This is the name that Nomad will invoke and is used in the config
+usb_plugin_name: nomad-usb-device-plugin

@@ -1,4 +1,18 @@
 ---
+- name: Ensure plugins directory
+  ansible.builtin.file:
+    path: "{{ nomad_data_dir }}/plugins"
+    state: directory
+    owner: "{{ nomad_user_name }}"
+    group: "{{ nomad_group_name }}"
+
+- name: Ensure downloads directory
+  ansible.builtin.file:
+    path: "{{ nomad_data_dir }}/downloads"
+    state: directory
+    owner: "{{ nomad_user_name }}"
+    group: "{{ nomad_group_name }}"
+
 - name: Ensure APT is updated
   ansible.builtin.apt:
     update_cache: true
@@ -17,3 +31,30 @@
     state: latest
   loop:
     - nomad-driver-podman
+
+# https://developer.hashicorp.com/nomad/plugins/devices/community/usb
+# https://gitlab.com/CarbonCollins/nomad-usb-device-plugin
+# libusb no longer needed
+# https://gitlab.com/api/v4/projects/23395095/packages/generic/nomad-usb-device-plugin/0.4.0/nomad-usb-device-plugin-linux-amd64-0.4.0
+- name: "Download USB plugin {{ usb_plugin_version }}"
+  ansible.builtin.get_url:
+    url: "https://gitlab.com/api/v4/projects/23395095/packages/generic/nomad-usb-device-plugin/{{ usb_plugin_version }}/{{ usb_plugin_binary }}"
+    dest: "{{ nomad_data_dir }}/downloads"
+    owner: "{{ nomad_user_name }}"
+    group: "{{ nomad_group_name }}"
+    mode: "0770"
+  when:
+    - nomad_usb_plugin_enabled is defined
+    - nomad_usb_plugin_enabled | bool
+
+- name: Link USB plugin binary
+  ansible.builtin.file:
+    src: "{{ nomad_data_dir }}/downloads/{{ usb_plugin_binary }}"
+    dest: "{{ nomad_data_dir }}/plugins/{{ usb_plugin_name }}"
+    owner: "{{ nomad_user_name }}"
+    group: "{{ nomad_group_name }}"
+    mode: "0770"
+    state: link
+  when:
+    - nomad_usb_plugin_enabled is defined
+    - nomad_usb_plugin_enabled | bool
