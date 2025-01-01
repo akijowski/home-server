@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eou pipefail
+set -eo pipefail
 
 TKN_ALIAS=ansible
 TKN_PERIOD=72h
@@ -10,8 +10,10 @@ FILE_OUT="../.ansible_token.yaml"
 
 # https://developer.hashicorp.com/vault/docs/commands/token/create
 function create() {
+    read -sp "Enter an admin token: " token
+    echo "\n"
     # create a periodic token for Ansible
-    vault token create \
+    VAULT_TOKEN="$token" vault token create \
         -role=ansible \
         -entity-alias="$TKN_ALIAS" \
         -policy=ansible \
@@ -48,6 +50,11 @@ function revoke() {
 
 function main() {
     cmd="$1"
+
+    if [[ -z "$cmd" ]]; then
+        echo -n "must provide a valid command: create, renew, revoke"
+        exit 0
+    fi
 
     case "$cmd" in
         create)

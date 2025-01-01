@@ -1,4 +1,5 @@
 locals {
+  nomad_server_url = "https://nomadsrv0.nomad.kijowski.casa:4646"
   entities = {
     "ansible" = {
       name     = "ansible"
@@ -6,6 +7,19 @@ locals {
       metadata = {
         description = "Auth entity used by ansible"
       }
+    }
+  }
+  nomad_jwt_roles = {
+    "default" = {
+      policies = ["default"]
+    }
+    "traefik" = {
+      policies = ["traefik"]
+      bound_claims = {
+        nomad_namespace = "core"
+        nomad_job_id    = "traefik"
+      }
+      token_period_sec = 7200 # 2 hours
     }
   }
 }
@@ -60,3 +74,46 @@ resource "vault_token_auth_backend_role" "ansible" {
 #   filename        = "./ansible_token.yaml"
 #   file_permission = "0600"
 # }
+
+# Nomad Workload Identities
+# https://developer.hashicorp.com/nomad/docs/integrations/vault/acl#nomad-workload-identities
+resource "vault_jwt_auth_backend" "nomad" {
+  path        = "nomad_jwt"
+  type        = "jwt"
+  description = "JWT ACL for Nomad workload identities"
+
+  jwks_url    = "${local.nomad_server_url}/.well-known/jwks.json"
+  jwks_ca_pem = sensitive(vault_pki_secret_backend_intermediate_set_signed.intermediate.certificate)
+
+  default_role = "nomad-default"
+
+  tune {
+    default_lease_ttl = "1h"
+    max_lease_ttl     = "168h" # 1 week
+    token_type = "default-service"
+  }
+}
+
+resource "vault_jwt_auth_backend_role" "nomad" {
+  for_each = local.nomad_jwt_roles
+
+  backend   = vault_jwt_auth_backend.nomad.path
+  role_type = "jwt"
+  role_name = try(each.value.name, "nomad-${each.key}")
+
+  claim_mappings = {
+    "nomad_namespace" = "nomad_namespace"
+    "nomad_job_id"    = "nomad_job_id"
+    "nomad_task"      = "nomad_task"
+  }
+
+  bound_audiences = ["vault.kijowski.casa"]
+  bound_claims    = try(each.value.bound_claims, {})
+
+  user_claim              = "/nomad_job_id"
+  user_claim_json_pointer = true
+
+  token_policies = sort(each.value.policies)
+  token_type     = "service"
+  token_period   = try(each.value.token_period_sec, 1800) # default 30 minutes
+}
