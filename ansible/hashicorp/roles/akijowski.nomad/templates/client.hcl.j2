@@ -17,13 +17,14 @@ client {
     "hostname" = "{{ inventory_hostname_short }}"
   }
 
-  {% for h in nomad_client_host_volumes | default([]) %}
-host_volume "{{ h.name }}" {
+  {% for h in nomad_client_host_volumes | default([]) -%}
+  host_volume "{{ h.name }}" {
     path = "{{ h.path }}"
     read_only = {{ h.read_only | default('false') }}
   }
 
   {% endfor %}
+
 }
 
 {% if nomad_usb_plugin_enabled | default(False) %}
@@ -32,5 +33,14 @@ plugin "{{ usb_plugin_name }}" {
   config {
     enabled = true
   }
+}
+{% endif %}
+
+{% if nomad_vault_integration | default(False) %}
+# https://developer.hashicorp.com/nomad/docs/configuration/vault#nomad-client
+vault {
+  enabled = true
+  address = "{{ nomad_vault_address }}"
+  jwt_auth_backend_path = "{{ nomad_vault_jwt_mount_path }}"
 }
 {% endif %}

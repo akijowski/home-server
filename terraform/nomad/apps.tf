@@ -7,7 +7,7 @@ locals {
         namespace             = jsonencode(local.namespaces["core"].name)
         traefik_image_version = "v3.2"
         domain                = "kijowski.casa"
-        nomad_address         = "192.168.50.31"
+        nomad_address         = "https://nomadsrv0.nomad.kijowski.casa:4646"
       }
     }
     "rd-csi-nfs-ctrl" = {
@@ -29,14 +29,7 @@ locals {
       }
     }
   }
-  nfs_volumes = {
-    "traefik-acme" = {
-      namespace       = local.namespaces["core"].name
-      access_mode     = "single-node-writer"
-      attachment_mode = "file-system"
-      capacity_max    = "2GiB"
-    }
-  }
+  nfs_volumes = {}
 }
 
 resource "nomad_job" "file_apps" {

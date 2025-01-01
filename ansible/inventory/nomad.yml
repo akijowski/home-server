@@ -6,9 +6,18 @@ nomad:
       nomad_server: true
       # Nomad has a unique naming structure for TLS
       nomad_tls_fqdn: 'server.global.nomad'
+      # Vault
+      nomad_vault_integration: true
+      nomad_vault_address: "https://vault.kijowski.casa:8200"
+      nomad_vault_jwt_aud: "vault.kijowski.casa"
+
     nomadcl0:
       ansible_host: 192.168.50.32
       nomad_client: true
       nomad_tls_fqdn: 'client.global.nomad'
       # This node is on hyperion which has a usb device
       nomad_usb_plugin_enabled: true
+      # Vault
+      nomad_vault_integration: true
+      nomad_vault_address: "https://vault.kijowski.casa:8200"
+      nomad_vault_jwt_mount_path: "nomad_jwt"

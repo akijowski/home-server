@@ -21,13 +21,6 @@ job "traefik" {
       }
     }
 
-    volume "acme" {
-      type = "csi"
-      source = "traefik-acme"
-      access_mode = "single-node-writer"
-      attachment_mode = "file-system"
-    }
-
     service {
       provider = "nomad"
       port     = "https"
@@ -83,7 +76,8 @@ job "traefik" {
 
         volumes = [
           "local/traefik.yml:/traefik.yml",
-          "local/rules:/rules"
+          "local/rules:/rules",
+          "secrets/intermediate.crt:/data/ca/intermediate.crt"
         ]
 
         labels = {
@@ -93,10 +87,17 @@ job "traefik" {
         }
       }
 
-      volume_mount {
-          volume = "acme"
-          destination = "/data/acme"
-        }
+      vault {
+        role = "nomad-traefik"
+      }
+
+      identity {
+        name = "vault_default"
+        aud = ["vault.kijowski.casa"]
+        change_mode = "signal"
+        change_signal = "SIGHUP"
+        ttl = "30m"
+      }
 
       template {
         data        = <<EOF
@@ -129,9 +130,9 @@ providers:
     directory: "/rules"
   nomad:
     endpoint:
-      address: 'https://${nomad_address}:4646'
+      address: '${nomad_address}'
       tls:
-        insecureSkipVerify: true #TODO: load a cert from Vault
+        ca: "/data/ca/intermediate.crt"
 EOF
         destination = "$${NOMAD_TASK_DIR}/traefik.yml"
       }
@@ -154,7 +155,7 @@ http:
     nomad:
       loadBalancer:
         servers:
-          - url: "https://${nomad_address}:4646"
+          - url: "${nomad_address}"
         serversTransport: insecureTransport
 
   serversTransports:
@@ -172,6 +173,18 @@ http:
         stsPreload: true
 EOF
         destination = "$${NOMAD_TASK_DIR}/rules/rules.yml"
+      }
+
+      template {
+        data = <<EOF
+      {{- with secret "pki_int/issuer/default/json" -}}
+      {{- with .Data -}}
+      {{- .certificate -}}
+      {{- end -}}
+      {{- end -}}
+      EOF
+        destination = "$${NOMAD_SECRETS_DIR}/intermediate.crt"
+        change_mode = "restart"
       }
 
       resources {

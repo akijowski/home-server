@@ -44,10 +44,12 @@
             engine_mount_point: pki_int
             role_name: nomad-server
             common_name: "{{ nomad_tls_fqdn }}"
-            ttl: '8760h' # 1 year
+            ttl: '1440h' # 60 days
             alt_names:
               - "localhost"
               - "{{ inventory_hostname_short }}.nomad.kijowski.casa"
+            ip_sans:
+              - "{{ ansible_host }}"
             auth_method: token
             token: "{{ vault_login.login.auth.client_token }}"
           register: vault_certs_server

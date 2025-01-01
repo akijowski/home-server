@@ -5,6 +5,16 @@ server {
   bootstrap_expect = {{ nomad_client_list | length }}
 }
 
-ui {
+{% if nomad_vault_integration | default(False) %}
+# https://developer.hashicorp.com/nomad/docs/configuration/vault#nomad-server
+vault {
   enabled = true
+  default_identity {
+    aud = ["{{ nomad_vault_jwt_aud }}"]
+    env = false
+    file = true
+    ttl = "1h"
+  }
+
 }
+{% endif %}

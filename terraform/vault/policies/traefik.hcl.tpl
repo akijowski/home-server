@@ -6,8 +6,6 @@ path "${pki_int_root}/issue/auth" {
   capabilities = ["create", "update"]
 }
 
-# TODO Read certs for vault
-
 #path "auth/agent/certs/*" {
 #  capabilities = ["create", "update"]
 #}
