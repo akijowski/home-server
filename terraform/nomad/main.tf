@@ -1,0 +1,20 @@
+provider "nomad" {
+  address     = var.nomad_url
+  skip_verify = true
+}
+
+locals {
+  namespaces = {
+    "core" = {
+      name        = "core"
+      description = "Core infrastructure services"
+    }
+  }
+}
+
+resource "nomad_namespace" "this" {
+  for_each = local.namespaces
+
+  name        = each.value.name
+  description = each.value.description
+}
