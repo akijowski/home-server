@@ -24,36 +24,6 @@ locals {
   #       ip0_ipv4    = "192.168.50.13/24"
   #       extra_tags  = ["arm", "ubuntu", "ansible"]
   #     }
-  #     traefik0 = {
-  #       name        = "traefik0"
-  #       description = <<-EOF
-  #         # Traefik node.
-  #         Managed by Terraform.
-
-  #         https://traefik.kijowski.casa/dashboard/
-  # EOF
-  #       target_node = "phoebe"
-  #       vmid        = 0
-  #       cpu         = 1
-  #       memory      = 2048 # 2 GiB
-  #       ip0_ipv4    = "192.168.50.14/24"
-  #       extra_tags  = ["traefik", "ubuntu", "ansible"]
-  #     }
-  #     homebridge0 = {
-  #       name        = "homebridge0"
-  #       description = <<-EOF
-  #         # Homebridge for Apple HomeKit.
-  #         Managed by Terraform.
-
-  #         https://homebridge.kijowski.casa
-  # EOF
-  #       target_node = "phoebe"
-  #       vmid        = 0
-  #       cpu         = 1
-  #       memory      = 1024 # 1 GiB
-  #       ip0_ipv4    = "192.168.50.15/24"
-  #       extra_tags  = ["homebridge", "ubuntu", "ansible"]
-  #     }
   #     tdarr0 = {
   #       name        = "tdarr0"
   #       description = <<-EOF
