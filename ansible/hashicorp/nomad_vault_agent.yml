@@ -1,0 +1,46 @@
+---
+- name: Run Vault Agent
+  hosts: nomad
+  # debugger: on_failed
+  become: true
+  tags:
+    - agent
+  vars:
+    nomad_tls_dir: /opt/nomad/tls
+    nomad_template_dir: /opt/nomad/templates
+    vault_address: "https://vault.kijowski.casa:8200"
+    vault_pki_mount: pki_int
+    vault_pki_server_role: nomad-server
+    vault_pki_client_role: nomad-client
+    vault_agent_approle_id: "{{ vault_hashi_vault_approle_id }}"
+    vault_agent_approle_secret: "{{ vault_hashi_vault_approle_secret }}"
+
+# https://developer.hashicorp.com/nomad/tutorials/integrate-vault/vault-pki-nomad
+# https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md#pkicert
+  tasks:
+    - name: Install Vault Agent (Server)
+      ansible.builtin.import_role:
+        name: akijowski.vaultagent
+      when:
+        - nomad_server is defined
+        - nomad_server | bool
+      vars:
+        vault_pki_role: "{{ vault_pki_server_role }}"
+        # Custom variable start and end strings for these templates
+        vault_agent_templates:
+          - ansible_tmpl: "templates/agent/server.agent.crt.tpl.j2"
+            agent_source: "{{ nomad_template_dir }}/server.agent.crt.tpl"
+            agent_dest: "{{ nomad_tls_dir }}/server.agent.full.crt"
+
+    - name: Install Vault Agent (Client)
+      ansible.builtin.import_role:
+        name: akijowski.vaultagent
+      when:
+        - nomad_client is defined
+        - nomad_client | bool
+      vars:
+        vault_pki_role: "{{ vault_pki_client_role }}"
+        vault_agent_templates:
+          - ansible_tmpl: "templates/agent/client.agent.crt.tpl.j2"
+            agent_source: "{{ nomad_template_dir }}/client.agent.crt.tpl"
+            agent_dest: "{{ nomad_tls_dir }}/client.agent.full.crt"

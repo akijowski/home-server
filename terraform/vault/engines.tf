@@ -21,3 +21,9 @@ resource "vault_mount" "pki_int" {
   description           = "PKI intermediate certificates secrets engine"
   max_lease_ttl_seconds = 315360000 # 10 years
 }
+
+resource "vault_aws_secret_backend" "aws" {
+  description               = "AWS credential generation secrets engine"
+  default_lease_ttl_seconds = 43200  # 12 hours
+  max_lease_ttl_seconds     = 172800 # 48 hours
+}

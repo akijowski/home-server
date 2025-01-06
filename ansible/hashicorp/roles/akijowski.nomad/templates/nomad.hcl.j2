@@ -23,9 +23,9 @@ tls {
   http = true
   rpc = true
 
-  ca_file = "{{ nomad_tls_dir }}/ca.crt"
-  cert_file = "{{ nomad_tls_dir }}/cert.crt"
-  key_file = "{{ nomad_tls_dir }}/key.pem"
+  ca_file = "{{ nomad_tls_dir }}/{{ nomad_tls_file_prefix}}.ca.crt"
+  cert_file = "{{ nomad_tls_dir }}/{{ nomad_tls_file_prefix }}.crt"
+  key_file = "{{ nomad_tls_dir }}/{{ nomad_tls_file_prefix }}.key"
 
   verify_server_hostname = true
   # false to allow external http access without the Vault CA

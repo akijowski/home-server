@@ -1,0 +1,61 @@
+#jinja2:lstrip_blocks: True
+{# helps with nested blocks #}
+{# https://stackoverflow.com/questions/42914324/extra-spaces-appearing-in-ansible-templates #}
+{# https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control #}
+{{ ansible_managed | comment }}
+
+pid_file = "./pidfile"
+
+vault {
+  address = "{{ vault_address }}"
+}
+
+auto_auth {
+  method {
+    type      = "approle"
+
+    config = {
+      role_id_file_path = "/opt/vault/vault-agent/roleid"
+      secret_id_file_path = "/opt/vault/vault-agent/secretid"
+      remove_secret_id_file_after_reading = false
+    }
+  }
+
+  sink {
+    type = "file"
+    wrap_ttl = "30m"
+    config = {
+      path = "sink_file_wrapped_1.txt"
+    }
+  }
+
+  sink {
+    type = "file"
+    config = {
+      path = "sink_file_unwrapped_2.txt"
+    }
+  }
+}
+
+listener "tcp" {
+  address = "127.0.0.1:8100"
+  tls_disable = true
+}
+
+template_config {
+  static_secret_render_interval = "10m"
+  exit_on_retry_failure = true
+  max_connections_per_host = 20
+}
+
+{# Vault will respect existing file ownership unless owner/group is specified #}
+{# Therefore, we can add these before installing Nomad, and then set the ownership to the Nomad user/group #}
+{# https://github.com/hashicorp/consul-template/blob/main/docs/configuration.md#templates #}
+{% for t in vault_agent_templates %}
+template {
+  source = "{{ t.agent_source }}"
+  destination = "{{ t.agent_dest }}"
+  create_dest_dirs = true
+}
+
+{% endfor %}

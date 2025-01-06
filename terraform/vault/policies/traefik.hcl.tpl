@@ -1,11 +1,6 @@
 # Templated Traefik policy
 # Managed by terraform
 
-# Create PKI certs for services
-path "${pki_int_root}/issue/auth" {
-  capabilities = ["create", "update"]
-}
-
 #path "auth/agent/certs/*" {
 #  capabilities = ["create", "update"]
 #}
@@ -13,6 +8,20 @@ path "${pki_int_root}/issue/auth" {
 #path "${kv_v2_root}/data/somepath" {
 #  capabilities = ["read", "create"]
 #}
+
+# Generate AWS credentials
+path "aws/creds/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}" {
+  capabilities = ["read", "create"]
+}
+
+path "aws/sts/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}" {
+  capabilities = ["read", "create", "update"]
+}
+
+# for now
+path "aws/sts/traefik-role" {
+  capabilities = ["read", "create", "update"]
+}
 
 # Read secrets based on nomad namespace/job_id
 path "secret/data/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}/*" {

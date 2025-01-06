@@ -25,6 +25,7 @@
           - ca-certificates
         state: latest
 
+# TODO: this is still flaky. The post-hook script in particular
     - ansible.builtin.import_role:
         name: akijowski.legoacme
       vars:

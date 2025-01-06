@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Hashicorp Vault - Agent
+Documentation=https://developer.hashicorp.com/vault/docs/agent-and-proxy/agent
+# Network needs to be ready
+Wants=network-online.target
+After=network-online.target
+# Wait 60 seconds up to 3 times
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+User=root
+Group=root
+EnvironmentFile={{ vault_config_dir }}/vault.env
+
+ExecStart=/usr/bin/vault agent -config={{ vault_agent_data_dir }}/vault_agent.conf
+
+[Install]
+WantedBy=multi-user.target

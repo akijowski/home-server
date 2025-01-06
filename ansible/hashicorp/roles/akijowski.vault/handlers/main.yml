@@ -1,6 +1,6 @@
 ---
 - name: reload vault
-  systemd:
+  ansible.builtin.systemd_service:
     name: vault
     state: reloaded
   when: not vault_started.changed

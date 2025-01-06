@@ -1,0 +1,21 @@
+---
+- ansible.builtin.import_tasks: preflight.yml
+
+- ansible.builtin.import_tasks: install_apt.yml
+  when:
+    - ansible_architecture == 'x86_64'
+    - ansible_distribution in ["Debian", "Ubuntu"]
+
+- ansible.builtin.import_tasks: ensure_configs.yml
+
+- ansible.builtin.import_tasks: ensure_agent_templates.yml
+
+- name: Copy systemd files
+  ansible.builtin.template:
+    src: vault-agent.service.j2
+    dest: /etc/systemd/system/vault-agent.service
+    owner: root
+    group: root
+    mode: 0740
+  notify:
+    - restart agent

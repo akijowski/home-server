@@ -1,0 +1,6 @@
+{{- with pkiCert "[[ vault_pki_mount ]]/issue/[[ vault_pki_role ]]" "common_name=client.global.nomad" "ttl=24h" "alt_names=localhost,[[ inventory_hostname_short ]].nomad.kijowski.casa" "ip_sans=127.0.0.1,[[ ansible_host ]]" -}}
+{{ .Data.Cert }}{{ .Data.CA }}{{ .Data.Key }}
+{{ .Data.Cert | writeToFile "[[ nomad_tls_dir ]]/client.agent.crt" "" "" "0640" }}
+{{ .Data.CA | writeToFile "[[ nomad_tls_dir ]]/client.agent.ca.crt" "" "" "0640" }}
+{{ .Data.Key | writeToFile "[[ nomad_tls_dir ]]/client.agent.key" "" "" "0400" }}
+{{ end }}

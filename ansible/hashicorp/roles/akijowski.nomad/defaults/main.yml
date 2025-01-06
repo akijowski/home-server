@@ -9,6 +9,8 @@ nomad_config_dir: "/etc/nomad.d"
 nomad_data_dir: "/opt/nomad/data"
 nomad_tls_dir: "/opt/nomad/tls"
 
+nomad_tls_file_prefix: "{{ (nomad_client | default(False)) | ternary('client', 'server') }}.agent"
+
 nomad_version: '1.9*'
 
 nomad_port: 4646

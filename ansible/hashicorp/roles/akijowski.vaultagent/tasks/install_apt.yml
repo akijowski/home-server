@@ -1,0 +1,42 @@
+---
+- name: Ensure apt requirements
+  ansible.builtin.apt:
+    name:
+      - wget
+      - gpg
+      - coreutils
+    state: latest
+
+- name: Ensure apt keyring directory
+  ansible.builtin.file:
+    path: "{{ apt_keyring_dir }}"
+    mode: 0755
+    owner: root
+    group: root
+    state: directory
+
+# TODO: update?
+- name: Ensure Hashicorp apt key
+  ansible.builtin.get_url:
+    url: "https://apt.releases.hashicorp.com/gpg"
+    dest: "{{ apt_keyring_hashicorp }}"
+    mode: 0644
+    force: true
+
+- name: Ensure Hashicorp apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by={{ apt_keyring_hashicorp }}] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    filename: hashicorp
+    state: present
+    update_cache: true
+
+- name: Ensure Vault is installed with apt
+  ansible.builtin.apt:
+    name: "vault={{ vault_version }}"
+    state: present
+
+- name: Ensure Vault is stopped
+  ansible.builtin.systemd_service:
+    name: vault
+    state: stopped
+    enabled: false

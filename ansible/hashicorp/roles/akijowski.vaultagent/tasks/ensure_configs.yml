@@ -1,0 +1,41 @@
+---
+- name: Ensure Vault directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0770"
+  with_items:
+    - "{{ vault_config_dir }}"
+    - "{{ vault_agent_data_dir }}"
+
+- name: Ensure Configs
+  ansible.builtin.template:
+    src: "vault_agent.conf.j2"
+    dest: "{{ vault_agent_data_dir }}/vault_agent.conf"
+    mode: "0640"
+  notify:
+    - restart agent
+
+- name: Ensure Env File
+  ansible.builtin.template:
+    src: "vault.env.j2"
+    dest: "{{ vault_config_dir }}/vault.env"
+    mode: "0740"
+  notify:
+    - restart agent
+
+- name: Ensure approle file
+  ansible.builtin.copy:
+    content: "{{ vault_agent_approle_id }}"
+    dest: "{{ vault_agent_data_dir }}/roleid"
+    mode: "0400"
+  notify:
+    - restart agent
+
+- name: Ensure approle secret file
+  ansible.builtin.copy:
+    content: "{{ vault_agent_approle_secret }}"
+    dest: "{{ vault_agent_data_dir }}/secretid"
+    mode: "0400"
+  notify:
+    - restart agent

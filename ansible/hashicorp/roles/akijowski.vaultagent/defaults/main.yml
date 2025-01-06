@@ -7,10 +7,10 @@ vault_group_name: vault
 
 vault_version: '1.18*'
 
+vault_data_dir: "/opt/vault"
+vault_agent_data_dir: "{{ vault_data_dir }}/vault-agent"
 vault_config_dir: "/etc/vault.d"
-vault_data_dir: "/opt/vault/data"
-vault_raft_dir: "{{ vault_data_dir }}/raft"
-vault_log_dir: "/opt/vault/logs"
-vault_tls_dir: "/opt/vault/tls"
 
-vault_log_file: "{{ vault_log_dir }}/vault.log"
+vault_address: "127.0.0.1:8200"
+# [{ansible_tmpl: "", agent_source: "", agent_dest: ""}]
+vault_agent_templates: []

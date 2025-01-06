@@ -40,6 +40,7 @@ resource "vault_identity_entity_policies" "this" {
 }
 
 # Set up ansible token generation for playbooks
+# Manage tokens with the Vault CLI
 resource "vault_token_auth_backend_role" "ansible" {
   role_name              = "ansible"
   allowed_policies       = local.entities["ansible"].policies
@@ -51,29 +52,22 @@ resource "vault_token_auth_backend_role" "ansible" {
   token_explicit_max_ttl = "115200" # 30 days
 }
 
-# Using a script to handle tokens
-# Leaving this here for posterity
-#
-# resource "vault_token" "ansible" {
-#   role_name    = vault_token_auth_backend_role.ansible.role_name
-#   policies     = local.entities["ansible"].policies
-#   renewable    = true
-#   display_name = "ansible service token"
-#   period       = "24h"
-#   metadata = {
-#     "description" = "For use by ansible playbooks"
-#   }
-# }
+# Vault Agent Approle
+resource "vault_auth_backend" "approle" {
+  type        = "approle"
+  description = "Vault AppRole authentication for simple service accounts"
+}
 
-# resource "local_file" "ansible_token" {
-#   content = yamlencode({
-#     token          = vault_token.ansible.client_token
-#     lease_started  = vault_token.ansible.lease_started
-#     lease_duration = vault_token.ansible.lease_duration
-#   })
-#   filename        = "./ansible_token.yaml"
-#   file_permission = "0600"
-# }
+resource "vault_approle_auth_backend_role" "nomad_cluster" {
+  backend            = vault_auth_backend.approle.path
+  role_name          = "nomad-cluster"
+  token_policies     = ["default", "nomad-certs"]
+  secret_id_num_uses = 0 # unlimited uses
+
+  token_type    = "batch"
+  token_ttl     = 600 # 10 minutes
+  token_max_ttl = 900 # 15 minutes
+}
 
 # Nomad Workload Identities
 # https://developer.hashicorp.com/nomad/docs/integrations/vault/acl#nomad-workload-identities
@@ -90,7 +84,7 @@ resource "vault_jwt_auth_backend" "nomad" {
   tune {
     default_lease_ttl = "1h"
     max_lease_ttl     = "168h" # 1 week
-    token_type = "default-service"
+    token_type        = "default-service"
   }
 }
 
