@@ -3,6 +3,8 @@ provider "nomad" {
   skip_verify = true
 }
 
+provider "dns" {}
+
 locals {
   namespaces = {
     "core" = {
@@ -10,6 +12,10 @@ locals {
       description = "Core infrastructure services"
     }
   }
+}
+
+data "dns_a_record_set" "nas" {
+  host = "truenas.kijowski.casa"
 }
 
 resource "nomad_namespace" "this" {

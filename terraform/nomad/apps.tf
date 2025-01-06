@@ -1,20 +1,12 @@
 locals {
   any_dcs = ["*"]
-  apps = {
-    "traefik" = {
-      vars = {
-        datacenters           = jsonencode(local.any_dcs)
-        namespace             = jsonencode(local.namespaces["core"].name)
-        traefik_image_version = "v3.2"
-        domain                = "kijowski.casa"
-        nomad_address         = "https://nomadsrv0.nomad.kijowski.casa:4646"
-      }
-    }
+  nas_ip  = data.dns_a_record_set.nas.addrs[0]
+  system_apps = {
     "rd-csi-nfs-ctrl" = {
       vars = {
         datacenters    = jsonencode(local.any_dcs)
         namespace      = jsonencode(local.namespaces["core"].name)
-        nfs_server     = "192.168.50.4"
+        nfs_server     = local.nas_ip
         nfs_share      = "/mnt/tank1600/nomad/pvs"
         nfs_mount_opts = "defaults,bg,intr,_netdev,retry=5"
       }
@@ -23,13 +15,43 @@ locals {
       vars = {
         datacenters    = jsonencode(local.any_dcs)
         namespace      = jsonencode(local.namespaces["core"].name)
-        nfs_server     = "192.168.50.4"
+        nfs_server     = local.nas_ip
         nfs_share      = "/mnt/tank1600/nomad/pvs"
         nfs_mount_opts = "defaults,bg,intr,_netdev,retry=5"
       }
     }
   }
-  nfs_volumes = {}
+  apps = {
+    "traefik" = {
+      vars = {
+        datacenters           = jsonencode(local.any_dcs)
+        namespace             = jsonencode(local.namespaces["core"].name)
+        traefik_image_version = "v3.2"
+        domain                = "kijowski.casa"
+        # pinned to this IP
+        nomad_ipv4        = "192.168.50.32"
+        nomad_address     = "https://nomadsrv0.nomad.kijowski.casa:4646"
+        acme_email        = "agkijow@gmail.com"
+        tpl_traefik       = file("${path.module}/data/traefik/traefik.yml.tpl")
+        tpl_traefik_rules = file("${path.module}/data/traefik/rules.yml.tpl")
+      }
+    }
+    "whoami" = {
+      vars = {
+        datacenters = jsonencode(local.any_dcs)
+        namespace   = jsonencode(local.namespaces["core"].name)
+        domain      = "kijowski.casa"
+      }
+    }
+  }
+  nfs_volumes = {
+    "traefik-acme" = {
+      namespace       = local.namespaces["core"].name
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+      capacity_max    = "1GiB"
+    }
+  }
 }
 
 resource "nomad_job" "file_apps" {
@@ -38,6 +60,17 @@ resource "nomad_job" "file_apps" {
   jobspec = templatefile("${path.module}/apps/${each.key}.hcl.tpl", each.value.vars)
 
   depends_on = [nomad_namespace.this, nomad_csi_volume.rd-nfs]
+}
+
+resource "nomad_job" "file_system_apps" {
+  for_each = local.system_apps
+
+  jobspec = templatefile("${path.module}/apps/${each.key}.hcl.tpl", each.value.vars)
+
+  # Monitor and wait for these jobs to finish before moving on
+  detach = false
+
+  depends_on = [nomad_namespace.this]
 }
 
 # https://gitlab.com/rocketduck/csi-plugin-nfs/-/blob/main/nomad/example.volume?ref_type=heads
@@ -69,5 +102,5 @@ resource "nomad_csi_volume" "rd-nfs" {
     prevent_destroy = false
   }
 
-  depends_on = [nomad_namespace.this]
+  depends_on = [nomad_namespace.this, nomad_job.file_system_apps]
 }

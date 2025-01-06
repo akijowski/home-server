@@ -4,6 +4,18 @@ job "storage-node-nfs" {
   type        = "system"
   namespace   = ${namespace}
 
+  ui {
+    description = "NFS CSI Driver Node"
+    link {
+      label = "Project Repo"
+      url = "https://gitlab.com/rocketduck/csi-plugin-nfs"
+    }
+    link {
+      label = "Example"
+      url = "https://gitlab.com/rocketduck/csi-plugin-nfs/-/blob/main/nomad/node.nomad?ref_type=heads"
+    }
+  }
+
   group "node" {
     task "node" {
       driver = "podman"

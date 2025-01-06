@@ -6,11 +6,29 @@ job "traefik" {
   # Traefik needs a static IP, so only run where the DNS records points
   constraint {
     attribute = "$${attr.unique.network.ip-address}"
-    value = "192.168.50.32"
+    value = "${nomad_ipv4}"
+  }
+
+  ui {
+    description = "Nomad cluster and on-prem reverse proxy"
+    link {
+      label = "Dashboard"
+      url = "https://traefik.kijowski.casa/dashboard/"
+    }
+    link {
+      label = "Documentation"
+      url = "https://doc.traefik.io/traefik/"
+    }
   }
 
   group "traefik" {
     count = 1
+
+    meta {
+      domain = "${domain}"
+      nomad_address = "${nomad_address}"
+      acme_email = "${acme_email}"
+    }
 
     network {
       port "http" {
@@ -19,6 +37,13 @@ job "traefik" {
       port "https" {
         static = "443"
       }
+    }
+
+    volume "acme" {
+      type = "csi"
+      source = "traefik-acme"
+      attachment_mode = "file-system"
+      access_mode = "single-node-writer"
     }
 
     service {
@@ -31,24 +56,9 @@ job "traefik" {
 
         # dashboard
         "traefik.http.routers.dashboard.rule=Host(`traefik.${domain}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))",
-        "traefik.http.routers.dashboard.server=api@internal"
-
-        # http to https redirect
-        # "traefik.http.routers.http-catch.entrypoints=http",
-        # "traefik.http.routers.http-catch.rule=HostRegexp(`{host:.+}`)",
-        # "traefik.http.routers.http-catch.middlewares=redirect-to-https",
-        # "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https",
-
-        # https router
-        # "traefik.http.routers.traefik-router.entrypoints=https",
-        # "traefik.http.routers.traefik-router.rule=Host(`${domain}`)",
-        # "traefik.http.routers.traefik-router.service=api@internal",
-
-        # "traefik.http.routers.traefik-router.tls=true",
-        # Comment out the below line after first run of traefik to force the use of wildcard certs
-        # "traefik.http.routers.traefik-router.tls.certResolver=dns-dgo",
-        # "traefik.http.routers.traefik-router.tls.domains[0].main=${domain}",
-        # "traefik.http.routers.traefik-router.tls.domains[0].sans=*.${domain}"
+        "traefik.http.routers.dashboard.service=api@internal",
+        "traefik.http.routers.dashboard.tls=true",
+        "traefik.http.routers.dashboard.tls.certresolver=dns-aws"
       ]
 
       check {
@@ -87,6 +97,11 @@ job "traefik" {
         }
       }
 
+      volume_mount {
+        volume = "acme"
+        destination = "/data/acme"
+      }
+
       vault {
         role = "nomad-traefik"
       }
@@ -101,76 +116,14 @@ job "traefik" {
 
       template {
         data        = <<EOF
-global:
-  checkNewVersion: true
-  sendAnonymousUsage: false
-
-api:
-  insecure: false
-  dashboard: true
-
-ping: {}
-
-log:
-  level: "INFO"
-
-accessLog:
-  filePath: "/logs/access.log"
-  filters:
-    statusCodes: "400-499"
-
-entrypoints:
-  http:
-    address: ":{{ env "NOMAD_PORT_http" }}"
-  https:
-    address: ":{{ env "NOMAD_PORT_https" }}"
-
-providers:
-  file:
-    directory: "/rules"
-  nomad:
-    endpoint:
-      address: '${nomad_address}'
-      tls:
-        ca: "/data/ca/intermediate.crt"
+${tpl_traefik}
 EOF
         destination = "$${NOMAD_TASK_DIR}/traefik.yml"
       }
 
       template {
         data        = <<EOF
-http:
-  routers:
-    nomad:
-      entryPoints:
-        - http # comment out after setting up tls
-        - https
-      rule: "Host(`nomad.${domain}`)"
-      tls: {}
-      middlewares:
-        - default-headers
-      service: nomad
-
-  services:
-    nomad:
-      loadBalancer:
-        servers:
-          - url: "${nomad_address}"
-        serversTransport: insecureTransport
-
-  serversTransports:
-    insecureTransport:
-      insecureSkipVerify: true
-
-  middlewares:
-    default-headers:
-      headers:
-        frameDeny: true
-        browserXssFilter: true
-        contentTypeNosniff: true
-        forceSTSHeader: true
-        stsIncludeSubdomains: true
-        stsPreload: true
+${tpl_traefik_rules}
 EOF
         destination = "$${NOMAD_TASK_DIR}/rules/rules.yml"
       }
@@ -185,6 +138,21 @@ EOF
       EOF
         destination = "$${NOMAD_SECRETS_DIR}/intermediate.crt"
         change_mode = "restart"
+      }
+
+      template {
+        data = <<EOF
+      {{- with secret "aws/sts/traefik" "ttl=1h" -}}
+      {{- with .Data -}}
+      AWS_ACCESS_KEY_ID={{ .access_key }}
+AWS_SECRET_ACCESS_KEY={{ .secret_key }}
+AWS_SESSION_TOKEN={{ .session_token }}
+AWS_REGION=us-east-1
+      {{- end -}}
+      {{- end -}}
+      EOF
+        destination = "$${NOMAD_SECRETS_DIR}/aws.env"
+        env = true
       }
 
       resources {

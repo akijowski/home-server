@@ -1,7 +1,7 @@
 locals {
   aws_users = {}
   aws_roles = {
-    "traefik-role" = {
+    "traefik" = {
       role_arns = [
         "arn:aws:iam::976648257138:role/VaultManageDNS"
       ]

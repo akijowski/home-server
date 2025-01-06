@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/nomad"
       version = "~> 2.4.0"
     }
+    dns = {
+      source  = "hashicorp/dns"
+      version = "~> 3.4.0"
+    }
   }
 
   backend "s3" {

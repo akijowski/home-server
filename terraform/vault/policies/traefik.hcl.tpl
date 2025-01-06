@@ -18,11 +18,6 @@ path "aws/sts/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job
   capabilities = ["read", "create", "update"]
 }
 
-# for now
-path "aws/sts/traefik-role" {
-  capabilities = ["read", "create", "update"]
-}
-
 # Read secrets based on nomad namespace/job_id
 path "secret/data/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}/*" {
   capabilities = ["read"]
