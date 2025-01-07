@@ -32,8 +32,8 @@ locals {
         nomad_ipv4        = "192.168.50.32"
         nomad_address     = "https://nomadsrv0.nomad.kijowski.casa:4646"
         acme_email        = "agkijow@gmail.com"
-        tpl_traefik       = file("${path.module}/data/traefik/traefik.yml.tpl")
-        tpl_traefik_rules = file("${path.module}/data/traefik/rules.yml.tpl")
+        tpl_traefik       = file("${path.module}/appdata/traefik/traefik.yml.tpl")
+        tpl_traefik_rules = file("${path.module}/appdata/traefik/rules.yml.tpl")
       }
     }
     "whoami" = {
@@ -50,6 +50,50 @@ locals {
         homebridge_image_version = "2024-12-19"
       }
     }
+    "tdarr" = {
+      vars = {
+        datacenters         = jsonencode(local.any_dcs)
+        namespace           = jsonencode(local.namespaces["core"].name)
+        tdarr_image_version = "2.27.02"
+        tdarr_volumes = [
+          {
+            name = "tdarr-cache"
+            src  = "tdarr-cache"
+            dest = "/temp"
+          },
+          {
+            name = "tdarr-config"
+            src  = "tdarr-config"
+            dest = "/app/configs"
+          },
+          {
+            name = "tdarr-server"
+            src  = "tdarr-server"
+            dest = "/app/server"
+          },
+          {
+            name = "arm-media"
+            src  = "arm-media"
+            dest = "/media"
+          },
+          {
+            name = "plex-movies"
+            src  = "plex-movies"
+            dest = "/opt/plex/libraries/movies"
+          },
+          {
+            name = "plex-tv-shows"
+            src  = "plex-tv-shows"
+            dest = "/opt/plex/libraries/tv-shows"
+          },
+          {
+            name = "plex-uhd-movies"
+            src  = "plex-uhd-movies"
+            dest = "/opt/plex/libraries/uhd-movies"
+          }
+        ]
+      }
+    }
   }
   nfs_volumes = {
     "traefik-acme" = {
@@ -64,7 +108,7 @@ locals {
 resource "nomad_job" "file_apps" {
   for_each = local.apps
 
-  jobspec = templatefile("${path.module}/apps/${each.key}.hcl.tpl", each.value.vars)
+  jobspec = templatefile("${path.module}/templates/${each.key}.hcl.tpl", each.value.vars)
 
   depends_on = [nomad_namespace.this, nomad_csi_volume.rd-nfs]
 }
@@ -72,7 +116,7 @@ resource "nomad_job" "file_apps" {
 resource "nomad_job" "file_system_apps" {
   for_each = local.system_apps
 
-  jobspec = templatefile("${path.module}/apps/${each.key}.hcl.tpl", each.value.vars)
+  jobspec = templatefile("${path.module}/templates/${each.key}.hcl.tpl", each.value.vars)
 
   # Monitor and wait for these jobs to finish before moving on
   detach = false
