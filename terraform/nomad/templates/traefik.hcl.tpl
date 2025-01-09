@@ -87,7 +87,8 @@ job "traefik" {
         volumes = [
           "local/traefik.yml:/traefik.yml",
           "local/rules:/rules",
-          "secrets/intermediate.crt:/data/ca/intermediate.crt"
+          "secrets/intermediate.crt:/data/ca/intermediate.crt",
+          "secrets/aws:/aws"
         ]
 
         labels = {
@@ -137,22 +138,34 @@ EOF
       {{- end -}}
       EOF
         destination = "$${NOMAD_SECRETS_DIR}/intermediate.crt"
-        change_mode = "restart"
+        change_mode = "signal"
+        change_signal = "SIGHUP"
       }
 
       template {
         data = <<EOF
-      {{- with secret "aws/sts/traefik" "ttl=1h" -}}
-      {{- with .Data -}}
-      AWS_ACCESS_KEY_ID={{ .access_key }}
-AWS_SECRET_ACCESS_KEY={{ .secret_key }}
-AWS_SESSION_TOKEN={{ .session_token }}
+AWS_SHARED_CREDENTIALS_FILE=/aws/credentials
 AWS_REGION=us-east-1
-      {{- end -}}
-      {{- end -}}
       EOF
         destination = "$${NOMAD_SECRETS_DIR}/aws.env"
         env = true
+      }
+
+      # Store AWS credential changes in a file
+      # This way we don't need to restart the task
+      template {
+        data = <<EOF
+      {{- with secret "aws/sts/traefik" "ttl=1h" -}}
+      {{- with .Data -}}
+      [default]
+aws_access_key_id = {{ .access_key }}
+aws_secret_access_key = {{ .secret_key }}
+aws_session_token = {{ .session_token }}
+      {{- end -}}
+      {{- end -}}
+      EOF
+        destination = "$${NOMAD_SECRETS_DIR}/aws/credentials"
+        change_mode = "noop"
       }
 
       resources {
