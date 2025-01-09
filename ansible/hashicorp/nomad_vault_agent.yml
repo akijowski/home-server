@@ -31,6 +31,7 @@
           - ansible_tmpl: "templates/agent/server.agent.crt.tpl.j2"
             agent_source: "{{ nomad_template_dir }}/server.agent.crt.tpl"
             agent_dest: "{{ nomad_tls_dir }}/server.agent.full.crt"
+            exec_cmd: ["systemctl", "reload", "nomad"]
 
     - name: Install Vault Agent (Client)
       ansible.builtin.import_role:
@@ -44,3 +45,4 @@
           - ansible_tmpl: "templates/agent/client.agent.crt.tpl.j2"
             agent_source: "{{ nomad_template_dir }}/client.agent.crt.tpl"
             agent_dest: "{{ nomad_tls_dir }}/client.agent.full.crt"
+            exec_cmd: ["systemctl", "reload", "nomad"]

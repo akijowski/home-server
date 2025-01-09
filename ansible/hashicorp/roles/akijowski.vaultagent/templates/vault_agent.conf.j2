@@ -56,6 +56,12 @@ template {
   source = "{{ t.agent_source }}"
   destination = "{{ t.agent_dest }}"
   create_dest_dirs = true
+  {% if t.exec_cmd | default([]) | length > 0 %}
+  exec {
+    command = [{{ t.exec_cmd | map('to_json') | join(", ") }}]
+    timeout = {{ '\"' + t.exec_timeout | default("30s") + '\"' }}
+  }
+  {% endif %}
 }
 
 {% endfor %}
