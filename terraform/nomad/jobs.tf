@@ -50,31 +50,31 @@ locals {
         homebridge_image_version = "2024-12-19"
       }
     }
-    "tdarr" = {
+    "fileflows" = {
       vars = {
-        datacenters         = jsonencode(local.any_dcs)
-        namespace           = jsonencode(local.namespaces["core"].name)
-        tdarr_image_version = "2.27.02"
-        tdarr_volumes = [
+        datacenters      = jsonencode(local.any_dcs)
+        namespace        = jsonencode(local.namespaces["core"].name)
+        ff_image_version = "latest"
+        ff_volumes = [
           {
-            name = "tdarr-cache"
-            src  = "tdarr-cache"
+            name = "fileflows-cache"
+            src  = "fileflows-cache"
             dest = "/temp"
           },
           {
-            name = "tdarr-config"
-            src  = "tdarr-config"
-            dest = "/app/configs"
+            name = "fileflows-config"
+            src  = "fileflows-config"
+            dest = "/app/Data"
           },
           {
-            name = "tdarr-server"
-            src  = "tdarr-server"
-            dest = "/app/server"
+            name = "fileflows-common"
+            src  = "fileflows-common"
+            dest = "/app/common"
           },
           {
             name = "arm-media"
             src  = "arm-media"
-            dest = "/media"
+            dest = "/opt/arm/media"
           },
           {
             name = "plex-movies"

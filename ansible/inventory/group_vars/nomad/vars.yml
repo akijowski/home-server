@@ -34,20 +34,20 @@ nfs_mounts:
     boot: true
 
   - host: "{{ truenas_ipv4 }}"
-    source_path: '/mnt/tank0400/tdarr/cache'
-    dest_path: '/mnt/tdarr/cache'
+    source_path: '/mnt/tank0400/fileflows/cache'
+    dest_path: '/mnt/fileflows/cache'
     opts: "{{ mount_opts }}"
     state: mounted
     boot: true
   - host: "{{ truenas_ipv4 }}"
-    source_path: '/mnt/tank0400/tdarr/config'
-    dest_path: '/mnt/tdarr/config'
+    source_path: '/mnt/tank0400/fileflows/config'
+    dest_path: '/mnt/fileflows/config'
     opts: "{{ mount_opts }}"
     state: mounted
     boot: true
   - host: "{{ truenas_ipv4 }}"
-    source_path: '/mnt/tank0400/tdarr/server'
-    dest_path: '/mnt/tdarr/server'
+    source_path: '/mnt/tank0400/fileflows/common'
+    dest_path: '/mnt/fileflows/common'
     opts: "{{ mount_opts }}"
     state: mounted
     boot: true
@@ -62,9 +62,9 @@ nomad_client_host_volumes:
     path: "{{ plex_libraries_root_dir }}/video/uhd-movies"
   - name: arm-media
     path: "/mnt/arm/media"
-  - name: tdarr-cache
-    path: "/mnt/tdarr/cache"
-  - name: tdarr-config
-    path: "/mnt/tdarr/config"
-  - name: tdarr-server
-    path: "/mnt/tdarr/server"
+  - name: fileflows-cache
+    path: "/mnt/fileflows/cache"
+  - name: fileflows-config
+    path: "/mnt/fileflows/config"
+  - name: fileflows-common
+    path: "/mnt/fileflows/common"
