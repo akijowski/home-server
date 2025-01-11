@@ -94,6 +94,32 @@ locals {
         ]
       }
     }
+    "arrstack" = {
+      vars = {
+        datacenters      = jsonencode(local.any_dcs)
+        namespace        = jsonencode(local.namespaces["core"].name)
+        radarr_image_tag = "release-5.17.2.9580"
+        sonarr_image_tag = "release-4.0.12.2823"
+        bazarr_image_tag = "release-1.5.1"
+        arr_volumes = [
+          {
+            name = "plex-movies"
+            src  = "plex-movies"
+            dest = "/data/plex/libraries/movies"
+          },
+          {
+            name = "plex-tv-shows"
+            src  = "plex-tv-shows"
+            dest = "/data/plex/libraries/tv-shows"
+          },
+          {
+            name = "plex-uhd-movies"
+            src  = "plex-uhd-movies"
+            dest = "/data/plex/libraries/uhd-movies"
+          }
+        ]
+      }
+    }
   }
   nfs_volumes = {
     "traefik-acme" = {
@@ -101,6 +127,24 @@ locals {
       access_mode     = "single-node-writer"
       attachment_mode = "file-system"
       capacity_max    = "1GiB"
+    }
+    "radarr-config" = {
+      namespace       = local.namespaces["core"].name
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+      capacity_max    = "2GiB"
+    }
+    "sonarr-config" = {
+      namespace       = local.namespaces["core"].name
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+      capacity_max    = "2GiB"
+    }
+    "bazarr-config" = {
+      namespace       = local.namespaces["core"].name
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+      capacity_max    = "2GiB"
     }
   }
 }
