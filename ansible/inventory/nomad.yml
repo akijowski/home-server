@@ -17,6 +17,10 @@ nomad:
       nomad_tls_fqdn: 'client.global.nomad'
       # This node is on hyperion which has a usb device
       nomad_usb_plugin_enabled: true
+      # https://usb-ids.gowdy.us/read/UD/174c/55aa
+      nomad_usb_vendor_id_allowlist: [
+        "0x174c"
+      ]
       # Vault
       nomad_vault_integration: true
       nomad_vault_address: "https://vault.kijowski.casa:8200"

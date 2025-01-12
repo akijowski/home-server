@@ -24,10 +24,11 @@ k8s:
   records:
     - '192.168.50.20'
 mgmt-wild:
-  prefix: '*.mgmt'
+  prefix: '*.mgmt.k8s'
   records:
     - '192.168.50.23'
 mgmt:
+  prefix: 'mgmt.k8s'
   records:
     - '192.168.50.23'
 vault:

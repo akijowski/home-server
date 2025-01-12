@@ -12,7 +12,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   node_name = var.target_node
   on_boot   = var.on_boot
   started   = var.started
-  reboot    = true
+  reboot    = false # if true, seems to always reboot :(
 
   agent {
     type = "virtio"
@@ -56,6 +56,16 @@ resource "proxmox_virtual_environment_vm" "this" {
       file_format = "raw"
       cache       = "none"
       backup      = true
+    }
+  }
+
+  dynamic "usb" {
+    for_each = var.usb_devices
+
+    content {
+      host    = try(usb.value["host"], null)
+      mapping = try(usb.value["mapping"], null)
+      usb3    = try(usb.value["usb3"], false)
     }
   }
 

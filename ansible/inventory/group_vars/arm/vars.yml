@@ -12,13 +12,17 @@ arm_config_dir: /etc/arm/config
 arm_port: 8080
 
 arm_container_image: 'docker.io/automaticrippingmachine/automatic-ripping-machine'
-arm_container_tag: '2.10.0'
+arm_container_tag: '2.10.1'
 arm_container_name: arm-rippers
 
 nfs_mounts:
   - host: '192.168.50.4'
     src: /mnt/tank1600/autoripm/media
     dest: "{{ arm_media_dir }}"
+    opts: "defaults,bg,intr,_netdev,retry=5"
+    state: mounted
   - host: '192.168.50.4'
     src: /mnt/tank1600/autoripm/config
     dest: "{{ arm_config_dir }}"
+    opts: "defaults,bg,intr,_netdev,retry=5"
+    state: mounted

@@ -21,6 +21,7 @@ autoinstall:
   packages:
     - qemu-guest-agent
     - sudo
+    - cloud-guest-utils
   refresh-installer:
     update: false
   storage:

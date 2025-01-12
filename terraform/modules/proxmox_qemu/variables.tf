@@ -35,6 +35,16 @@ variable "disks" {
   }
 }
 
+variable "usb_devices" {
+  type = map(object({
+    host    = optional(string)
+    mapping = optional(string)
+    usb3    = optional(bool, false)
+  }))
+  description = "Map of USB devices to provide to the VM. Must use either host or mapping (cluster mapping name)"
+  default     = {}
+}
+
 variable "vm_id" {
   type        = number
   default     = 0

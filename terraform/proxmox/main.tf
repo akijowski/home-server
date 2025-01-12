@@ -24,37 +24,6 @@ locals {
   #       ip0_ipv4    = "192.168.50.13/24"
   #       extra_tags  = ["arm", "ubuntu", "ansible"]
   #     }
-  #     tdarr0 = {
-  #       name        = "tdarr0"
-  #       description = <<-EOF
-  #         # Tdarr
-  #         Managed by Terraform.
-
-  #         https://docs.tdarr.io/docs/welcome/what
-  # EOF
-  #       target_node = "hyperion"
-  #       vmid        = 0
-  #       cpu         = 3
-  #       memory      = 3072 # 3 GiB
-  #       ip0_ipv4    = "192.168.50.36/24"
-  #       extra_tags  = ["tdarr", "ubuntu", "ansible"]
-  #     }
-  #     tdarr1 = {
-  #       name        = "tdarr1"
-  #       description = <<-EOF
-  #         # Tdarr
-  #         Managed by Terraform.
-
-  #         https://docs.tdarr.io/docs/welcome/what
-  # EOF
-  #       target_node = "mnemosyne"
-  #       vmid        = 0
-  #       cpu         = 3
-  #       memory      = 3072 # 3 GiB
-  #       ip0_ipv4    = "192.168.50.37/24"
-  #       extra_tags  = ["tdarr", "ubuntu", "ansible"]
-  #     }
-  # }
 }
 
 locals {
@@ -66,6 +35,14 @@ locals {
     (local.hyperion)  = 8000
     (local.phoebe)    = 8001
     (local.mnemosyne) = 8002
+  }
+
+  usb_devices = {
+    "dvdrom" = {
+      node    = local.hyperion
+      comment = "usb3.0 blu-ray dvd-rom"
+      id      = "174c:55aa"
+    }
   }
 
   tmpl_vars = {
@@ -102,8 +79,23 @@ module "pve_vms" {
 
   disks = each.value.disks
 
+  usb_devices = try(each.value.usb_devices, {})
+
   ipv4_addr = each.value.ipv4_addr
 
   description = try(each.value.description, "")
   extra_tags  = try(each.value.tags, [])
+}
+
+resource "proxmox_virtual_environment_hardware_mapping_usb" "this" {
+  for_each = local.usb_devices
+
+  name    = each.key
+  comment = each.value.comment
+  map = [
+    {
+      id   = each.value.id
+      node = each.value.node
+    }
+  ]
 }

@@ -29,6 +29,8 @@ cni_plugin_arch_map:
 cni_plugin_arch: "{{ cni_plugin_arch_map[ansible_architecture] }}"
 cni_plugin_tar: "cni-plugins-{{ ansible_system | lower }}-{{ cni_plugin_arch }}-v{{ cni_plugin_version }}.tgz"
 
+nomad_usb_plugin_enabled: false
+nomad_usb_vendor_id_allowlist: []
 usb_plugin_version: '0.4.0'
 usb_plugin_arch_map:
   armv7l: arm

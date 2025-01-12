@@ -1,3 +1,7 @@
+#jinja2:lstrip_blocks: True
+{# helps with nested blocks #}
+{# https://stackoverflow.com/questions/42914324/extra-spaces-appearing-in-ansible-templates #}
+{# https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control #}
 {{ ansible_managed | comment }}
 
 client {
@@ -17,7 +21,7 @@ client {
     "hostname" = "{{ inventory_hostname_short }}"
   }
 
-  {% for h in nomad_client_host_volumes | default([]) -%}
+  {% for h in nomad_client_host_volumes | default([]) %}
   host_volume "{{ h.name }}" {
     path = "{{ h.path }}"
     read_only = {{ h.read_only | default('false') }}
@@ -32,6 +36,15 @@ client {
 plugin "{{ usb_plugin_name }}" {
   config {
     enabled = true
+    mount_dev_nodes = true
+
+    included_vendor_ids = [{{ nomad_usb_vendor_id_allowlist | join(', ') }}]
+    excluded_vendor_ids = []
+
+    included_product_ids = []
+    excluded_product_ids = []
+
+    fingerprint_period = "1m"
   }
 }
 {% endif %}

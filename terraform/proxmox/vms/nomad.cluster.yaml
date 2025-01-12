@@ -15,10 +15,14 @@ nomadclient:
     ipv4_addr: '192.168.50.32/24'
     cores: 3
     memory: 6144 # 6 GiB
+    usb_devices:
+      dvdrom:
+        mapping: dvdrom
+        usb3: true
     disks:
       virtio0:
         interface: virtio0
-        size: 20
+        size: 50
 nomadserver:
   - target_node: ${tmpl_node_phoebe}
     description: |-
