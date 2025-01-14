@@ -120,6 +120,14 @@ locals {
         ]
       }
     }
+    "registry" = {
+      vars = {
+        datacenters           = jsonencode(local.any_dcs)
+        namespace             = jsonencode(local.namespaces["core"].name)
+        registry_ui_image_tag = "2.5-debian"
+        registry_image_tag    = "2.8"
+      }
+    }
   }
   nfs_volumes = {
     "traefik-acme" = {
@@ -145,6 +153,12 @@ locals {
       access_mode     = "single-node-writer"
       attachment_mode = "file-system"
       capacity_max    = "2GiB"
+    }
+    "container-registry" = {
+      namespace       = local.namespaces["core"].name
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+      capacity_max    = "20GiB"
     }
   }
 }

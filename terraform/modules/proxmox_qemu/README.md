@@ -123,6 +123,22 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_usb_devices"></a> [usb\_devices](#input\_usb\_devices)
+
+Description: Map of USB devices to provide to the VM. Must use either host or mapping (cluster mapping name)
+
+Type:
+
+```hcl
+map(object({
+    host    = optional(string)
+    mapping = optional(string)
+    usb3    = optional(bool, false)
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_vm_id"></a> [vm\_id](#input\_vm\_id)
 
 Description: The VM ID to use
