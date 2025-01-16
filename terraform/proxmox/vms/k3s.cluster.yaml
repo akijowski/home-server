@@ -9,7 +9,7 @@ k3s:
       - ansible
     ipv4_addr: '192.168.50.20/24'
     cores: 2
-    memory: 8192 # 8 GiB
+    memory: 4096 # 4 GiB
     disks:
       virtio0:
         interface: virtio0
@@ -22,8 +22,8 @@ k3s:
       - ubuntu
       - ansible
     ipv4_addr: '192.168.50.21/24'
-    cores: 8
-    memory: 12288 # 12 GiB
+    cores: 4
+    memory: 6144 # 6 GiB
     disks:
       virtio0:
         interface: virtio0
