@@ -629,6 +629,70 @@
         }
       }
     },
+    "python312Packages.dnspython@latest": {
+      "last_modified": "2025-02-07T11:26:36Z",
+      "resolved": "github:NixOS/nixpkgs/d98abf5cf5914e5e4e9d57205e3af55ca90ffc1d#python312Packages.dnspython",
+      "source": "devbox-search",
+      "version": "2.7.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/xw4dfz4wm21a33m9zvn5axq2qk1fsa6c-python3.12-dnspython-2.7.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/bl8iwzvadfpx5ipy2dx58y4y5i7822j2-python3.12-dnspython-2.7.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/xw4dfz4wm21a33m9zvn5axq2qk1fsa6c-python3.12-dnspython-2.7.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/sb0xlw6d26w8kygm2y9z223q5zv24sq1-python3.12-dnspython-2.7.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/8r4m0vvb163ncnj3p0fy0h6dnpqn04dv-python3.12-dnspython-2.7.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/sb0xlw6d26w8kygm2y9z223q5zv24sq1-python3.12-dnspython-2.7.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/cw46s1r7dm3pgrdikrzjxf0n2anm8fkv-python3.12-dnspython-2.7.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/4vnwddzwy7a7rgmyzm8kizzynj5djmhx-python3.12-dnspython-2.7.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/cw46s1r7dm3pgrdikrzjxf0n2anm8fkv-python3.12-dnspython-2.7.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/fd906l6psdq3n562ymh0ixixabddm4kd-python3.12-dnspython-2.7.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/vwgjly8kqa45vinr2a5gg65681zlj4xj-python3.12-dnspython-2.7.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/fd906l6psdq3n562ymh0ixixabddm4kd-python3.12-dnspython-2.7.0"
+        }
+      }
+    },
     "python312Packages.hvac@latest": {
       "last_modified": "2024-12-23T21:10:33Z",
       "resolved": "github:NixOS/nixpkgs/de1864217bfa9b5845f465e771e0ecb48b30e02d#python312Packages.hvac",

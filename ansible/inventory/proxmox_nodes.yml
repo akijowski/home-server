@@ -1,8 +1,8 @@
 proxmox_nodes:
   hosts:
     hyperion:
-      ansible_host: 192.168.50.3
+      ansible_host: 'hyperion.lab.arpa'
     phoebe:
-      ansible_host: 192.168.50.6
+      ansible_host: 'phoebe.lab.arpa'
     mnemosyne:
-      ansible_host: 192.168.50.9
+      ansible_host: 'mnemosyne.lab.arpa'

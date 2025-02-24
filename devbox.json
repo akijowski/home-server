@@ -15,7 +15,8 @@
     "kustomize@latest",
     "ansible-lint@latest",
     "python312Packages.hvac@latest",
-    "vault@latest"
+    "vault@latest",
+    "python312Packages.dnspython@latest"
   ],
   "shell": {
     "init_hook": [

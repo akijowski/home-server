@@ -1,0 +1,10 @@
+---
+- ansible.builtin.import_tasks: preflight.yml
+
+- ansible.builtin.import_tasks: ensure_users.yml
+
+- ansible.builtin.import_tasks: ensure_zone_files.yml
+
+- ansible.builtin.import_tasks: ensure_config.yml
+
+- ansible.builtin.import_tasks: ensure_binary.yml

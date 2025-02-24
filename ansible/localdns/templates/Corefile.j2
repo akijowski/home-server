@@ -1,0 +1,13 @@
+{{ ansible_managed | comment }}
+# https://coredns.io/manual/toc/
+.:{{ coredns_dns_port }} {
+   auto kijowski.casa {
+      directory {{ coredns_zone_dir }}
+   }
+
+   cache 30
+   log kijowski.casa 10.10.10.in-addr.arpa
+   errors
+   health
+   whoami
+}

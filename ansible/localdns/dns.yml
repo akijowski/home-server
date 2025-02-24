@@ -1,0 +1,62 @@
+---
+- name: Install DNS
+  hosts: localdns0
+  debugger: on_failed
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Update apt
+      ansible.builtin.apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 600
+
+    - name: Install additional packages
+      ansible.builtin.apt:
+        name:
+          - acl # for become an unprivileged user
+          - wget
+          - gpg
+          - coreutils
+          - ca-certificates
+        state: latest
+
+    - name: Install CoreDNS
+      ansible.builtin.import_role:
+        name: akijowski.coredns
+      vars:
+        coredns_corefile_tmpl: "templates/Corefile.j2"
+        coredns_zones:
+          kijowski.casa:
+            a_records: true
+            ptr_records: true
+            zone_hostmaster: hostmaster.kijowski.casa
+            zone_server_ip: "{{ ansible_host }}"
+            ptr_origin: '10.10.10'
+            zone_servers:
+              - prefix: localdns
+                ipv4: "{{ ansible_host }}"
+              - prefix: truenas
+                ipv4: '10.10.10.4'
+              - prefix: proxmox
+                ipv4: '10.10.10.3'
+              - prefix: hyperion
+                ipv4: '10.10.10.3'
+              - prefix: proxmox
+                ipv4: '10.10.10.6'
+              - prefix: phoebe
+                ipv4: '10.10.10.6'
+              - prefix: proxmox
+                ipv4: '10.10.10.9'
+              - prefix: mnemosyne
+                ipv4: '10.10.10.9'
+              - prefix: vault
+                ipv4: "{{ lookup('community.dns.lookup', 'vault0.lab.arpa') }}"
+              - prefix: server.nomad
+                ipv4: "{{ lookup('community.dns.lookup', 'nomadserver0.lab.arpa') }}"
+              - prefix: client.nomad
+                ipv4: "{{ lookup('community.dns.lookup', 'nomadclient0.lab.arpa') }}"
+              - prefix: '*'
+                ipv4: "{{ lookup('community.dns.lookup', 'nomadclient0.lab.arpa') }}"

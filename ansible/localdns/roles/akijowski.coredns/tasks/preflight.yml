@@ -1,0 +1,20 @@
+---
+- name: Assert usage of systemd as an init system
+  ansible.builtin.assert:
+    that: ansible_service_mgr == 'systemd'
+    msg: "This module only works with systemd"
+
+- name: Assert Debian or Ubuntu release (apt required)
+  ansible.builtin.assert:
+    that: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    msg: "This module only works with Debian and Ubuntu releases"
+
+- name: Assert CPU Architecture
+  ansible.builtin.assert:
+    that: ansible_architecture == 'x86_64'
+    msg: "This module only works with amd64 or x86_64 CPU architectures"
+
+- name: Lookup latest version of CoreDNS
+  ansible.builtin.set_fact:
+    coredns_version: "{{ (lookup('ansible.builtin.url', 'https://api.github.com/repos/coredns/coredns/releases/latest', split_lines=False) | from_json).get('tag_name') | replace('v', '') }}"
+  when: "coredns_version == 'latest'"

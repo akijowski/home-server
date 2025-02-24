@@ -25,3 +25,9 @@ tasks:
     dir: ansible
     cmds:
       - ansible -i ./inventory -m ansible.builtin.setup {{ .ANSIBLE_HOST }} | tee hostvars | less
+
+  ping:
+    desc: ping host
+    dir: ansible
+    cmds:
+      - ansible all -i ./inventory -m ping -l {{ .ANSIBLE_HOST }}

@@ -39,15 +39,16 @@ k3s_cluster:
           - "NodeFamily=Ubuntu"
           - "NodeArch=AMD64"
 
-    tpi-k3s2: # TuringPi RK1 module
-      ansible_host: 192.168.50.22
-      k3s_control_node: false
-      k3s_agent:
-        with-node-id: true
-        node-label:
-          - "NodeLocation=TuringPi"
-          - "NodeFamily=RK1"
-          - "NodeArch=ARM64"
+    # tpi-k3s2: # TuringPi RK1 module
+    #   ansible_host: 192.168.50.22
+    #   k3s_control_node: false
+    #   k3s_agent:
+    #     # with-node-id: true # Don't use this
+    #     node-label:
+    #       - "NodeLocation=TuringPi"
+    #       - "NodeFamily=RK1"
+    #       - "NodeArch=ARM64"
+    #   k3s_state: uninstalled # remove from the cluster for now
 
 k3s_mgmt_cluster:
   hosts:

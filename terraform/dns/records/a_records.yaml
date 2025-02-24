@@ -1,21 +1,4 @@
 ---
-proxmox:
-  records:
-    - '192.168.50.3'
-    - '192.168.50.6'
-    - '192.168.50.9'
-hyperion:
-  records:
-    - '192.168.50.3'
-phoebe:
-  records:
-    - '192.168.50.6'
-mnemosyne:
-  records:
-    - '192.168.50.9'
-truenas:
-  records:
-    - '192.168.50.4'
 k8s-wild:
   prefix: '*.k8s'
   records:
@@ -31,16 +14,3 @@ mgmt:
   prefix: 'mgmt.k8s'
   records:
     - '192.168.50.23'
-vault:
-  records:
-    - '192.168.50.16'
-# Traefik running on Nomad server
-local-wild:
-  prefix: '*'
-  records:
-    - '192.168.50.32'
-nomadsrv0:
-  # Quick direct access to the nomad server. In the future use a local dns entry (if available)
-  prefix: nomadsrv0.nomad
-  records:
-    - '192.168.50.31'

@@ -1,0 +1,17 @@
+---
+- name: Ensure CoreDNS system group
+  ansible.builtin.group:
+    name: "{{ coredns_system_group }}"
+    state: present
+    system: true
+
+- name: Ensure CoreDNS system user
+  ansible.builtin.user:
+    name: "{{ coredns_system_user }}"
+    group: "{{ coredns_system_group }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    createhome: false
+    home: /
+    state: present

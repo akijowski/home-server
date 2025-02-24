@@ -1,0 +1,19 @@
+{{ ansible_managed | comment(decoration='; ') }}
+$ORIGIN {{ item.value.ptr_origin }}.in-addr.arpa.
+$TTL    86400
+@    IN    SOA    ns1.{{ item.key }}. {{ item.value.zone_hostmaster }}. (
+      {{ zone_serial }}          ; serial, update on changes, must be 10 characters
+			21600      ; refresh after 6 hours
+			3600       ; retry after 1 hour
+			604800     ; expire after 1 week
+			86400 )    ; minimum TTL of 1 day
+;
+; name servers - NS records
+@    IN    NS    ns1
+; name servers - A records
+ns1.{{ item.key }}.    IN    A    {{ item.value.zone_server_ip }}
+
+; reverse servers
+{% for srv in item.value.zone_servers %}
+{{ srv.ipv4 | split('.') | last }} IN  PTR {{ srv.prefix }}.{{ item.key }}
+{% endfor %}

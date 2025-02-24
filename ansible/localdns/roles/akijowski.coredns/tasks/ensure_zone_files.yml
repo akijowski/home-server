@@ -1,0 +1,32 @@
+---
+- name: Ensure zone directory exists
+  ansible.builtin.file:
+    path: "{{ coredns_zone_dir }}"
+    state: directory
+    mode: 0750
+    owner: "{{ coredns_system_user }}"
+    group: "{{ coredns_system_group }}"
+
+- name: Generate serial for zones
+  ansible.builtin.set_fact:
+    zone_serial: "{{ ansible_date_time.epoch[:10] }}"
+
+- name: Ensure zone A records exists
+  ansible.builtin.template:
+    src: zonefile_a.j2
+    dest: "{{ coredns_zone_dir }}/db.{{ item.key }}"
+    mode: 0750
+    owner: "{{ coredns_system_user }}"
+    group: "{{ coredns_system_group }}"
+  loop: "{{ coredns_zones | dict2items }}"
+  when: item.value.a_records | default(False)
+
+- name: Ensure zone PTR records exists
+  ansible.builtin.template:
+    src: zonefile_ptr.j2
+    dest: "{{ coredns_zone_dir }}/db.{{ item.value.ptr_origin }}"
+    mode: 0750
+    owner: "{{ coredns_system_user }}"
+    group: "{{ coredns_system_group }}"
+  loop: "{{ coredns_zones | dict2items }}"
+  when: item.value.ptr_records | default(False)
