@@ -9,7 +9,7 @@ plex_metadata_nfs_root_dir: '/opt/plex/metadata'
 # TODO: related support link
 plex_metadata_ssd_root_dir: '/mnt/ssd/plexmetadata'
 # nfs role
-truenas_ipv4: '192.168.50.4'
+truenas_ipv4: '10.10.10.4'
 # default NFS mount options: https://linux.die.net/man/5/nfs
 mount_opts: "defaults,bg,intr,_netdev,retry=5"
 nfs_mounts:

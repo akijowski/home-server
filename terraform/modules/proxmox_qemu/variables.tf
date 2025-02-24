@@ -89,10 +89,15 @@ variable "memory" {
 
 variable "ipv4_gw" {
   type        = string
-  default     = "192.168.50.1"
   description = "The IPv4 Gateway (e.g. 1.2.3.4)"
   validation {
     condition     = can(cidrnetmask("${var.ipv4_gw}/24"))
     error_message = "Must be a valid IPv4 address"
   }
+}
+
+variable "vlan_id" {
+  type = number
+  default = 0
+  description = "VLAN tag to add to the primary network device"
 }

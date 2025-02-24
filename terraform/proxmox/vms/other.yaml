@@ -9,7 +9,9 @@ plex:
       - plex
       - ubuntu
       - ansible
-    ipv4_addr: '192.168.50.11/24'
+    ipv4_addr: '192.168.50.10/24'
+    ipv4_gw: '192.168.50.1'
+    vlan_id: 50
     cores: 3
     memory: 6144 # 6 GiB
     disks:
@@ -31,6 +33,25 @@ vault:
       - ubuntu
       - ansible
     ipv4_addr: '192.168.50.16/24'
+    ipv4_gw: '192.168.50.1'
+    cores: 1
+    memory: 2048 # 2 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 20
+localdns:
+  - target_node: ${tmpl_node_phoebe}
+    description: |-
+      # Local DNS Resolver
+
+      CoreDNS: https://coredns.io
+    tags:
+      - dns
+      - ubuntu
+      - ansible
+    ipv4_addr: '10.10.10.10/24'
+    ipv4_gw: '10.10.10.1'
     cores: 1
     memory: 2048 # 2 GiB
     disks:

@@ -45,6 +45,8 @@ locals {
     }
   }
 
+  default_ipv4_gw = "10.10.10.1"
+
   tmpl_vars = {
     tmpl_node_hyperion  = local.hyperion
     tmpl_node_phoebe    = local.phoebe
@@ -82,6 +84,8 @@ module "pve_vms" {
   usb_devices = try(each.value.usb_devices, {})
 
   ipv4_addr = each.value.ipv4_addr
+  ipv4_gw = try(each.value.ipv4_gw, local.default_ipv4_gw)
+  vlan_id = try(each.value.vlan_id, 0)
 
   description = try(each.value.description, "")
   extra_tags  = try(each.value.tags, [])
