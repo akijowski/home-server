@@ -4,10 +4,11 @@ job "traefik" {
   namespace   = ${namespace}
 
   # Traefik needs a static IP, so only run where the DNS records points
-  constraint {
-    attribute = "$${attr.unique.network.ip-address}"
-    value = "${nomad_ipv4}"
-  }
+  # Switching to DHCP and DNS lookup, removing for now
+  #constraint {
+  #  attribute = "$${attr.unique.network.ip-address}"
+  #  value = "removed"
+  #}
 
   ui {
     description = "Nomad cluster and on-prem reverse proxy"

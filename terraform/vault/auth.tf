@@ -1,5 +1,5 @@
 locals {
-  nomad_server_url = "https://nomadsrv0.nomad.kijowski.casa:4646"
+  nomad_server_url = "https://server.nomad.kijowski.casa:4646" # loadbalanced DNS records
   entities = {
     "ansible" = {
       name     = "ansible"

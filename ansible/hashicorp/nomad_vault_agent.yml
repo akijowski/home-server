@@ -8,6 +8,7 @@
   vars:
     nomad_tls_dir: /opt/nomad/tls
     nomad_template_dir: /opt/nomad/templates
+    nomad_root_fqdn: nomad.kijowski.casa
     vault_address: "https://vault.kijowski.casa:8200"
     vault_pki_mount: pki_int
     vault_pki_server_role: nomad-server

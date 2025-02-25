@@ -2,7 +2,7 @@
 # nomad_group_id: 2400
 # nfs role
 # mount these on each nomad instance so they can present as host volumes to tasks
-truenas_ipv4: '192.168.50.4'
+truenas_ipv4: '10.10.10.4'
 # default NFS mount options: https://linux.die.net/man/5/nfs
 mount_opts: "defaults,bg,intr,_netdev,retry=5"
 plex_libraries_root_dir: /mnt/plex/libraries

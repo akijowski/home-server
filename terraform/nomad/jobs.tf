@@ -29,8 +29,9 @@ locals {
         traefik_image_version = "v3.2"
         domain                = "kijowski.casa"
         # pinned to this IP
-        nomad_ipv4        = "192.168.50.32"
-        nomad_address     = "https://nomadsrv0.nomad.kijowski.casa:4646"
+        # Deprecated for DHCP and private DNS
+        # nomad_ipv4        = "192.168.50.32"
+        nomad_address     = "https://server.nomad.kijowski.casa:4646" # loadbalanced DNS records
         acme_email        = "agkijow@gmail.com"
         tpl_traefik       = file("${path.module}/appdata/traefik/traefik.yml.tpl")
         tpl_traefik_rules = file("${path.module}/appdata/traefik/rules.yml.tpl")

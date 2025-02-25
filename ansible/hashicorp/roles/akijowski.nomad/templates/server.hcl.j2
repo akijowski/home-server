@@ -2,7 +2,7 @@
 
 server {
   enabled          = true
-  bootstrap_expect = {{ nomad_client_list | length }}
+  bootstrap_expect = {{ nomad_client_list | default([]) | length }}
 }
 
 {% if nomad_vault_integration | default(False) %}

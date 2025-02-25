@@ -11,11 +11,10 @@
     - "{{ nomad_data_dir }}"
 
 # TODO
-- name: Ensure client IPs for server config
+- name: Ensure client IPs for client config
   ansible.builtin.set_fact:
-    nomad_server_ips: "{{ nomad_server_list | map(attribute='ansible_host') | map('tojson') | join(',') }}"
-  loop:
-    - nomad_server_list
+    nomad_server_ips: "{{ nomad_server_list | map(attribute='ansible_default_ipv4.address') | map('tojson') | join(',') }}"
+  when: nomad_client | default(False)
 
 - name: Ensure Nomad configurations
   block:
