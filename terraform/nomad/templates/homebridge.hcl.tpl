@@ -28,6 +28,13 @@ job "homebridge" {
       }
     }
 
+    volume "storage" {
+      type = "csi"
+      source = "homebridge-storage"
+      attachment_mode = "file-system"
+      access_mode = "single-node-writer"
+    }
+
     service {
       provider = "nomad"
       name = "homebridge"
@@ -61,12 +68,11 @@ job "homebridge" {
         image = "docker.io/homebridge/homebridge:${homebridge_image_version}"
         ports = ["app"]
         network_mode = "host"
+      }
 
-        labels = {
-          "diun.enable"     = "true"
-          "diun.watch_repo" = "true"
-          "diun.max_tags"   = 3
-        }
+      volume_mount {
+        volume = "storage"
+        destination = "/homebridge"
       }
 
       template {

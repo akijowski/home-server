@@ -161,6 +161,12 @@ locals {
       attachment_mode = "file-system"
       capacity_max    = "20GiB"
     }
+    "homebridge-storage" = {
+      namespace       = local.namespaces["core"].name
+      access_mode     = "single-node-writer"
+      attachment_mode = "file-system"
+      capacity_max    = "20GiB"
+    }
   }
 }
 
