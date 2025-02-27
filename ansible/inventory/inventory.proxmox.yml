@@ -1,25 +1,31 @@
 ---
 plugin: community.general.proxmox
 
-# in memory cache
-cache: true
-
 validate_certs: true
 want_facts: true
 
 keyed_groups:
   - key: proxmox_tags_parsed
     separator: "_"
-    prefix: tags
+    prefix: group
 # By default the hosts will show up as tags_<name> so host vars go under the name, but we can rename with groups so group vars make sense
 groups:
   ubuntu: "'ubuntu' in (proxmox_tags_parsed|list)"
-  arm: "'arm' in (proxmox_tags_parsed|list)"
   plex: "'plex' in (proxmox_tags_parsed|list)"
+  arm: "'arm' in (proxmox_tags_parsed|list)"
+  vault: "'vault' in (proxmox_tags_parsed|list)"
   # if you use <name>.lan you can parse it like so to make a group (for group_vars) of <name>
   # plex: "'plex' in (proxmox_tags_parsed|list)"
 
+# Return only running VMs/LXCs and ones that have been tagged with 'ansible'
+filters:
+  - proxmox_status == "running"
+  - "proxmox_tags_parsed is defined and 'ansible' in proxmox_tags_parsed"
+
 want_proxmox_nodes_ansible_host: false
 compose:
-  ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ansible.utils.ipaddr('address')
+  # use the qemu guest agent IP. First one is localhost, so use the second one.
+  # workaround for the inconsistent naming: https://github.com/ansible-collections/community.general/issues/4854#issuecomment-1295908101
+  ansible_host: proxmox_agent_interfaces[1]["ip-addresses"][0] | default(proxmox_net0.ip) | ansible.utils.ipaddr('address')
+  #ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ansible.utils.ipaddr('address')
   some_var: "'another_var'"

@@ -1,4 +1,0 @@
-# common config -> group_vars/vault
-vault:
-  hosts:
-    vault0: {}

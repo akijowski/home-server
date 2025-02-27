@@ -1,7 +1,7 @@
 # common config -> group_vars/nomad
 nomad:
   hosts:
-    nomadserver0.lab.arpa:
+    nomadserver0:
       nomad_server: true
       # Nomad has a unique naming structure for TLS
       nomad_tls_fqdn: 'server.global.nomad'
@@ -10,7 +10,7 @@ nomad:
       nomad_vault_address: "https://vault.kijowski.casa:8200"
       nomad_vault_jwt_aud: "vault.kijowski.casa"
 
-    nomadclient0.lab.arpa:
+    nomadclient0:
       nomad_client: true
       nomad_tls_fqdn: 'client.global.nomad'
       # This node is on hyperion which has a usb device
