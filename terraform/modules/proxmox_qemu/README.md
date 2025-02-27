@@ -51,6 +51,12 @@ Description: IPv4 address in CIDR (e.g. 1.2.3.4/24)
 
 Type: `string`
 
+### <a name="input_ipv4_gw"></a> [ipv4\_gw](#input\_ipv4\_gw)
+
+Description: The IPv4 Gateway (e.g. 1.2.3.4)
+
+Type: `string`
+
 ### <a name="input_target_node"></a> [target\_node](#input\_target\_node)
 
 Description: Proxmox Node for this VM
@@ -91,14 +97,6 @@ Type: `list(string)`
 
 Default: `[]`
 
-### <a name="input_ipv4_gw"></a> [ipv4\_gw](#input\_ipv4\_gw)
-
-Description: The IPv4 Gateway (e.g. 1.2.3.4)
-
-Type: `string`
-
-Default: `"192.168.50.1"`
-
 ### <a name="input_memory"></a> [memory](#input\_memory)
 
 Description: The number in MiB of memory for this VM
@@ -138,6 +136,14 @@ map(object({
 ```
 
 Default: `{}`
+
+### <a name="input_vlan_id"></a> [vlan\_id](#input\_vlan\_id)
+
+Description: VLAN tag to add to the primary network device
+
+Type: `number`
+
+Default: `0`
 
 ### <a name="input_vm_id"></a> [vm\_id](#input\_vm\_id)
 

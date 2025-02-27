@@ -32,8 +32,7 @@ vault:
       - vault
       - ubuntu
       - ansible
-    ipv4_addr: '192.168.50.16/24'
-    ipv4_gw: '192.168.50.1'
+    ipv4_addr: 'dhcp'
     cores: 1
     memory: 2048 # 2 GiB
     disks:
@@ -42,6 +41,7 @@ vault:
         size: 20
 localdns:
   - target_node: ${tmpl_node_phoebe}
+    on_boot: true
     description: |-
       # Local DNS Resolver
 

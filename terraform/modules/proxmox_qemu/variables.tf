@@ -17,8 +17,8 @@ variable "ipv4_addr" {
   type        = string
   description = "IPv4 address in CIDR (e.g. 1.2.3.4/24)"
   validation {
-    condition     = can(cidrnetmask(var.ipv4_addr))
-    error_message = "Must be a valid IPv4 address with subnet mask"
+    condition     = var.ipv4_addr == "dhcp" || can(cidrnetmask(var.ipv4_addr))
+    error_message = "Must be literal 'dhcp' or a valid IPv4 address with subnet mask"
   }
 }
 
@@ -91,13 +91,13 @@ variable "ipv4_gw" {
   type        = string
   description = "The IPv4 Gateway (e.g. 1.2.3.4)"
   validation {
-    condition     = can(cidrnetmask("${var.ipv4_gw}/24"))
+    condition     = var.ipv4_gw == null || can(cidrnetmask("${var.ipv4_gw}/24"))
     error_message = "Must be a valid IPv4 address"
   }
 }
 
 variable "vlan_id" {
-  type = number
-  default = 0
+  type        = number
+  default     = 0
   description = "VLAN tag to add to the primary network device"
 }

@@ -45,8 +45,6 @@ locals {
     }
   }
 
-  default_ipv4_gw = "10.10.10.1"
-
   tmpl_vars = {
     tmpl_node_hyperion  = local.hyperion
     tmpl_node_phoebe    = local.phoebe
@@ -54,7 +52,8 @@ locals {
   }
 
   pve_vms = merge(
-    yamldecode(templatefile("${path.module}/vms/k3s.cluster.yaml", local.tmpl_vars)),
+    # Remove K3s cluster for now, will rebuild
+    # yamldecode(templatefile("${path.module}/vms/k3s.cluster.yaml", local.tmpl_vars)),
     yamldecode(templatefile("${path.module}/vms/other.yaml", local.tmpl_vars)),
     yamldecode(templatefile("${path.module}/vms/nomad.cluster.yaml", local.tmpl_vars))
   )
@@ -76,6 +75,9 @@ module "pve_vms" {
   target_node    = each.value.target_node
   vm_template_id = local.pve_templates[each.value.target_node]
 
+  started = try(each.value.started, true)
+  on_boot = try(each.value.on_boot, false)
+
   cores  = try(each.value.cores, null)
   memory = try(each.value.memory, null)
 
@@ -84,8 +86,8 @@ module "pve_vms" {
   usb_devices = try(each.value.usb_devices, {})
 
   ipv4_addr = each.value.ipv4_addr
-  ipv4_gw = try(each.value.ipv4_gw, local.default_ipv4_gw)
-  vlan_id = try(each.value.vlan_id, 0)
+  ipv4_gw   = try(each.value.ipv4_gw, null)
+  vlan_id   = try(each.value.vlan_id, 0)
 
   description = try(each.value.description, "")
   extra_tags  = try(each.value.tags, [])
