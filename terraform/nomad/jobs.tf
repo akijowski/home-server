@@ -97,8 +97,8 @@ locals {
     }
     "arrstack" = {
       vars = {
-        datacenters      = jsonencode(local.any_dcs)
-        namespace        = jsonencode(local.namespaces["core"].name)
+        datacenters = jsonencode(local.any_dcs)
+        namespace   = jsonencode(local.namespaces["core"].name)
         # https://hotio.dev/containers/radarr/
         radarr_image_tag = "release-5.19.3.9730"
         sonarr_image_tag = "release-4.0.13.2932"
