@@ -43,6 +43,7 @@ job "fileflows" {
 
       config {
         image = "docker.io/revenz/fileflows:${ff_image_version}"
+        force_pull = true # always pull latest
         ports = ["app"]
       }
 

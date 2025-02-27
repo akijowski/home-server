@@ -99,8 +99,9 @@ locals {
       vars = {
         datacenters      = jsonencode(local.any_dcs)
         namespace        = jsonencode(local.namespaces["core"].name)
-        radarr_image_tag = "release-5.17.2.9580"
-        sonarr_image_tag = "release-4.0.12.2823"
+        # https://hotio.dev/containers/radarr/
+        radarr_image_tag = "release-5.19.3.9730"
+        sonarr_image_tag = "release-4.0.13.2932"
         bazarr_image_tag = "release-1.5.1"
         arr_volumes = [
           {
