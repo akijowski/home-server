@@ -1,4 +1,4 @@
-{{- with pkiCert "[[ vault_pki_mount ]]/issue/[[ vault_pki_role ]]" "common_name=server.global.nomad" "ttl=24h" "alt_names=localhost,[[ inventory_hostname ]],[[ inventory_hostname_short ]].[[ nomad_root_fqdn ]],server.[[ nomad_root_fqdn ]]" "ip_sans=127.0.0.1,[[ ansible_default_ipv4.address ]]" -}}
+{{- with pkiCert "[[ vault_pki_mount ]]/issue/[[ vault_pki_role ]]" "common_name=server.global.nomad" "ttl=24h" "alt_names=localhost,[[ inventory_hostname_short ]].[[ nomad_root_fqdn ]],server.[[ nomad_root_fqdn ]]" "ip_sans=127.0.0.1,[[ ansible_default_ipv4.address ]]" -}}
 {{ .Data.Cert }}{{ .Data.CA }}{{ .Data.Key }}
 {{ .Data.Cert | writeToFile "[[ nomad_tls_dir ]]/server.agent.crt" "" "" "0640" }}
 {{ .Data.CA | writeToFile "[[ nomad_tls_dir ]]/server.agent.ca.crt" "" "" "0640" }}

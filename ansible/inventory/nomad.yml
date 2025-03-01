@@ -3,6 +3,7 @@ nomad:
   hosts:
     nomadserver0:
       nomad_server: true
+      nomad_cluster_tls: true
       # Nomad has a unique naming structure for TLS
       nomad_tls_fqdn: 'server.global.nomad'
       # Vault
@@ -12,6 +13,7 @@ nomad:
 
     nomadclient0:
       nomad_client: true
+      nomad_cluster_tls: true
       nomad_tls_fqdn: 'client.global.nomad'
       # This node is on hyperion which has a usb device
       nomad_usb_plugin_enabled: true
@@ -23,3 +25,18 @@ nomad:
       nomad_vault_integration: true
       nomad_vault_address: "https://vault.kijowski.casa:8200"
       nomad_vault_jwt_mount_path: "nomad_jwt"
+      nomad_client_host_networks:
+        - name: home
+          cidr: '192.168.50.0/24'
+
+    nomadclient1:
+      nomad_client: true
+      nomad_cluster_tls: true
+      nomad_tls_fqdn: 'client.global.nomad'
+      # Vault
+      nomad_vault_integration: true
+      nomad_vault_address: "https://vault.kijowski.casa:8200"
+      nomad_vault_jwt_mount_path: "nomad_jwt"
+      nomad_client_host_networks:
+        - name: home
+          cidr: '192.168.50.0/24'

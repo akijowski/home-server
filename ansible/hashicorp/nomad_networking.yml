@@ -1,0 +1,16 @@
+---
+- name: Update Nomad networking
+  hosts: nomad
+  become: true
+  tags:
+    - net
+  tasks:
+    # Nomad Clients have multiple network devices allowing them to deploy jobs in multiple VLANs.
+    - name: Update Netplan for extra ethernet devices
+      ansible.builtin.import_role:
+        name: akijowski.netplan
+      when:
+        - nomad_client is defined
+        - nomad_client | bool
+      vars:
+        ip_gateway: '192.168.50.1'

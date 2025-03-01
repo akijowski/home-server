@@ -1,0 +1,17 @@
+{{ ansible_managed | comment }}
+# https://netplan.readthedocs.io/en/stable/netplan-yaml
+# This current config is mostly to get the device in line with the default from cloud-init
+network:
+  version: 2
+  ethernets:
+    {{ item.key }}:
+      match:
+        macaddress: '{{ item.value.macaddress }}'
+      dhcp4: true
+      accept-ra: false # disable self-configured ipv6
+      routes:
+        - to: default
+          via: '{{ ip_gateway }}'
+          metric: 100
+          on-link: true
+          table: {{ 150 | ansible.builtin.random(seed=inventory_hostname, start=0) }}

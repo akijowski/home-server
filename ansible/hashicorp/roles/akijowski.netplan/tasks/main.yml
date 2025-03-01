@@ -1,0 +1,21 @@
+---
+- name: Filter for inactive devices
+# Useful: https://serverfault.com/questions/768470/how-to-enumerate-network-interfaces-in-ansible
+  ansible.builtin.set_fact:
+    inactive_devices: "{{ ansible_facts | dict2items | selectattr('value.active', 'defined') | selectattr('value.active', 'equalto', false) | list }}"
+
+- name: Filter for ethernet devices
+  ansible.builtin.set_fact:
+    inactive_eth_devices: "{{ inactive_devices | selectattr('key', 'match', '^enp.*$') | list }}"
+
+- name: Write configs to disk
+  ansible.builtin.template:
+    src: netplan.yml.j2
+    dest: "/etc/netplan/60-{{ item.key }}.yaml"
+    owner: root
+    group: root
+    mode: '0600'
+  loop: "{{ inactive_eth_devices }}"
+  loop_control:
+    label: "{{ item.key }}"
+  notify: Apply Netplan Changes

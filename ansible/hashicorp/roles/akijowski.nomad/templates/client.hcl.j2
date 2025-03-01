@@ -30,7 +30,31 @@ client {
 
   {% endfor %}
 
+  {% for n in nomad_client_host_networks | default([]) %}
+  {# https://support.hashicorp.com/hc/en-us/articles/22202167019411-Nomad-Setting-Up-Multiple-Network-Interfaces #}
+  {# https://developer.hashicorp.com/nomad/docs/configuration/client#host_network-block #}
+  host_network "{{ n.name }}" {
+    cidr = "{{ n.cidr }}"
+  }
+
+  {% endfor %}
+  {% if nomad_client_host_networks | default([]) | length > 0 %}
+  # specify a primary network interface for the client as there are multiple networks on the host
+  # exclude private addresses that have been added by the nomad_client_host_networks variable
+  # network_interface = {% raw %}"{{ GetPrivateInterfaces | exclude \"network\" \"{% endraw %}{{ nomad_client_host_networks | map(attribute='cidr') | join('|') }}{% raw %}\" }}"{% endraw %}
+
+  network_interface = "eth0"
+  {% endif %}
+
+  # Either leave_on_interrupt or leave_on_terminate must be set
+  # for this to take effect.
+  drain_on_shutdown = {
+    deadline = "10m"
+  }
+
 }
+
+leave_on_terminate = true
 
 {% if nomad_usb_plugin_enabled | default(False) %}
 # https://gitlab.com/CarbonCollins/nomad-usb-device-plugin#configuration

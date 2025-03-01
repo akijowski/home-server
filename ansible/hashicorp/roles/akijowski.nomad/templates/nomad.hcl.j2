@@ -4,7 +4,10 @@
 
 datacenter = "dc1"
 data_dir   = "{{ nomad_data_dir }}"
-bind_addr  = "0.0.0.0"
+# Clients have multiple interfaces so we want to bind to the address on eth0 for all services
+# It is possible to break out the individual http/grpc services if needed
+bind_addr = {%raw%}"{{ GetAllInterfaces | include \"name\" \"eth0\" | exclude \"type\" \"IPv6\" | sort \"-private\" | limit 1 | attr \"address\" }}"
+{% endraw %}
 
 ui {
   enabled = true
