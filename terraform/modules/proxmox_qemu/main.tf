@@ -90,6 +90,15 @@ resource "proxmox_virtual_environment_vm" "this" {
     vlan_id = var.vlan_id
   }
 
+  dynamic "network_device" {
+    for_each = var.extra_network_devices
+
+    content {
+      bridge  = network_device.value["bridge"]
+      vlan_id = network_device.value["vlan_id"]
+    }
+  }
+
   operating_system {
     type = "l26"
   }

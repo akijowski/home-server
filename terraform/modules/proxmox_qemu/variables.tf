@@ -22,6 +22,15 @@ variable "ipv4_addr" {
   }
 }
 
+variable "extra_network_devices" {
+  type = map(object({
+    bridge  = string
+    vlan_id = number
+  }))
+  description = "Map of extra network devices that will be added to the VM. A bridge 'vmbr0' is added by default"
+  default     = {}
+}
+
 variable "disks" {
   type = map(object({
     datastore_id = optional(string, "local-lvm")

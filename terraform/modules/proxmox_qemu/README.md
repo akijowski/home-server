@@ -89,6 +89,21 @@ Type: `string`
 
 Default: `"MY TF VM"`
 
+### <a name="input_extra_network_devices"></a> [extra\_network\_devices](#input\_extra\_network\_devices)
+
+Description: Map of extra network devices that will be added to the VM. A bridge 'vmbr0' is added by default
+
+Type:
+
+```hcl
+map(object({
+    bridge  = string
+    vlan_id = number
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_extra_tags"></a> [extra\_tags](#input\_extra\_tags)
 
 Description: Set of additional tags to apply to the VM. Defaults are added by this module

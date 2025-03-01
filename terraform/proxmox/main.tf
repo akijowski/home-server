@@ -5,28 +5,6 @@ provider "proxmox" {
 }
 
 locals {
-  # vms = {
-  # TODO
-  # These are now orphaned and will be moved in to Nomad
-  # As they are migrated I will remove them from here
-  #     arm0 = {
-  #       name        = "arm0"
-  #       description = <<-EOF
-  #         # Automatic Ripping Machine
-  #         Managed by Terraform.
-
-  #         https://arm.kijowski.casa
-  # EOF
-  #       target_node = "hyperion"
-  #       vmid        = 0
-  #       cpu         = 2
-  #       memory      = 6144 # 6 GiB
-  #       ip0_ipv4    = "192.168.50.13/24"
-  #       extra_tags  = ["arm", "ubuntu", "ansible"]
-  #     }
-}
-
-locals {
   hyperion  = "hyperion"
   phoebe    = "phoebe"
   mnemosyne = "mnemosyne"
@@ -42,6 +20,12 @@ locals {
       node    = local.hyperion
       comment = "usb3.0 blu-ray dvd-rom"
       id      = "174c:55aa"
+    }
+    "dvdrom-path" = {
+      node    = local.hyperion
+      comment = "usb3.0 port1 left side, dvd-rom"
+      id      = "174c:55aa"
+      path    = "2-3"
     }
   }
 
@@ -85,9 +69,10 @@ module "pve_vms" {
 
   usb_devices = try(each.value.usb_devices, {})
 
-  ipv4_addr = each.value.ipv4_addr
-  ipv4_gw   = try(each.value.ipv4_gw, null)
-  vlan_id   = try(each.value.vlan_id, 0)
+  ipv4_addr             = each.value.ipv4_addr
+  ipv4_gw               = try(each.value.ipv4_gw, null)
+  vlan_id               = try(each.value.vlan_id, 0)
+  extra_network_devices = try(each.value.extra_network_devices, {})
 
   description = try(each.value.description, "")
   extra_tags  = try(each.value.tags, [])
@@ -102,6 +87,7 @@ resource "proxmox_virtual_environment_hardware_mapping_usb" "this" {
     {
       id   = each.value.id
       node = each.value.node
+      path = try(each.value.path, null)
     }
   ]
 }
