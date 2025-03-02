@@ -25,6 +25,7 @@ job "homebridge" {
     network {
       port "app" {
         static = 8581
+        host_network = "home" # run this in a different VLAN, see nomad client configs
       }
     }
 

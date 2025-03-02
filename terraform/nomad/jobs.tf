@@ -48,7 +48,7 @@ locals {
       vars = {
         datacenters              = jsonencode(local.any_dcs)
         namespace                = jsonencode(local.namespaces["core"].name)
-        homebridge_image_version = "2024-12-19"
+        homebridge_image_version = "2025-02-26"
       }
     }
     "fileflows" = {
