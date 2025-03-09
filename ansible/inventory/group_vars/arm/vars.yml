@@ -12,7 +12,7 @@ arm_config_dir: /etc/arm/config
 arm_port: 8080
 
 arm_container_image: 'docker.io/automaticrippingmachine/automatic-ripping-machine'
-arm_container_tag: '2.10.1'
+arm_container_tag: '2.10.5'
 arm_container_name: arm-rippers
 
 nfs_mounts:

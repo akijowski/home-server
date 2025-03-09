@@ -1,0 +1,33 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Automatic Ripping Machine - Automatically copy discs
+After=local-fs.target
+
+[Container]
+Image=arm.image
+ContainerName={{ arm_container_name }}
+
+PublishPort=8080:8080
+
+PodmanArgs=--privileged
+
+Environment=ARM_UID={{ arm_user_id }}
+Environment=ARM_GID={{ arm_group_id }}
+
+Volume={{ arm_base_dir }}:/home/arm
+Volume={{ arm_music_dir }}:/home/arm/music
+Volume={{ arm_logs_dir }}:/home/arm/logs
+Volume={{ arm_media_dir }}:/home/arm/media
+Volume={{ arm_config_dir }}:/etc/arm/config
+
+AddDevice=/dev/sr0:/dev/sr0
+AddDevice=/dev/sr1:/dev/sr1
+AddDevice=/dev/sr2:/dev/sr2
+AddDevice=/dev/sr3:/dev/sr3
+
+[Service]
+Restart=always
+
+[Install]
+
+WantedBy=multi-user.target default.target
