@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Simple Nginx container to force the podman0 bridge creation for networking
+# Run this container before nomad
+Before=nomad.service
+
+[Container]
+Image=podman-network-boot.image
+PublishPort=1000:80
+
+[Install]
+WantedBy=default.target

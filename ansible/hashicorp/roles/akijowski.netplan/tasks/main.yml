@@ -1,21 +1,51 @@
 ---
-- name: Filter for inactive devices
-# Useful: https://serverfault.com/questions/768470/how-to-enumerate-network-interfaces-in-ansible
-  ansible.builtin.set_fact:
-    inactive_devices: "{{ ansible_facts | dict2items | selectattr('value.active', 'defined') | selectattr('value.active', 'equalto', false) | list }}"
+- name: Ensure podman is installed
+  ansible.builtin.apt:
+    name:
+      - podman
+    state: present
 
-- name: Filter for ethernet devices
-  ansible.builtin.set_fact:
-    inactive_eth_devices: "{{ inactive_devices | selectattr('key', 'match', '^enp.*$') | list }}"
-
-- name: Write configs to disk
+- name: Copy start-up Podman container
   ansible.builtin.template:
-    src: netplan.yml.j2
-    dest: "/etc/netplan/60-{{ item.key }}.yaml"
+    src: "{{ item.src }}"
+    dest: "/etc/containers/systemd/{{ item.dest }}"
+    mode: 0644
     owner: root
     group: root
-    mode: '0600'
-  loop: "{{ inactive_eth_devices }}"
-  loop_control:
-    label: "{{ item.key }}"
-  notify: Apply Netplan Changes
+  loop:
+    - src: podman-network-boot.image.j2
+      dest: podman-network-boot.image
+    - src: podman-network-boot.container.j2
+      dest: podman-network-boot.container
+
+- name: Get network information
+  ansible.builtin.set_fact:
+    new_if_mac: "{{ ansible_facts | dict2items | selectattr('key', 'equalto', new_if_name) | map(attribute='value.macaddress') | first }}"
+    eth0:
+      cidr: "{{ ansible_eth0.ipv4.network + '/' + ansible_eth0.ipv4.prefix }}"
+      gateway: "{{ (ansible_eth0.ipv4.network + '/' + ansible_eth0.ipv4.prefix) | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+
+- name: Write Netplan configuration
+  ansible.builtin.template:
+    src: netplan_conf.yaml.j2
+    dest: "/etc/netplan/60-{{ new_if_name }}.yaml"
+    owner: root
+    group: root
+    mode: 0600
+  # register: netplan_conf
+  notify: apply netplan
+
+- name: Copy networkd hook
+  ansible.builtin.template:
+    src: netplan_hook.sh.j2
+    dest: /etc/networkd-dispatcher/routable.d/10-create-podman.sh
+    owner: root
+    group: root
+    mode: 0755
+  # register: networkd_hook
+  notify: apply netplan
+
+# - name: Reboot machine to apply changes
+#   ansible.builtin.reboot: {}
+#   when:
+#     - (netplan_conf is changed) or (networkd_hook is changed)

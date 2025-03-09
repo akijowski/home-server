@@ -4,13 +4,15 @@
   become: true
   tags:
     - net
+  vars:
+    new_if_name: enp6s19
+    new_if_cidr: '192.168.50.0/24'
+    new_if_gw: '192.168.50.1'
   tasks:
     # Nomad Clients have multiple network devices allowing them to deploy jobs in multiple VLANs.
-    - name: Update Netplan for extra ethernet devices
+    - name: Update networking for multihomed interfaces
       ansible.builtin.import_role:
         name: akijowski.netplan
       when:
         - nomad_client is defined
         - nomad_client | bool
-      vars:
-        ip_gateway: '192.168.50.1'

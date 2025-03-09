@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+{{ ansible_managed | comment }}
+#
+# This script runs as a hook after network changes through Netplan and networkd
+# https://gitlab.com/craftyguy/networkd-dispatcher
+# TODO: better handle the behavior based on the passed env vars
+# this works for now though
+#
+set -eou pipefail
+
+LOGF=" [netplan_hook_podman] "
+
+PODMAN_BRIDGE_NAME=podman0
+PODMAN_BRIDGE_SUBNET="10.88.0.0/16"
+PODMAN_BRIDGE_NEXTHOP="10.88.0.1"
+
+EXISTING_PODMAN_ROUTES=0
+TABLES=(1 2) # Hard coded for now
+
+function log() {
+    printf "$(date -Iseconds) ${LOGF} ${1}\n"
+}
+
+# get_numeric_tables parses tables found in 'ip rules', filtering out ones that are not named
+# and reading them in to an array TABLES
+# NOTE: This doesn't work so we can skip and hard code the tables
+function get_numeric_tables() {
+    tmp_file="/tmp/ip_tables_num.json"
+    set +e
+    ip -j rule show all > $tmp_file
+    RET=$?
+    set -e
+    if [[ $RET -gt 0 ]]; then
+        log "error getting tables, exiting $RET"
+        cat "$tmp_file"
+        exit "$RET"
+    fi
+
+    # get 'numeric' tables, this excludes built-in tables like local, main, etc
+    # however if you were to put a name in /etc/iproute2/rt_tables then this may break
+    table_list=$(jq 'map(select(.table | test("\\d")) | .table) | sort | join(",")' < "$tmp_file")
+    rm -f "$tmp_file"
+
+    $(IFS=',' read -r -a TABLES <<< "$table_list")
+}
+
+# get_ip_routes_from_table reads existing routes from a table in arg 1 and writes the count in to
+# EXISTING_PODMAN_ROUTES
+function get_ip_routes_from_table() {
+    table=${1:?table is unset or null}
+
+    tmp_file="/tmp/ip_routes_$table.json"
+    set +e
+    ip -j route show all table $table > $tmp_file
+    RET=$?
+    set -e
+    if [[ $RET -gt 0 ]]; then
+        log "error getting routes, exiting $RET"
+        cat "$tmp_file"
+        exit "$RET"
+    fi
+
+    EXISTING_PODMAN_ROUTES=$(jq --arg BR_NAME "${PODMAN_BRIDGE_NAME}" 'map(select(.dev == $BR_NAME)) | length' < "$tmp_file")
+    rm -f "$tmp_file"
+
+}
+
+# add_ip_route_to_table uses 'ip route add' to assign a new podman bridge route to the table in arg 1
+# 'ip route add' will fail on duplicate entries
+function add_ip_route_to_table() {
+    table=${1:?table is unset or null}
+
+    set +e
+    ip route add to $PODMAN_BRIDGE_SUBNET protocol static scope link table $table src $PODMAN_BRIDGE_NEXTHOP nexthop dev $PODMAN_BRIDGE_NAME
+    RET=$?
+    set -e
+
+    if [[ $RET -gt 0 ]]; then
+        log "error adding route to table $table, exiting $RET"
+        exit "$RET"
+    fi
+}
+
+function main() {
+    log "starting"
+
+    #log "tables: ${TABLES[*]}"
+
+    for t in "${TABLES[@]}"; do
+        log "reading table $t"
+        get_ip_routes_from_table "$t"
+
+        if [[ "$EXISTING_PODMAN_ROUTES" -eq 0 ]]; then
+            log "no podman routes found, adding"
+            add_ip_route_to_table "$t"
+        else
+            log "podman route exists, skipping"
+        fi
+    done
+
+}
+
+main "$@"

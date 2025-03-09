@@ -1,0 +1,33 @@
+{{ ansible_managed | comment }}
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      routes:
+        - to: {{ eth0.cidr }}
+          from: {{ eth0.cidr }}
+        - to: default
+          via: {{ eth0.gateway }}
+          table: 1
+        - to: {{ eth0.cidr }}
+          table: 1
+      routing-policy:
+        - from: {{ eth0.cidr }}
+          table: 1
+    {{ new_if_name }}:
+      match:
+        macaddress: {{ new_if_mac }}
+      dhcp4: true
+      dhcp6: true
+      routes:
+        - to: {{ new_if_cidr }}
+          from: {{ new_if_cidr }}
+        - to: default
+          via: {{ new_if_gw }}
+          table: 2
+        - to: {{ new_if_cidr }}
+          table: 2
+      routing-policy:
+        - from: {{ new_if_cidr }}
+          table: 2
