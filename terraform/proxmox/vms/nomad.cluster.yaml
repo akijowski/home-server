@@ -14,15 +14,15 @@ nomadclient:
       - ansible
     ipv4_addr: 'dhcp'
     extra_network_devices:
-      vmbr0_50:
-        bridge: vmbr0
-        vlan_id: 50
+      vmbr50:
+        bridge: vmbr50
+        vlan_id: 0
     cores: 3
     memory: 6144 # 6 GiB
-    usb_devices:
-      dvdrom:
-        mapping: dvdrom-path
-        usb3: true
+    # usb_devices:
+    #   dvdrom:
+    #     mapping: dvdrom-path
+    #     usb3: true
     disks:
       virtio0:
         interface: virtio0
@@ -43,9 +43,9 @@ nomadclient:
     started: false # this is a manual node used for backups
     ipv4_addr: 'dhcp'
     extra_network_devices:
-      vmbr0_50:
-        bridge: vmbr0
-        vlan_id: 50
+      vmbr50:
+        bridge: vmbr50
+        vlan_id: 0
     cores: 3
     memory: 6144 # 6 GiB
     disks:

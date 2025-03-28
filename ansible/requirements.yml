@@ -12,4 +12,7 @@ collections:
   - name: community.general
   - name: community.crypto
   - name: amazon.aws
+  - name: https://github.com/evrardjp/ansible-collection-ha.git # keepalived and haproxy
+    type: git
+    version: main
   # - name: vladgh.samba

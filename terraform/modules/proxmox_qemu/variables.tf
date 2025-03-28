@@ -110,3 +110,9 @@ variable "vlan_id" {
   default     = 0
   description = "VLAN tag to add to the primary network device"
 }
+
+variable "network_bridge" {
+  type        = string
+  default     = "vmbr0"
+  description = "The default bridge to attach to the vm"
+}

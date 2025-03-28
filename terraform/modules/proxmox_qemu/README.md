@@ -120,6 +120,14 @@ Type: `number`
 
 Default: `1024`
 
+### <a name="input_network_bridge"></a> [network\_bridge](#input\_network\_bridge)
+
+Description: The default bridge to attach to the vm
+
+Type: `string`
+
+Default: `"vmbr0"`
+
 ### <a name="input_on_boot"></a> [on\_boot](#input\_on\_boot)
 
 Description: Start this VM on host boot

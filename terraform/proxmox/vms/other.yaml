@@ -11,7 +11,7 @@ plex:
       - ansible
     ipv4_addr: '192.168.50.10/24'
     ipv4_gw: '192.168.50.1'
-    vlan_id: 50
+    network_bridge: "vmbr50" # custom bridge set up for VLAN50
     cores: 3
     memory: 6144 # 6 GiB
     disks:
@@ -50,8 +50,24 @@ localdns:
       - dns
       - ubuntu
       - ansible
-    ipv4_addr: '10.10.10.10/24'
-    ipv4_gw: '10.10.10.1'
+    ipv4_addr: 'dhcp'
+    cores: 1
+    memory: 2048 # 2 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 20
+  - target_node: ${tmpl_node_mnemosyne}
+    on_boot: true
+    description: |-
+      # Local DNS Resolver
+
+      CoreDNS: https://coredns.io
+    tags:
+      - dns
+      - ubuntu
+      - ansible
+    ipv4_addr: 'dhcp'
     cores: 1
     memory: 2048 # 2 GiB
     disks:

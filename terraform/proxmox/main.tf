@@ -71,6 +71,7 @@ module "pve_vms" {
 
   ipv4_addr             = each.value.ipv4_addr
   ipv4_gw               = try(each.value.ipv4_gw, null)
+  network_bridge        = try(each.value.network_bridge, "vmbr0")
   vlan_id               = try(each.value.vlan_id, 0)
   extra_network_devices = try(each.value.extra_network_devices, {})
 

@@ -1,0 +1,4 @@
+vrrp_id: 10
+vrrp_password: "{{ vault_vrrp_password }}"
+vrrp_vips:
+  - '10.10.10.10/24'

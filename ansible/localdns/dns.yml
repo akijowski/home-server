@@ -1,6 +1,7 @@
 ---
 - name: Install DNS
-  hosts: localdns0
+  hosts:
+    - localdns
   debugger: on_failed
   become: true
   tags:
@@ -60,3 +61,28 @@
                 ipv4: "{{ lookup('community.dns.lookup', 'nomadclient0.lab.arpa') }}"
               - prefix: '*'
                 ipv4: "{{ lookup('community.dns.lookup', 'nomadclient0.lab.arpa') }}"
+
+- name: Install HA
+  hosts:
+    - localdns
+  become: true
+  tags:
+    - install_ha
+  # https://docs.ansible.com/ansible/latest/collections_guide/collections_using_playbooks.html#using-collections-in-playbooks
+  collections:
+    - evrardjp.ha
+
+  tasks:
+    - name: Configure Keepalived
+      ansible.builtin.include_role:
+        name: keepalived
+      vars:
+        keepalived_instances:
+          virtdns:
+            state: "{{ vrrp_state }}"
+            interface: "{{ vrrp_nic | default(ansible_default_ipv4.interface, true) }}"
+            virtual_router_id: "{{ vrrp_id }}"
+            priority: "{{ vrrp_priority }}"
+            advert_int: 1
+            authentication_password: "{{ vrrp_password }}"
+            vips: "{{ vrrp_vips }}"

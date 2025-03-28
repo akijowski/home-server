@@ -1,0 +1,9 @@
+---
+localdns:
+  hosts:
+    localdns0:
+      vrrp_state: MASTER
+      vrrp_priority: 255
+    localdns1:
+      vrrp_state: BACKUP
+      vrrp_priority: 240
