@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path: "{{ item.agent_source | dirname }}"
     state: directory
-  with_items: "{{ vault_agent_templates }}"
+  loop: "{{ vault_agent_templates }}"
   loop_control:
     label: "{{ item.agent_source | dirname }}"
 
@@ -11,9 +11,25 @@
   ansible.builtin.file:
     path: "{{ item.agent_dest | dirname }}"
     state: directory
-  with_items: "{{ vault_agent_templates }}"
+  loop: "{{ vault_agent_templates }}"
   loop_control:
     label: "{{ item.agent_dest | dirname }}"
+
+- name: Ensure output file ownership
+  ansible.builtin.file:
+    path: "{{ item.agent_dest }}"
+    owner: "{{ item.agent_dest_owner }}"
+    group: "{{ item.agent_dest_group }}"
+    mode: "{{ item.agent_dest_mode | default('0640') }}"
+    modification_time: preserve
+    access_time: preserve
+    state: touch
+  loop: "{{ vault_agent_templates }}"
+  when:
+    - item.agent_dest_owner is defined
+    - item.agent_dest_group is defined
+  loop_control:
+    label: "{{ item.agent_dest }}"
 
 - name: Ensure server configuration
   ansible.builtin.template:
@@ -21,7 +37,7 @@
     dest: "{{ item.agent_source }}"
     variable_end_string: "]]"
     variable_start_string: "[["
-  with_items: "{{ vault_agent_templates }}"
+  loop: "{{ vault_agent_templates }}"
   loop_control:
     label: "{{ item.agent_source }}"
   notify:

@@ -16,6 +16,7 @@ NoNewPrivileges=true
 WorkingDirectory=/etc/coredns
 User={{ coredns_system_user }}
 Group={{ coredns_system_group }}
+EnvironmentFile={{ coredns_config_dir }}/coredns.env
 ExecStart=/usr/local/bin/coredns \
     -conf {{ coredns_config_dir }}/Corefile \
     -dns.port "{{ coredns_dns_port }}"

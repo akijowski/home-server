@@ -69,6 +69,17 @@ resource "vault_approle_auth_backend_role" "nomad_cluster" {
   token_max_ttl = 900 # 15 minutes
 }
 
+resource "vault_approle_auth_backend_role" "coredns" {
+  backend            = vault_auth_backend.approle.path
+  role_name          = "coredns"
+  token_policies     = ["default", "coredns"]
+  secret_id_num_uses = 0
+
+  token_type    = "batch"
+  token_ttl     = 600
+  token_max_ttl = 900
+}
+
 # Nomad Workload Identities
 # https://developer.hashicorp.com/nomad/docs/integrations/vault/acl#nomad-workload-identities
 resource "vault_jwt_auth_backend" "nomad" {

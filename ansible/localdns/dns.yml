@@ -29,6 +29,8 @@
         name: akijowski.coredns
       vars:
         coredns_corefile_tmpl: "templates/Corefile.j2"
+        coredns_env:
+          AWS_REGION: us-east-1
         coredns_zones:
           kijowski.casa:
             a_records: true

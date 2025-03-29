@@ -6,6 +6,11 @@ locals {
         "arn:aws:iam::976648257138:role/VaultManageDNS"
       ]
     }
+    "coredns" = {
+      role_arns = [
+        "arn:aws:iam::976648257138:role/VaultManageDNS"
+      ]
+    }
   }
 }
 

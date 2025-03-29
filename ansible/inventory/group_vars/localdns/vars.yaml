@@ -2,3 +2,12 @@ vrrp_id: 10
 vrrp_password: "{{ vault_vrrp_password }}"
 vrrp_vips:
   - '10.10.10.10/24'
+# Vault Agent
+vault_address: "https://vault.kijowski.casa:8200"
+vault_agent_approle_id: "{{ vault_coredns_approle_id }}"
+vault_agent_approle_secret: "{{ vault_coredns_approle_secret }}"
+vault_agent_template_dir: /etc/coredns/templates
+coredns_aws_policy: coredns
+# AWS Route53
+coredns_aws_credential_file: /etc/coredns/aws/credentials
+coredns_aws_zone_id_kijowski_casa: "{{ vault_coredns_aws_zone_id_kijowski_casa }}"

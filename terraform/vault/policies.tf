@@ -9,7 +9,9 @@ locals {
     "admin",
     "ansible",
     "traefik",
-    "nomad-certs"
+    "nomad-certs",
+    "diun",
+    "coredns"
   ]
 }
 

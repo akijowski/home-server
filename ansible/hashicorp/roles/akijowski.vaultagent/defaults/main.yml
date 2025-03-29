@@ -5,7 +5,7 @@ apt_keyring_dir: "{{ apt_keyring_hashicorp | dirname }}"
 vault_user_name: vault
 vault_group_name: vault
 
-vault_version: '1.18*'
+vault_version: '1.19*'
 
 vault_data_dir: "/opt/vault"
 vault_agent_data_dir: "{{ vault_data_dir }}/vault-agent"

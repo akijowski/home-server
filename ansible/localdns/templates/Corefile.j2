@@ -1,6 +1,11 @@
 {{ ansible_managed | comment }}
 # https://coredns.io/manual/toc/
 .:{{ coredns_dns_port }} {
+   route53 kijowski.casa.:{{ coredns_aws_zone_id_kijowski_casa }} {
+      credentials default {{ coredns_aws_credential_file }}
+      fallthrough
+   }
+
    auto kijowski.casa {
       directory {{ coredns_zone_dir }}
    }

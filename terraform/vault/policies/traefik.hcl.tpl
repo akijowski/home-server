@@ -19,18 +19,19 @@ path "aws/sts/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job
 }
 
 # Read secrets based on nomad namespace/job_id
-path "secret/data/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}/*" {
+# KV v2 API
+path "kv/data/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}/*" {
   capabilities = ["read"]
 }
 
-path "secret/data/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}" {
+path "kv/data/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_job_id}}" {
   capabilities = ["read"]
 }
 
-path "secret/metadata/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/*" {
+path "kv/metadata/{{identity.entity.aliases.${nomad_jwt_accessor}.metadata.nomad_namespace}}/*" {
   capabilities = ["list"]
 }
 
-path "secret/metadata/*" {
+path "kv/metadata/*" {
   capabilities = ["list"]
 }

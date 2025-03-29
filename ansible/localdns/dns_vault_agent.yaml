@@ -1,0 +1,25 @@
+---
+- name: Install Vault Agent
+  hosts:
+    - localdns
+  become: true
+  tags:
+    - agent
+
+  tasks:
+  # Info on creating and obtaining an approle
+  # https://developer.hashicorp.com/nomad/tutorials/integrate-vault/vault-pki-nomad
+  # Added with Terraform, used the Vault API to get the values
+    - name: Install Vault Agent
+      ansible.builtin.import_role:
+        name: akijowski.vaultagent
+      vars:
+        vault_agent_templates:
+        # NOTE: keep an eye on this, it was still broken even after pulling latest (probably needs to get published)
+        # https://github.com/hashicorp/vault/issues/29869
+          - ansible_tmpl: "templates/agent/aws-credentials.tpl.j2"
+            agent_source: "{{ vault_agent_template_dir }}/agent/aws-credentials.tpl"
+            agent_dest: "{{ coredns_aws_credential_file }}"
+            agent_dest_owner: coredns
+            agent_dest_group: coredns
+            exec_cmd: ["systemctl", "reload", "coredns"]

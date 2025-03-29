@@ -7,6 +7,16 @@
     owner: "{{ coredns_system_user }}"
     group: "{{ coredns_system_group }}"
 
+- name: Ensure Corefile env file exists
+  ansible.builtin.template:
+    src: coredns.env.j2
+    dest: "{{ coredns_config_dir }}/coredns.env"
+    owner: "{{ coredns_system_user }}"
+    group: "{{ coredns_system_group }}"
+    mode: 0640
+  notify:
+    - restart coredns
+
 - name: Ensure Corefile exists
   ansible.builtin.template:
     src: "{{ coredns_corefile_tmpl }}"
