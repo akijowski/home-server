@@ -53,7 +53,7 @@ nomadclient:
         interface: virtio0
         size: 75
 nomadserver:
-  - target_node: ${tmpl_node_phoebe}
+  - target_node: ${tmpl_node_pve01}
     description: |-
       # Nomad Server
 

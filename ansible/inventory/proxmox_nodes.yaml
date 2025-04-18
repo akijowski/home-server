@@ -2,7 +2,7 @@ proxmox_nodes:
   hosts:
     hyperion:
       ansible_host: 'hyperion.lab.arpa'
-    phoebe:
-      ansible_host: 'phoebe.lab.arpa'
+    pve01:
+      ansible_host: 'pve01.lab.arpa'
     mnemosyne:
       ansible_host: 'mnemosyne.lab.arpa'

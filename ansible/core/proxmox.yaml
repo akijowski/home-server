@@ -136,11 +136,10 @@
         path: "{{ scripts_dir }}"
         state: directory
 
-    # https://tteck.github.io/Proxmox
-    # TODO: update to https://github.com/community-scripts/ProxmoxVE :(
+    # Formerly https://tteck.github.io/Proxmox :(
     - name: Download helper scripts
       ansible.builtin.get_url:
-        url: "https://github.com/tteck/Proxmox/raw/main/misc/{{ item }}"
+        url: "https://github.com/community-scripts/ProxmoxVE/raw/main/tools/pve/{{ item }}"
         dest: "{{ scripts_dir }}/{{ item }}"
         mode: '0550'
         owner: root

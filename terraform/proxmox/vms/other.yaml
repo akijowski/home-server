@@ -40,7 +40,7 @@ vault:
         interface: virtio0
         size: 20
 localdns:
-  - target_node: ${tmpl_node_phoebe}
+  - target_node: ${tmpl_node_pve01}
     on_boot: true
     description: |-
       # Local DNS Resolver

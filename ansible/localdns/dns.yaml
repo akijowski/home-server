@@ -49,7 +49,7 @@
                 ipv4: '10.10.10.3'
               - prefix: proxmox
                 ipv4: '10.10.10.6'
-              - prefix: phoebe
+              - prefix: pve01
                 ipv4: '10.10.10.6'
               - prefix: proxmox
                 ipv4: '10.10.10.9'

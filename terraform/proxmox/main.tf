@@ -6,12 +6,12 @@ provider "proxmox" {
 
 locals {
   hyperion  = "hyperion"
-  phoebe    = "phoebe"
+  pve01    = "pve01"
   mnemosyne = "mnemosyne"
 
   pve_templates = {
     (local.hyperion)  = 8000
-    (local.phoebe)    = 8001
+    (local.pve01)    = 8001
     (local.mnemosyne) = 8002
   }
 
@@ -31,7 +31,7 @@ locals {
 
   tmpl_vars = {
     tmpl_node_hyperion  = local.hyperion
-    tmpl_node_phoebe    = local.phoebe
+    tmpl_node_pve01    = local.pve01
     tmpl_node_mnemosyne = local.mnemosyne
   }
 
