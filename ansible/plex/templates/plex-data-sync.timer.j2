@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Plex Backup Metadata to NFS
+
+[Timer]
+Persistent=true
+#OnCalendar=*-*-* 00:00:00
+OnCalendar=hourly
+
+[Install]
+WantedBy=timers.target

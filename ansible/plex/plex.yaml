@@ -66,23 +66,23 @@
           - rsync
         state: latest
 
-    - name: Create rsync script directory
-      ansible.builtin.file:
-        path: /etc/plex_metadata_sync
-        state: directory
-
-    - name: Copy rsync script
+    - name: Ensure systemd timer and service
       ansible.builtin.template:
-        src: templates/sync_metadata.sh.j2
-        dest: /etc/plex_metadata_sync/sync.sh
-        mode: '0774'
+        src: "templates/{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ item }}"
+        mode: 0755
+        owner: root
+        group: root
+      loop:
+        - plex-data-sync.timer
+        - plex-data-sync.service
 
-    - name: Configure rsync crontab
-      ansible.builtin.cron:
-        name: "sync plex metadata"
-        special_time: "daily"
-        job: /etc/plex_metadata_sync/sync.sh
-        state: present
+    - name: Ensure timer is enabled
+      ansible.builtin.systemd_service:
+        name: plex-data-sync.timer
+        daemon_reload: true
+        state: started
+        enabled: true
 
 - name: Seed Plex Metadata
   hosts: plex

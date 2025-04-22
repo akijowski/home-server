@@ -1,0 +1,23 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Plex Backup Metadata to NFS
+
+# Network needs to be ready
+Wants=network-online.target
+After=network-online.target
+# Wait 120 seconds up to 3 times
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+User=root
+Group=root
+
+Type=oneshot
+ExecStart=rm -f /var/log/rsync_plex_metadata.log
+ExecStart=/usr/bin/rsync --archive --stats --log-file=/var/log/rsync_plex_metadata.log {{ plex_metadata_ssd_root_dir }}/ {{ plex_metadata_nfs_root_dir }}/
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
