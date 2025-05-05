@@ -16,6 +16,7 @@ client {
   options = {
     "user.checked_drivers" = "exec,raw_exec,qemu,java"
     "user.denylist" = "root,ubuntu"
+    "driver.denylist" = "docker"
   }
 
   meta = {
@@ -53,6 +54,9 @@ client {
   }
 
 }
+
+# enable the podman plugin
+plugin "nomad-driver-podman" {}
 
 leave_on_terminate = true
 
