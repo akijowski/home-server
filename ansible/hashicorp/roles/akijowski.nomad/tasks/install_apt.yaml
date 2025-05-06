@@ -32,7 +32,7 @@
 
 - name: Ensure Nomad is installed with APT
   ansible.builtin.apt:
-    name: "nomad={{ nomad_version }}"
+    name: "nomad"
     state: present
 
 # Nomad starts on install which complicates configuration changes

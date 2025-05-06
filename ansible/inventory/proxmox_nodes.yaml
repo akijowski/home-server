@@ -4,5 +4,5 @@ proxmox_nodes:
       ansible_host: 'hyperion.lab.arpa'
     pve01:
       ansible_host: 'pve01.lab.arpa'
-    mnemosyne:
-      ansible_host: 'mnemosyne.lab.arpa'
+    pve02:
+      ansible_host: 'pve02.lab.arpa'

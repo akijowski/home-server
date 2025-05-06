@@ -11,7 +11,7 @@ nomad_tls_dir: "/opt/nomad/tls"
 
 nomad_tls_file_prefix: "{{ (nomad_client | default(False)) | ternary('client', 'server') }}.agent"
 
-nomad_version: '1.9*'
+# nomad_version: '1.9*'
 
 nomad_port: 4646
 
@@ -20,6 +20,9 @@ nomad_force_reset: false
 
 # [{name: foo, path: /path, read_only: false}]
 nomad_client_host_volumes: []
+
+# TODO build this from host names
+nomad_server_fqdns: "nomadserver0.lab.arpa"
 
 cni_plugin_version: latest
 # cni_plugin_checksum: ''

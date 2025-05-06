@@ -35,7 +35,8 @@
 - name: Restart Nomad if there are changes
   ansible.builtin.meta: flush_handlers
 
-- name: Wait for Nomad port
-  ansible.builtin.wait_for:
-    port: "{{ nomad_port }}"
-    state: started
+# TODO: investigate why this hangs now
+# - name: Wait for Nomad port
+#   ansible.builtin.wait_for:
+#     port: "{{ nomad_port }}"
+#     state: started

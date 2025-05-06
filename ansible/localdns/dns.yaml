@@ -53,7 +53,7 @@
                 ipv4: '10.10.10.6'
               - prefix: proxmox
                 ipv4: '10.10.10.9'
-              - prefix: mnemosyne
+              - prefix: pve02
                 ipv4: '10.10.10.9'
               - prefix: vault
                 ipv4: "{{ lookup('community.dns.lookup', 'vault0.lab.arpa') }}"
