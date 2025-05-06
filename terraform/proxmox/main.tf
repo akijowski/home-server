@@ -5,14 +5,14 @@ provider "proxmox" {
 }
 
 locals {
-  hyperion  = "hyperion"
+  hyperion = "hyperion"
   pve01    = "pve01"
-  mnemosyne = "mnemosyne"
+  pve02    = "pve02"
 
   pve_templates = {
-    (local.hyperion)  = 8000
+    (local.hyperion) = 8000
     (local.pve01)    = 8001
-    (local.mnemosyne) = 8002
+    (local.pve02)    = 8002
   }
 
   usb_devices = {
@@ -30,9 +30,9 @@ locals {
   }
 
   tmpl_vars = {
-    tmpl_node_hyperion  = local.hyperion
+    tmpl_node_hyperion = local.hyperion
     tmpl_node_pve01    = local.pve01
-    tmpl_node_mnemosyne = local.mnemosyne
+    tmpl_node_pve02    = local.pve02
   }
 
   pve_vms = merge(

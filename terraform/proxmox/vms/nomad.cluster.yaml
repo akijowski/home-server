@@ -27,7 +27,7 @@ nomadclient:
       virtio0:
         interface: virtio0
         size: 75
-  - target_node: ${tmpl_node_mnemosyne}
+  - target_node: ${tmpl_node_pve01}
     description: |-
       # Nomad Client
 

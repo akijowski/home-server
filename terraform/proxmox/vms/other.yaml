@@ -23,7 +23,7 @@ plex:
         interface: virtio1
         size: 100
 vault:
-  - target_node: ${tmpl_node_mnemosyne}
+  - target_node: ${tmpl_node_pve01}
     description: |-
       # Hashicorp Vault
 
@@ -57,7 +57,7 @@ localdns:
       virtio0:
         interface: virtio0
         size: 20
-  - target_node: ${tmpl_node_mnemosyne}
+  - target_node: ${tmpl_node_hyperion}
     on_boot: true
     description: |-
       # Local DNS Resolver
