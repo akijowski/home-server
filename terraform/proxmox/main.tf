@@ -1,9 +1,3 @@
-provider "proxmox" {
-  endpoint = var.pve_url
-  # https://registry.terraform.io/providers/bpg/proxmox/latest/docs#vm-and-container-id-assignment
-  # random_vm_ids = true
-}
-
 locals {
   hyperion = "hyperion"
   pve01    = "pve01"

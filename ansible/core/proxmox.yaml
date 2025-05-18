@@ -13,9 +13,9 @@
       - name: ansible
         system: true
         comment: Ansible automation user
-      - name: admin
-        system: false
-        comment: Admin user
+      # - name: admin
+      #   system: false
+      #   comment: Admin user
   tasks:
     - name: Install sudo from apt
       ansible.builtin.apt:
@@ -52,12 +52,12 @@
         mode: '0440'
         validate: '/usr/sbin/visudo -cf %s'
 
-    - name: Allow Admin group password sudo
-      ansible.builtin.copy:
-        content: "%admin ALL=(ALL:ALL) ALL"
-        dest: /etc/sudoers.d/admin
-        mode: '0440'
-        validate: '/usr/sbin/visudo -cf %s'
+    # - name: Allow Admin group password sudo
+    #   ansible.builtin.copy:
+    #     content: "%admin ALL=(ALL:ALL) ALL"
+    #     dest: /etc/sudoers.d/admin
+    #     mode: '0440'
+    #     validate: '/usr/sbin/visudo -cf %s'
 
     - name: Add SSH key
       ansible.posix.authorized_key:
@@ -66,7 +66,7 @@
         key: 'https://github.com/akijowski.keys'
       loop:
         - ansible
-        - admin
+        # - admin
 
 # Note: Proxmox automatically updates packages on a schedule. This may not be necessary
 - name: Update APT packages

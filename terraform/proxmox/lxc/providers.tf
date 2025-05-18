@@ -9,7 +9,7 @@ terraform {
 
   backend "s3" {
     bucket = "kijowski-tf-remote-state"
-    key    = "home-server/proxmox.tfstate"
+    key    = "home-server/proxmox/lxc.tfstate"
     region = "us-east-1"
   }
 }

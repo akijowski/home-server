@@ -1,0 +1,27 @@
+---
+plex-lxc:
+  - target_node: "${tmpl_node_pve01}"
+    description: |-
+      # Plexmediaserver
+
+      https://plex.tv
+    tags:
+      - plex
+      - ubuntu
+      - ansible
+      - terraform
+      - lxc
+    tmplfile: "${tmpl_lxc_ubuntu}"
+    cpu: 4
+    memory: 6144
+    swap: 2048
+    ipv4_addr: '192.168.50.10/24'
+    ipv4_gw: '192.168.50.1'
+    dns:
+      main:
+        domain: home.arpa
+        servers:
+          - '192.168.50.1'
+    net_bridge: "vmbr50"
+    disk:
+      size: 64
