@@ -38,8 +38,8 @@ build {
   }
 
   source "proxmox-iso.image" {
-    name          = "ubuntu24-phoebe"
-    node          = "phoebe"
+    name          = "ubuntu24-pve01"
+    node          = "pve01"
     vm_id         = var.vm_id >= 0 ? var.vm_id : 8001
     template_name = "ubuntu24-noble"
 
@@ -66,8 +66,8 @@ build {
   }
 
   source "proxmox-iso.image" {
-    name          = "ubuntu24-mnemosyne"
-    node          = "mnemosyne"
+    name          = "ubuntu24-pve02"
+    node          = "pve02"
     vm_id         = var.vm_id >= 0 ? var.vm_id : 8002
     template_name = "ubuntu24-noble"
 

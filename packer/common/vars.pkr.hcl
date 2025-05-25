@@ -82,7 +82,7 @@ variable "iso_url" {
   type = map(string)
   default = {
     "debian12" = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.7.0-amd64-netinst.iso"
-    "ubuntu24" = "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso"
+    "ubuntu24" = "https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso"
   }
 }
 
@@ -134,8 +134,8 @@ variable "target_node" {
   type        = string
   default     = "hyperion"
   validation {
-    condition     = contains(["hyperion", "phoebe", "mnemosyne"], var.target_node)
-    error_message = "Must be one of [hyperion, phoebe, mnemosyne]."
+    condition     = contains(["hyperion", "pve01", "pve02"], var.target_node)
+    error_message = "Must be one of [hyperion, pve01, pve02]."
   }
 }
 

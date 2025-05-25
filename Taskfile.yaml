@@ -60,3 +60,16 @@ tasks:
     cmds:
       - rm -f ~/.ssh/packer_id_ed25519
       - rm -f ~/.ssh/packer_id_ed25519.pub
+
+  ssh:gh:
+    desc: Copy public keys from github (used by Packer when creating templates)
+    cmds:
+    # get the first line of the output (that is the correct one currently)
+      - wget -q -O- 'https://github.com/akijowski.keys' | sed -n 1p > ~/.ssh/github_akijowski.pub
+    status:
+      - test -f ~/.ssh/github_akijowski.pub
+
+  ssh:gh:rm:
+    desc: Remove the public Github keys (used by Packer when creating templates)
+    cmds:
+      - rm -f ~/.ssh/github_akijowski.pub
