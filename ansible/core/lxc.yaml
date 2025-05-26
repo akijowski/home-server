@@ -63,6 +63,20 @@
       when:
         - proxmox_vmtype == "lxc"
 
+# https://superuser.com/questions/1764831/i-want-to-search-for-string-in-a-file-using-ansible
+    - name: Check for LXC configuration
+      delegate_to: "{{ proxmox_node }}"
+      become: true
+      ansible.builtin.command:
+        cmd: "grep -e '^lxc.cgroup.devices.allow: c {{ dev_major_id }}.*' /etc/pve/nodes/{{ proxmox_node }}/lxc/{{ proxmox_vmid }}.conf"
+      register: conf_result
+      # failed on unexpected status code
+      failed_when: conf_result.rc != 0 and conf_result.rc != 1
+      check_mode: false
+      changed_when: false
+      when:
+        - proxmox_vmtype == "lxc"
+
     - name: Ensure LXC is not running
       delegate_to: 127.0.0.1
       community.general.proxmox:
@@ -76,6 +90,7 @@
         state: stopped
       when:
         - proxmox_vmtype == "lxc"
+        - conf_result.rc == 1 # the devices line was not found in the file so we assume it is absent
 
     - name: Ensure permissions to modify subgid
       delegate_to: "{{ proxmox_node }}"
@@ -86,8 +101,8 @@
         state: present
       when:
         - proxmox_vmtype == "lxc"
+        - conf_result.rc == 1 # the devices line was not found in the file so we assume it is absent
 
-# TODO: only do this once
     - name: Update LXC configuration
       delegate_to: "{{ proxmox_node }}"
       become: true
@@ -97,8 +112,10 @@
         insertafter: "^unprivileged: 0" # this is the last line in the file
         state: present
         backup: true
+      register: conf_update
       when:
         - proxmox_vmtype == "lxc"
+        - conf_result.rc == 1 # the devices line was not found in the file so we assume it is absent
 
     - name: Restart LXC
       delegate_to: 127.0.0.1
@@ -113,6 +130,7 @@
         state: started
       when:
         - proxmox_vmtype == "lxc"
+        - conf_update.changed
 
     - name: Give root permissions to video,render
       ansible.builtin.user:
@@ -122,3 +140,21 @@
         groups:
           - video
           - render
+
+    - name: Update packages
+      become: true
+      ansible.builtin.apt:
+        upgrade: true
+        state: present
+
+    - name: Install gpu packages
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+        autoclean: true
+        autoremove: true
+        cache_valid_time: 86400 # 1 day
+        name:
+          - intel-opencl-icd
+          - intel-gpu-tools # intel_gpu_top
+        state: latest

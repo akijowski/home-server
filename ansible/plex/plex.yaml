@@ -24,6 +24,12 @@
         fstype: nfs
       loop: "{{ nfs_mounts }}"
 
+    - name: Change Plex ssd metadata directory
+      ansible.builtin.set_fact:
+        plex_metadata_ssd_root_dir: "/opt/ssd/plexmetadata"
+      when:
+        - proxmox_node == "pve01" # this node does not have an extra ssd slot to mount. yet.
+
     - name: Create Plex ssd metadata directory
       ansible.builtin.file:
         path: "{{ plex_metadata_ssd_root_dir }}"
@@ -41,8 +47,6 @@
     - ansible.builtin.import_role:
         name: akijowski.plex
       vars:
-        # plex_user_id: "{{ plex_user_id }}"
-        # plex_group_id: "{{ plex_group_id }}"
         plex_additional_dirs:
         # Make sure the ownership permissions are set on these directories
           - "{{ plex_libraries_root_dir }}/audio/music"
@@ -65,6 +69,12 @@
         name:
           - rsync
         state: latest
+
+    - name: Change Plex ssd metadata directory
+      ansible.builtin.set_fact:
+        plex_metadata_ssd_root_dir: "/opt/ssd/plexmetadata"
+      when:
+        - proxmox_node == "pve01" # this node does not have an extra ssd slot to mount. yet.
 
     - name: Ensure systemd timer and service
       ansible.builtin.template:
@@ -95,6 +105,12 @@
       ansible.builtin.pause:
         prompt: This will overwrite data from the NFS storage pool (it could take a while), specify 'Y' to proceed
       register: seed_metadata
+
+    - name: Change Plex ssd metadata directory
+      ansible.builtin.set_fact:
+        plex_metadata_ssd_root_dir: "/opt/ssd/plexmetadata"
+      when:
+        - proxmox_node == "pve01" # this node does not have an extra ssd slot to mount. yet.
 
     - name: Seed Plex metadata from NFS
       ansible.builtin.copy:
