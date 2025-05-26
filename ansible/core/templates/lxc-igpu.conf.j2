@@ -1,0 +1,16 @@
+lxc.cgroup.devices.allow: c {{ dev_major_id }}:* rwm
+lxc.mount.entry: /dev/dri/card1 dev/dri/card1 none bind,optional,create=file,mode=0666
+lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file
+{# subuid/subgid mappings #}
+{# check permissions in /etc/subuid and /etc/subgid #}
+lxc.idmap: u 0 100000 65536
+{# video #}
+lxc.idmap: g 0 100000 {{ pve_video_gid | int }}
+lxc.idmap: g {{ pve_video_gid }} {{ lxc_video_gid }} 1
+lxc.idmap: g {{ pve_video_gid | int + 1 }} {{ pve_video_gid | int + 100001 }} {{ pve_render_gid | int  - pve_video_gid | int - 1 }}
+{# render #}
+lxc.idmap: g {{ pve_render_gid | int }} {{ lxc_render_gid | int }} 1
+lxc.idmap: g {{ pve_render_gid | int + 1 }} {{ pve_render_gid | int + 100001 }} {{ 65536 - (pve_render_gid | int + 1) }}
+
+lxc.hook.pre-start: sh -c "chown 0:{{ lxc_render_gid | int + 100000 }} /dev/dri/renderD128"
+lxc.hook.post-stop: sh -c "chown 0:render /dev/dri/renderD128"

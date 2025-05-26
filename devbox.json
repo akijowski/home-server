@@ -16,7 +16,8 @@
     "ansible-lint@latest",
     "python312Packages.hvac@latest",
     "vault@latest",
-    "python312Packages.dnspython@latest"
+    "python312Packages.dnspython@latest",
+    "python312Packages.proxmoxer@latest"
   ],
   "shell": {
     "init_hook": [

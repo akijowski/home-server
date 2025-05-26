@@ -1,0 +1,124 @@
+---
+# https://bookstack.swigg.net/books/linux/page/lxc-gpu-access
+# https://www.saninnsalas.com/pass-intel-igpu-to-an-unprivileged-lxc-container-proxmox/
+#
+# NOTE: This play assumes that the 'video' group ID is less than the 'render' group ID
+# The steps in this play should work for an unprivileged container,
+# however I had to create the container as privileged first, then make it unprivileged
+#
+# video pve: 44 lxc: 44
+# render pve:104 lxc: 993
+- name: Configure LXC for iGPU Passthrough
+  hosts:
+    - ubuntu
+  tags:
+    - igpu
+    - gpu
+  vars:
+    # iGPU dev ID
+    dev_major_id: 226
+  tasks:
+    - name: Ensure LXC is running
+      delegate_to: 127.0.0.1
+      community.general.proxmox:
+        vmid: "{{ proxmox_vmid }}"
+        api_host: "proxmox.kijowski.casa"
+        api_port: 8006
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+        node: "{{ proxmox_node }}"
+        state: started
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Get group IDs
+      block:
+        - name: render-lxc
+          ansible.builtin.getent:
+            database: group
+            key: render
+        - ansible.builtin.set_fact:
+            lxc_render_gid: "{{ getent_group.render[1] | int }}"
+        - name: video-lxc
+          ansible.builtin.getent:
+            database: group
+            key: video
+        - ansible.builtin.set_fact:
+            lxc_video_gid: "{{ getent_group.video[1] | int }}"
+        - name: render-pve
+          delegate_to: "{{ proxmox_node }}"
+          ansible.builtin.getent:
+            database: group
+            key: render
+        - ansible.builtin.set_fact:
+            pve_render_gid: "{{ getent_group.render[1] | int }}"
+        - name: video-pve
+          delegate_to: "{{ proxmox_node }}"
+          ansible.builtin.getent:
+            database: group
+            key: video
+        - ansible.builtin.set_fact:
+            pve_video_gid: "{{ getent_group.video[1] | int }}"
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Ensure LXC is not running
+      delegate_to: 127.0.0.1
+      community.general.proxmox:
+        vmid: "{{ proxmox_vmid }}"
+        api_host: "proxmox.kijowski.casa"
+        api_port: 8006
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+        node: "{{ proxmox_node }}"
+        state: stopped
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Ensure permissions to modify subgid
+      delegate_to: "{{ proxmox_node }}"
+      become: true
+      ansible.builtin.blockinfile:
+        dest: "/etc/subgid"
+        content: "{{ lookup('ansible.builtin.template', 'templates/pve-igpu-subgid.j2') }}"
+        state: present
+      when:
+        - proxmox_vmtype == "lxc"
+
+# TODO: only do this once
+    - name: Update LXC configuration
+      delegate_to: "{{ proxmox_node }}"
+      become: true
+      ansible.builtin.blockinfile:
+        dest: "/etc/pve/nodes/{{ proxmox_node }}/lxc/{{ proxmox_vmid }}.conf"
+        content: "{{ lookup('ansible.builtin.template', 'templates/lxc-igpu.conf.j2') }}"
+        insertafter: "^unprivileged: 0" # this is the last line in the file
+        state: present
+        backup: true
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Restart LXC
+      delegate_to: 127.0.0.1
+      community.general.proxmox:
+        vmid: "{{ proxmox_vmid }}"
+        api_host: "proxmox.kijowski.casa"
+        api_port: 8006
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+        node: "{{ proxmox_node }}"
+        state: started
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Give root permissions to video,render
+      ansible.builtin.user:
+        name: root
+        state: present
+        append: true
+        groups:
+          - video
+          - render

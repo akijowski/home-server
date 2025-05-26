@@ -1,6 +1,7 @@
 ---
 # https://docs.ansible.com/ansible/latest/reference_appendices/general_precedence.html
 # use -e 'ansible_user=root' to override the default user set in inventory vars
+# on LXC root is disabled, set /etc/ssh/sshd_config 'PermitRootLogin prohibit-password'
 # Cloud init images no longer need this
 - name: Ensure default users exist
   hosts:

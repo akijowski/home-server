@@ -75,8 +75,7 @@ resource "proxmox_virtual_environment_container" "this" {
       }
     }
     user_account {
-      # assume the first key returned is a valid public key
-      keys     = ["${chomp(split("\n", data.http.github_key.response_body)[0])}"]
+      keys = [ for s in split("\n", data.http.github_key.response_body) : chomp(s) if s != "" ]
       password = var.lxc_root_password
     }
   }
@@ -102,6 +101,7 @@ resource "proxmox_virtual_environment_container" "this" {
 
   started       = false
   start_on_boot = false
+  # plex - first time making container make privileged so the gpu can be mapped
   unprivileged = false
 
 

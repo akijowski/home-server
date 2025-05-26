@@ -757,6 +757,70 @@
         }
       }
     },
+    "python312Packages.proxmoxer@latest": {
+      "last_modified": "2025-05-16T20:19:48Z",
+      "resolved": "github:NixOS/nixpkgs/12a55407652e04dcf2309436eb06fef0d3713ef3#python312Packages.proxmoxer",
+      "source": "devbox-search",
+      "version": "2.2.0-unstable-2025-02-18",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6cb5z43a03y4hpnc7810y17vg2knc4wy-python3.12-proxmoxer-2.2.0-unstable-2025-02-18",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/r52dmjrbam7bpvfpg0h0fiq8bmyxsijw-python3.12-proxmoxer-2.2.0-unstable-2025-02-18-dist"
+            }
+          ],
+          "store_path": "/nix/store/6cb5z43a03y4hpnc7810y17vg2knc4wy-python3.12-proxmoxer-2.2.0-unstable-2025-02-18"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/am005pyispdn17vjvmxba8lnd984jxya-python3.12-proxmoxer-2.2.0-unstable-2025-02-18",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/binbaa9w8h9v6wmagz5n892ja7d77l7j-python3.12-proxmoxer-2.2.0-unstable-2025-02-18-dist"
+            }
+          ],
+          "store_path": "/nix/store/am005pyispdn17vjvmxba8lnd984jxya-python3.12-proxmoxer-2.2.0-unstable-2025-02-18"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/592564p30bg10y4rakznrlpbkkrsrx2m-python3.12-proxmoxer-2.2.0-unstable-2025-02-18",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/q66q83c0bb5k186rmd5sx5dmqxjf35gq-python3.12-proxmoxer-2.2.0-unstable-2025-02-18-dist"
+            }
+          ],
+          "store_path": "/nix/store/592564p30bg10y4rakznrlpbkkrsrx2m-python3.12-proxmoxer-2.2.0-unstable-2025-02-18"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/v6yc6zkyr40gbn4myxpbszi4pa29ln31-python3.12-proxmoxer-2.2.0-unstable-2025-02-18",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/w646j3izc2psz6j4h8dacia7y040gb9c-python3.12-proxmoxer-2.2.0-unstable-2025-02-18-dist"
+            }
+          ],
+          "store_path": "/nix/store/v6yc6zkyr40gbn4myxpbszi4pa29ln31-python3.12-proxmoxer-2.2.0-unstable-2025-02-18"
+        }
+      }
+    },
     "tenv@latest": {
       "last_modified": "2024-10-13T23:44:06Z",
       "resolved": "github:NixOS/nixpkgs/d4f247e89f6e10120f911e2e2d2254a050d0f732#tenv",
