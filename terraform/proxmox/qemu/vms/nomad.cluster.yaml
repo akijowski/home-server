@@ -1,0 +1,72 @@
+---
+nomadclient:
+  - target_node: ${tmpl_node_pve02}
+    description: |-
+      # Nomad Client
+
+      This one does the work
+
+      https://developer.hashicorp.com/nomad
+    tags:
+      - nomad
+      - client
+      - ubuntu
+      - ansible
+    ipv4_addr: 'dhcp'
+    extra_network_devices:
+      vmbr50:
+        bridge: vmbr50
+        vlan_id: 0
+    cores: 3
+    memory: 6144 # 6 GiB
+    # usb_devices:
+    #   dvdrom:
+    #     mapping: dvdrom-path
+    #     usb3: true
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 75
+  - target_node: ${tmpl_node_pve01}
+    description: |-
+      # Nomad Client
+
+      This one does the work
+      Backup node
+
+      https://developer.hashicorp.com/nomad
+    tags:
+      - nomad
+      - client
+      - ubuntu
+      - ansible
+    started: false # this is a manual node used for backups
+    ipv4_addr: 'dhcp'
+    extra_network_devices:
+      vmbr50:
+        bridge: vmbr50
+        vlan_id: 0
+    cores: 3
+    memory: 6144 # 6 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 75
+nomadserver:
+  - target_node: ${tmpl_node_pve01}
+    description: |-
+      # Nomad Server
+
+      https://developer.hashicorp.com/nomad
+    tags:
+      - nomad
+      - server
+      - ubuntu
+      - ansible
+    ipv4_addr: 'dhcp'
+    cores: 1
+    memory: 1024 # 1 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 20

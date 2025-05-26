@@ -4,7 +4,7 @@ variable "pve_url" {
 }
 
 variable "lxc_root_password" {
-  type = string
+  type        = string
   description = "Default root password for LXC containers"
-  sensitive = true
+  sensitive   = true
 }

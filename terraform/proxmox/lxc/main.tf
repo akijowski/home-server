@@ -19,7 +19,7 @@ locals {
     tmpl_node_hyperion = local.hyperion
     tmpl_node_pve01    = local.pve01
     tmpl_node_pve02    = local.pve02
-    tmpl_lxc_ubuntu = local.lxc_ubuntu
+    tmpl_lxc_ubuntu    = local.lxc_ubuntu
   }
   pve_lxcs = merge(
     yamldecode(templatefile("${path.module}/lxcs.yaml", local.tmpl_vars))
@@ -34,13 +34,13 @@ locals {
 }
 
 data "http" "github_key" {
-    url = "https://github.com/akijowski.keys"
+  url = "https://github.com/akijowski.keys"
 
-    retry {
-        attempts = 3
-        max_delay_ms = 30000
-        min_delay_ms = 500
-    }
+  retry {
+    attempts     = 3
+    max_delay_ms = 30000
+    min_delay_ms = 500
+  }
 }
 
 resource "proxmox_virtual_environment_container" "this" {
@@ -61,7 +61,7 @@ resource "proxmox_virtual_environment_container" "this" {
       for_each = try(each.value.dns, {})
 
       content {
-        domain = dns.value.domain
+        domain  = dns.value.domain
         servers = dns.value.servers
       }
     }
@@ -75,7 +75,7 @@ resource "proxmox_virtual_environment_container" "this" {
       }
     }
     user_account {
-      keys = [ for s in split("\n", data.http.github_key.response_body) : chomp(s) if s != "" ]
+      keys     = [for s in split("\n", data.http.github_key.response_body) : chomp(s) if s != ""]
       password = var.lxc_root_password
     }
   }
@@ -95,8 +95,8 @@ resource "proxmox_virtual_environment_container" "this" {
   }
 
   disk {
-      datastore_id = try(each.value.disk.store_id, "local-lvm")
-      size = each.value.disk.size
+    datastore_id = try(each.value.disk.store_id, "local-lvm")
+    size         = each.value.disk.size
   }
 
   started       = false
@@ -114,6 +114,6 @@ resource "proxmox_virtual_environment_container" "this" {
   tags = sort(try(each.value.tags, []))
 
   lifecycle {
-    ignore_changes = [ started ]
+    ignore_changes = [started]
   }
 }

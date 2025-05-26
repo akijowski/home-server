@@ -9,10 +9,11 @@ resource "proxmox_virtual_environment_vm" "this" {
   description = "${var.description}\n\n_Managed by Terraform_"
   tags        = sort(toset(concat(var.extra_tags, local.default_tags)))
 
-  node_name = var.target_node
-  on_boot   = var.on_boot
-  started   = var.started
-  reboot    = false # if true, seems to always reboot :(
+  node_name           = var.target_node
+  on_boot             = var.on_boot
+  started             = var.started
+  reboot              = true  # reboot after creation
+  reboot_after_update = false # reboot after updates
 
   agent {
     type = "virtio"
@@ -111,7 +112,9 @@ resource "proxmox_virtual_environment_vm" "this" {
     ignore_changes = [
       # Helps avoid issues when importing and dealing with cloud-init
       initialization[0].user_account,
-      clone
+      clone,
+      reboot,
+      reboot_after_update
     ]
   }
 }
