@@ -1,10 +1,10 @@
 ---
-- name: Install Plex
+- name: Mount Directories for Plex
   hosts: plex
-  debugger: on_failed
   become: true
   tags:
-    - install
+    - mount
+    - nfs
 
   tasks:
     - name: Install additional packages
@@ -16,7 +16,7 @@
 
     - name: Mount NFS directories
       ansible.posix.mount:
-        src: "{{ item.host }}:{{ item.source_path}}"
+        src: "{{ item.host }}:{{ item.source_path }}"
         path: "{{ item.dest_path }}"
         opts: "{{ item.opts }}"
         state: "{{ item.state }}"
@@ -24,6 +24,14 @@
         fstype: nfs
       loop: "{{ nfs_mounts }}"
 
+- name: Install Plex
+  hosts: plex
+  debugger: on_failed
+  become: true
+  tags:
+    - install
+
+  tasks:
     - name: Change Plex ssd metadata directory
       ansible.builtin.set_fact:
         plex_metadata_ssd_root_dir: "/opt/ssd/plexmetadata"

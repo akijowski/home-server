@@ -1,0 +1,106 @@
+---
+- name: Initialize Plex (LXC)
+  hosts: plex
+  debugger: on_failed
+  tags:
+    - init
+
+  tasks:
+    - name: Mount NFS directories on host (PVE)
+      delegate_to: "{{ proxmox_node }}"
+      become: true
+      ansible.posix.mount:
+        src: "{{ item.host }}:{{ item.source_path }}"
+        path: "{{ item.dest_path }}"
+        opts: "{{ item.opts }}"
+        state: "{{ item.state }}"
+        boot: "{{ item.boot }}"
+        fstype: nfs
+      loop: "{{ nfs_mounts }}"
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Ensure LXC is not running
+      delegate_to: 127.0.0.1
+      community.general.proxmox:
+        vmid: "{{ proxmox_vmid }}"
+        api_host: "proxmox.kijowski.casa"
+        api_port: 8006
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+        node: "{{ proxmox_node }}"
+        state: stopped
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Ensure permissions to modify subgid
+      delegate_to: "{{ proxmox_node }}"
+      become: true
+      ansible.builtin.blockinfile:
+        dest: "/etc/subgid"
+        content: "{{ lookup('ansible.builtin.template', 'templates/pve-idmap-plex.j2') }}"
+        state: present
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Ensure permissions to modify subuid
+      delegate_to: "{{ proxmox_node }}"
+      become: true
+      ansible.builtin.blockinfile:
+        dest: "/etc/subuid"
+        content: "{{ lookup('ansible.builtin.template', 'templates/pve-idmap-plex.j2') }}"
+        state: present
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Update LXC configuration
+      delegate_to: "{{ proxmox_node }}"
+      become: true
+      ansible.builtin.template:
+        dest: "/etc/pve/nodes/{{ proxmox_node }}/lxc/{{ proxmox_vmid }}.conf"
+        src: "templates/plex-lxc.conf.j2"
+        backup: true
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Restart LXC
+      delegate_to: 127.0.0.1
+      community.general.proxmox:
+        vmid: "{{ proxmox_vmid }}"
+        api_host: "proxmox.kijowski.casa"
+        api_port: 8006
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+        node: "{{ proxmox_node }}"
+        state: started
+      when:
+        - proxmox_vmtype == "lxc"
+
+    - name: Give root permissions to video,render
+      ansible.builtin.user:
+        name: root
+        state: present
+        append: true
+        groups:
+          - video
+          - render
+
+    - name: Update packages
+      become: true
+      ansible.builtin.apt:
+        upgrade: true
+        state: present
+
+    - name: Install gpu packages
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+        autoclean: true
+        autoremove: true
+        cache_valid_time: 86400 # 1 day
+        name:
+          - intel-opencl-icd
+          - intel-gpu-tools # intel_gpu_top
+        state: latest

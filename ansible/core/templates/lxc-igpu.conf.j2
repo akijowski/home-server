@@ -3,14 +3,28 @@ lxc.mount.entry: /dev/dri/card1 dev/dri/card1 none bind,optional,create=file,mod
 lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file
 {# subuid/subgid mappings #}
 {# check permissions in /etc/subuid and /etc/subgid #}
+{# https://hywax.space/projects/lxc-id-mapper #}
+{% if plex_user_id is defined %}
+lxc.idmap: u 0 100000 {{ plex_user_id }}
+lxc.idmap: u {{ plex_user_id }} {{ plex_user_id }} 1
+lxc.idmap: u {{ plex_user_id | int + 1 }} {{ plex_user_id | int + 100001 }} {{ 65536 - (plex_user_id | int + 1) }}
+{% else %}
 lxc.idmap: u 0 100000 65536
+{% endif %}
 {# video #}
 lxc.idmap: g 0 100000 {{ pve_video_gid | int }}
 lxc.idmap: g {{ pve_video_gid }} {{ lxc_video_gid }} 1
 lxc.idmap: g {{ pve_video_gid | int + 1 }} {{ pve_video_gid | int + 100001 }} {{ pve_render_gid | int  - pve_video_gid | int - 1 }}
 {# render #}
 lxc.idmap: g {{ pve_render_gid | int }} {{ lxc_render_gid | int }} 1
+{# carve out for plex #}
+{% if plex_group_id is defined %}
+lxc.idmap: g {{ pve_render_gid | int + 1 }} {{ pve_render_gid | int + 100001 }} {{ plex_group_id | int - pve_render_gid | int - 1 }}
+lxc.idmap: g {{ plex_group_id }} {{ plex_group_id }} 1
+lxc.idmap: g {{ plex_group_id | int + 1 }} {{ plex_group_id | int + 100001 }} {{ 65536 - (plex_group_id | int + 1) }}
+{% else %}
 lxc.idmap: g {{ pve_render_gid | int + 1 }} {{ pve_render_gid | int + 100001 }} {{ 65536 - (pve_render_gid | int + 1) }}
+{% endif %}
 
 lxc.hook.pre-start: sh -c "chown 0:{{ lxc_render_gid | int + 100000 }} /dev/dri/renderD128"
 lxc.hook.post-stop: sh -c "chown 0:render /dev/dri/renderD128"

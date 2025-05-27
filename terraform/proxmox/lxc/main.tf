@@ -102,7 +102,7 @@ resource "proxmox_virtual_environment_container" "this" {
   started       = false
   start_on_boot = false
   # plex - first time making container make privileged so the gpu can be mapped
-  unprivileged = false
+  unprivileged = true
 
 
   # features {

@@ -1,5 +1,5 @@
 ---
-- ansible.builtin.import_tasks: ensure_user_group_dir.yml
+- ansible.builtin.import_tasks: ensure_user_group_dir.yaml
 
 - name: Ensure Plex repo GPG key is installed
   ansible.builtin.get_url:
@@ -21,6 +21,6 @@
       - plexmediaserver
     state: latest
 
-- ansible.builtin.import_tasks: ensure_ufw.yml
+- ansible.builtin.import_tasks: ensure_ufw.yaml
 
-- ansible.builtin.import_tasks: ensure_systemd_conf.yml
+- ansible.builtin.import_tasks: ensure_systemd_conf.yaml

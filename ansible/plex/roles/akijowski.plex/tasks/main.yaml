@@ -1,10 +1,10 @@
 ---
-- ansible.builtin.import_tasks: preflight.yml
+- ansible.builtin.import_tasks: preflight.yaml
   become: true
   tags:
     - plex_install
 
-- ansible.builtin.import_tasks: install.yml
+- ansible.builtin.import_tasks: install.yaml
   become: true
   tags:
     - plex_install

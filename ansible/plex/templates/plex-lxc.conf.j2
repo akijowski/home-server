@@ -1,0 +1,44 @@
+## Plexmediaserver
+#
+#https%3A//plex.tv
+arch: amd64
+cmode: tty
+console: 1
+cores: 4
+cpuunits: 1024
+features: nesting=1
+hostname: plex-lxc0
+memory: 6144
+mp0: {{ plex_libraries_root_dir }}/video/movies,mp={{ plex_libraries_root_dir }}/video/movies
+mp1: {{ plex_libraries_root_dir }}/video/uhd-movies,mp={{ plex_libraries_root_dir }}/video/uhd-movies
+mp2: {{ plex_libraries_root_dir }}/video/tv-shows,mp={{ plex_libraries_root_dir }}/video/tv-shows
+mp3: {{ plex_libraries_root_dir }}/video/9round,mp={{ plex_libraries_root_dir }}/video/9round
+mp4: {{ plex_libraries_root_dir }}/audio/music,mp={{ plex_libraries_root_dir }}/audio/music
+mp5: {{ plex_metadata_nfs_root_dir }},mp={{ plex_metadata_nfs_root_dir }}
+nameserver: 192.168.50.1
+net0: name=eth0,bridge=vmbr50,gw=192.168.50.1,hwaddr=BC:24:11:1E:37:A1,ip=192.168.50.10/24,ip6=dhcp,type=veth
+onboot: 0
+ostype: ubuntu
+protection: 0
+rootfs: local-lvm:vm-101-disk-0,size=64G
+searchdomain: home.arpa
+swap: 2048
+tags: ansible;lxc;plex;terraform;ubuntu
+template: 0
+tty: 2
+unprivileged: 1
+lxc.cgroup.devices.allow: c 226:* rwm
+lxc.mount.entry: /dev/dri/card1 dev/dri/card1 none bind,optional,create=file,mode=0666
+lxc.mount.entry: /dev/dri/renderD128 dev/dri/renderD128 none bind,optional,create=file
+lxc.idmap: u 0 100000 1800
+lxc.idmap: u 1800 1800 1
+lxc.idmap: u 1801 101801 63735
+lxc.idmap: g 0 100000 44
+lxc.idmap: g 44 44 1
+lxc.idmap: g 45 100045 59
+lxc.idmap: g 104 993 1
+lxc.idmap: g 105 100105 1695
+lxc.idmap: g 1800 1800 1
+lxc.idmap: g 1801 101801 63735
+lxc.hook.pre-start: sh -c "chown 0:100993 /dev/dri/renderD128"
+lxc.hook.post-stop: sh -c "chown 0:render /dev/dri/renderD128"
