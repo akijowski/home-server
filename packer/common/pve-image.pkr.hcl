@@ -1,8 +1,14 @@
 packer {
   required_plugins {
     proxmox = {
-      version = "~> 1"
+      # version = "~> 1"
+      # https://github.com/hashicorp/packer-plugin-proxmox/issues/307
+      version = "1.2.1"
       source  = "github.com/hashicorp/proxmox"
+    }
+    ansible = {
+      source  = "github.com/hashicorp/ansible"
+      version = "~> 1"
     }
   }
 }
@@ -27,7 +33,7 @@ source "proxmox-iso" "image" {
 
   // System
   machine    = "q35"
-  bios       = "seabios"
+  bios       = var.vm_bios == "ovmf" ? "ovmf" : "seabios"
   qemu_agent = true
 
   // Disks

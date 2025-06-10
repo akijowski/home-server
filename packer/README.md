@@ -11,12 +11,16 @@ This configuration is based off the work of [ChristianLempa](https://github.com/
 Additional configuration is based off of [packer-proxmox-template](https://github.com/trfore/packer-proxmox-templates/tree/main).
 I trimmed it down to meet my more limited use case.
 
+## Working Directory
+
+It is assumed all commands are run from `./packer`.
+
 ## Formatting
 
 Format packer files
 
 ```bash
-packer fmt -recursive ./packer
+packer fmt -recursive .
 ```
 
 ## Validating
@@ -24,8 +28,8 @@ packer fmt -recursive ./packer
 Validate the packer template
 
 ```bash
-packer init ./packer/common
-packer validate ./packer/ubuntu
+packer init ./common
+packer validate ./ubuntu
 ```
 
 ## Build
@@ -33,8 +37,8 @@ packer validate ./packer/ubuntu
 Build all templates
 
 ```bash
-packer init ./packer/common
-packer build ./packer/ubuntu
+packer init ./common
+packer build ./ubuntu
 ```
 
 Build specific template
@@ -49,3 +53,4 @@ packer build -only=proxmox-iso.ubuntu24-pve01 .
 [Proxmox ISO Plugin](https://developer.hashicorp.com/packer/integrations/hashicorp/proxmox)
 [Cloud-Init Reference](https://cloudinit.readthedocs.io/en/latest/reference/index.html)
 [Ubuntu Autoinstall Reference](https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html)
+[Proxmox Packer Examples](https://github.com/ajschroeder/proxmox-packer-examples/tree/main)

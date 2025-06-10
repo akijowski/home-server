@@ -1,0 +1,22 @@
+---
+- name: "Checking Red Hat Subscription Manager status."
+  ansible.builtin.shell: "subscription-manager refresh"
+  when: "ansible_facts['distribution'] == 'RedHat'"
+
+- block:
+  - name: "Updating the guest operating system."
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+      update_cache: "yes"
+
+  - name: "Installing additional packages."
+    ansible.builtin.dnf:
+      name: "{{ additional_packages[ansible_os_family] }}"
+      state: latest
+
+- name: "Installing cloud-init."
+  become: true
+  ansible.builtin.dnf:
+    name: cloud-init
+    state: latest

@@ -1,0 +1,4 @@
+---
+- name: Prepare the {{ ansible_facts['distribution'] }} guest operating system
+  include_tasks: redhat.yaml
+  when: "ansible_facts['distribution'] in ['RedHat', 'CentOS', 'Rocky', 'AlmaLinux', 'OracleLinux']"

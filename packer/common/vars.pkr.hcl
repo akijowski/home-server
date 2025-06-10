@@ -83,6 +83,8 @@ variable "iso_url" {
   default = {
     "debian12" = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.7.0-amd64-netinst.iso"
     "ubuntu24" = "https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso"
+    "rocky8"   = ""
+    "rocky9"   = "https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
   }
 }
 
@@ -91,6 +93,7 @@ variable "iso_file" {
   default = {
     "debian12" = ""
     "ubuntu24" = "nfs-isos:iso/ubuntu-24.04.1-live-server-amd64.iso"
+    "rocky9"   = "nfs-isos:iso/Rocky-9.5-x86_64-minimal.iso"
   }
 }
 
@@ -99,6 +102,7 @@ variable "iso_checksum" {
   default = {
     "debian12" = "file:https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/SHA256SUMS"
     "ubuntu24" = "file:https://releases.ubuntu.com/24.04/SHA256SUMS"
+    "rocky9"   = "file:https://download.rockylinux.org/pub/rocky/9/isos/x86_64/CHECKSUM"
   }
 }
 
@@ -128,6 +132,23 @@ variable "boot_cmd_debian" {
   ]
 }
 
+variable "boot_cmd_rocky9" {
+  description = "Boot command for Rockylinux"
+  type        = list(string)
+  default = [
+    // This sends the "up arrow" key, typically used to navigate through boot menu options.
+    "<up>",
+    // This sends the "e" key. In the GRUB boot loader, this is used to edit the selected boot menu option.
+    "e",
+    // This sends two "down arrow" keys, followed by the "end" key, and then waits. This is used to navigate to a specific line in the boot menu option's configuration.
+    "<down><down><end><wait>",
+    // This is used to modify the boot menu option's configuration to boot in text mode and specify the kickstart data source configured in the common variables.
+    "text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg",
+    // This sends the "enter" key, waits, turns on the left control key, sends the "x" key, and then turns off the left control key. This is used to save the changes and exit the boot menu option's configuration, and then continue the boot process.
+    "<enter><wait><leftCtrlOn>x<leftCtrlOff>"
+  ]
+}
+
 // Image vars
 variable "target_node" {
   description = "Target node to create the template"
@@ -143,4 +164,10 @@ variable "vm_id" {
   description = "The template VM ID. Setting to 0 will use the next available. Setting to -1 will use defaults defined by the source. Only use this with the -only flag to create a single image on a single node"
   type        = number
   default     = -1
+}
+
+variable "vm_bios" {
+  description = "BIOS configuration for VM. Default to seabios. Allowed [seabios, ovmf]"
+  type        = string
+  default     = "seabios"
 }

@@ -1,0 +1,9 @@
+---
+task_name: "Update the operating system and install additional packages."
+additional_packages:
+  RedHat:
+    - ca-certificates
+    - curl
+    - python3
+    - unzip
+    - wget
