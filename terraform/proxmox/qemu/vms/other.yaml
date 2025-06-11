@@ -9,6 +9,7 @@ plex:
       - plex
       - ubuntu
       - ansible
+    started: false # This VM has been disabled and is now an LXC with iGPU
     ipv4_addr: '192.168.50.10/24'
     ipv4_gw: '192.168.50.1'
     network_bridge: "vmbr50" # custom bridge set up for VLAN50
@@ -74,3 +75,26 @@ localdns:
       virtio0:
         interface: virtio0
         size: 20
+cockpit:
+  - target_node: ${tmpl_node_pve01}
+    vm_template: 8201 # RockyLinux on pve01
+    started: false #disable for now
+    bios: ovmf #uefi
+    description: |-
+      # Fileserver with Cockpit
+
+      https://cockpit-project.org
+    tags:
+      - cockpit
+      - fileserver
+      - rockylinux
+      - ansible
+    ipv4_addr: '192.168.50.12/24'
+    ipv4_gw: '192.168.50.1'
+    network_bridge: "vmbr50" # custom bridge set up for VLAN50
+    cores: 3
+    memory: 6144 # 6 GiB
+    disks:
+      virtio0:
+        interface: virtio0
+        size: 32

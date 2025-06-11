@@ -13,6 +13,12 @@ variable "vm_template_id" {
   description = "The VM Template ID on the Node"
 }
 
+variable "vm_bios" {
+  type        = string
+  description = "VM BIOS configuration. Either seabios (legacy) or ovmf (uefi)"
+  default     = "seabios"
+}
+
 variable "ipv4_addr" {
   type        = string
   description = "IPv4 address in CIDR (e.g. 1.2.3.4/24)"

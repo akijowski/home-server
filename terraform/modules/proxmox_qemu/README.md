@@ -168,6 +168,14 @@ Type: `number`
 
 Default: `0`
 
+### <a name="input_vm_bios"></a> [vm\_bios](#input\_vm\_bios)
+
+Description: VM BIOS configuration. Either seabios (legacy) or ovmf (uefi)
+
+Type: `string`
+
+Default: `"seabios"`
+
 ### <a name="input_vm_id"></a> [vm\_id](#input\_vm\_id)
 
 Description: The VM ID to use

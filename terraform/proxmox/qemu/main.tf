@@ -11,7 +11,7 @@ locals {
 
   usb_devices = {
     "dvdrom" = {
-      node    = local.pve01
+      node    = local.pve02
       comment = "usb3.0 blu-ray dvd-rom"
       id      = "174c:55aa"
       path    = "8-1"
@@ -46,13 +46,14 @@ module "pve_vms" {
 
   hostname       = try(each.value.hostname, each.key)
   target_node    = each.value.target_node
-  vm_template_id = local.pve_templates[each.value.target_node]
+  vm_template_id = try(each.value.vm_template, local.pve_templates[each.value.target_node])
 
   started = try(each.value.started, true)
   on_boot = try(each.value.on_boot, false)
 
-  cores  = try(each.value.cores, null)
-  memory = try(each.value.memory, null)
+  vm_bios = try(each.value.bios, "seabios")
+  cores   = try(each.value.cores, null)
+  memory  = try(each.value.memory, null)
 
   disks = each.value.disks
 

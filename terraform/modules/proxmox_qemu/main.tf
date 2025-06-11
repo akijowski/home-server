@@ -28,7 +28,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     full  = true
   }
 
-  bios = "seabios"
+  bios = var.vm_bios
 
   cpu {
     cores   = var.cores
@@ -43,6 +43,14 @@ resource "proxmox_virtual_environment_vm" "this" {
   boot_order = [var.disks[local.default_disk_id].interface, "net0", "ide0"]
 
   scsi_hardware = "virtio-scsi-single"
+
+  dynamic "efi_disk" {
+    for_each = var.vm_bios == "ovmf" ? [1] : []
+
+    content {
+      type = "4m"
+    }
+  }
 
   dynamic "disk" {
     for_each = var.disks
