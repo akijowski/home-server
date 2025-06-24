@@ -15,5 +15,7 @@ ns1.{{ item.key }}.    IN    A    {{ item.value.zone_server_ip }}
 
 ; reverse servers
 {% for srv in item.value.zone_servers %}
+{% if (srv.ipv4 is defined) and srv.ipv4 %}
 {{ srv.ipv4 | split('.') | last }} IN  PTR {{ srv.prefix }}.{{ item.key }}
+{% endif %}
 {% endfor %}
