@@ -35,6 +35,30 @@
     name: "nomad"
     state: present
 
+- name: Ensure systemd overrides directory
+  ansible.builtin.file:
+    path: "/etc/systemd/system/nomad.service.d"
+    state: directory
+    mode: 0644
+    owner: root
+    group: root
+  when: nomad_client | default(False)
+
+- name: Copy systemd overrides
+  ansible.builtin.template:
+    src: "nomad-client-override.conf.j2"
+    dest: "/etc/systemd/system/nomad.service.d/10-client-override.conf"
+    mode: 0644
+    owner: root
+    group: root
+  when: nomad_client | default(False)
+  register: _nomad_client_conf
+
+- name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when: _nomad_client_conf.changed
+
 # Nomad starts on install which complicates configuration changes
 - name: Ensure Nomad is Reset
   block:

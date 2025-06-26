@@ -1,0 +1,6 @@
+{# https://github.com/hashicorp/nomad-driver-podman/issues/363#issuecomment-2248529182 #}
+{# https://docs.podman.io/en/latest/markdown/podman-auto-update.1.html#systemd-unit-and-timer #}
+{# After updating images, prune old ones #}
+[Service]
+ExecStartPost=
+ExecStartPost=/usr/bin/podman image prune -a -f
