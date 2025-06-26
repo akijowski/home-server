@@ -26,7 +26,7 @@ locals {
       vars = {
         datacenters           = jsonencode(local.any_dcs)
         namespace             = jsonencode(local.namespaces["core"].name)
-        traefik_image_version = "v3.2"
+        traefik_image_version = "v3.4"
         domain                = "kijowski.casa"
         # pinned to this IP
         # Deprecated for DHCP and private DNS
@@ -48,7 +48,7 @@ locals {
       vars = {
         datacenters              = jsonencode(local.any_dcs)
         namespace                = jsonencode(local.namespaces["core"].name)
-        homebridge_image_version = "2025-02-26"
+        homebridge_image_version = "2025-06-10"
       }
     }
     "fileflows" = {
@@ -122,14 +122,14 @@ locals {
         ]
       }
     }
-    "registry" = {
-      vars = {
-        datacenters           = jsonencode(local.any_dcs)
-        namespace             = jsonencode(local.namespaces["core"].name)
-        registry_ui_image_tag = "2.5-debian"
-        registry_image_tag    = "2.8"
-      }
-    }
+    # "registry" = {
+    #   vars = {
+    #     datacenters           = jsonencode(local.any_dcs)
+    #     namespace             = jsonencode(local.namespaces["core"].name)
+    #     registry_ui_image_tag = "2.5-debian"
+    #     registry_image_tag    = "2.8"
+    #   }
+    # }
   }
   nfs_volumes = {
     "traefik-acme" = {
