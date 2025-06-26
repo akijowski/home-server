@@ -5,6 +5,7 @@ roles:
   - name: xanmanning.k3s
   # - name: geerlingguy.docker
   # - name: cloudalchemy.node_exporter
+  - name: linux-system-roles.cockpit # https://galaxy.ansible.com/ui/standalone/roles/linux-system-roles/cockpit/documentation/
 
 collections:
   - name: ansible.posix

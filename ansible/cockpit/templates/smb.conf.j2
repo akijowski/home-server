@@ -1,0 +1,122 @@
+{{ ansible_managed | comment }}
+
+[global]
+    # vfs objects = recycle fruit streams_xattr
+    vfs objects = fruit streams_xattr
+    # recycle:touch = yes
+    panic action = /usr/share/samba/panic-action %d
+    # recycle:versions = yes
+    delete user script = /usr/sbin/userdel -r '%u'
+    log file = /var/log/samba/samba.log
+    wins support = yes
+    server string = RockyLinux Cockpit
+    # recycle:exclude_dir = tmp quarantine
+    passwd program = /usr/bin/passwd %u
+    # recycle:keeptree = yes
+    passdb backend = tdbsam
+    os level = 20
+    workgroup = WORKGROUP
+    pam password change = yes
+    delete group script = /usr/sbin/groupdel '%g'
+    netbios name = FILESERVER
+    max log size = 1000
+    # deprecated - encrypt passwords = true
+    restrict anonymous = 2
+    socket options = SO_KEEPALIVE TCP_NODELAY IPTOS_LOWDELAY
+    guest account = nobody
+    unix password sync = yes
+    dns proxy = no
+    obey pam restrictions = yes
+    # deprecated - syslog = 0
+    passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+    add user to group script = /usr/sbin/usermod -G '%g' '%u'
+    add user script = /usr/sbin/useradd -m '%u' -g users -G users
+    admin users = root
+    security = user
+    add group script = /usr/sbin/groupadd '%g'
+
+# Apple config
+# https://wiki.samba.org/index.php/Configure_Samba_to_Work_Better_with_Mac_OS_X
+    fruit:metadata = stream
+    fruit:veto_appledouble = yes
+    fruit:posix_rename = yes
+    fruit:zero_file_id = yes
+    fruit:wipe_intentially_left_blank_rfork = yes
+    fruit:delete_empty_adfiles = yes
+    fruit:model = iMacPro1,1
+    fruit:advertise_fullsync = true
+    fruit:aapl = yes
+
+# Prevent junk Apple files
+    veto files = /._*/.DS_Store/.Trashes/.TemporaryItems
+    delete veto files = yes
+
+# Performance Tweaks (most of these are default)
+# https://www.oreilly.com/openbook/samba/book/appb.pdf
+# https://www.reddit.com/r/truenas/comments/lrbjz8/truenas120u2_slow_smb_transfer_rates/
+# https://top-frog.com/2020/07/03/osx-samba-with-linux-server/
+    server signing = no
+    ea support = yes
+    read raw = yes
+    write raw = yes
+    strict locking = no
+    oplocks = yes
+    deadtime = 15
+    getwd cache = yes
+    max xmit = 65535
+    use sendfile = true
+    aio read size = 16384
+    aio write size = 16384
+
+
+[homes]
+    comment = Home Directory
+    browseable = no
+    read only = no
+    valid users = %S
+
+[etc]
+    browseable = yes
+    read only = no
+    create mask = 0644
+    directory mask = 0755
+
+    force user = sambaetc
+    force group = sambaetc
+    path = /mnt/nfs/samba/etc
+    comment = samba etc folder shares
+
+[plex-movies]
+    force group = plex
+    comment = plex movies
+    force user = plex
+    path = /mnt/nfs/plex/movies
+    copy = etc
+
+[plex-uhd-movies]
+    comment = plex uhd movies
+    force group = plex
+    path = /mnt/nfs/plex/uhd-movies
+    force user = plex
+    copy = etc
+
+[plex-tv-shows]
+    path = /mnt/nfs/plex/tv-shows
+    comment = plex tv shows
+    force user = plex
+    force group = plex
+    copy = etc
+
+[arm-media]
+    force group = arm
+    force user = arm
+    path = /mnt/nfs/arm/media
+    comment = arm media
+    copy = etc
+
+# [backup]
+# 	comment = Samba Backups
+# 	copy = etc
+# 	path = /opt/share/backup
+# 	force user = sambaetc
+# 	force group = sambaetc

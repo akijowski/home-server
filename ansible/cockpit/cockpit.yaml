@@ -1,0 +1,231 @@
+---
+- name: Configure system
+  hosts: cockpit0
+  become: true
+  tags:
+    - config
+  vars:
+    truenas_ipv4: '10.10.10.4'
+    # default NFS mount options: https://linux.die.net/man/5/nfs
+    mount_opts: "defaults,bg,intr,_netdev,retry=5"
+    mount_base_dir: "/mnt/nfs"
+    nfs_mounts:
+      - host: '{{ truenas_ipv4 }}'
+        source_path: '/mnt/tank0400/samba/etc'
+        dest_path: '{{ mount_base_dir }}/samba/etc'
+        opts: "{{ mount_opts }}"
+        state: mounted
+        boot: true
+      - host: '{{ truenas_ipv4 }}'
+        source_path: '/mnt/tank1600/autoripm/media'
+        dest_path: '{{ mount_base_dir }}/arm/media'
+        opts: "{{ mount_opts }}"
+        state: mounted
+        boot: true
+      - host: '{{ truenas_ipv4 }}'
+        source_path: '/mnt/tank1600/plex/libraries/video/movies'
+        dest_path: '{{ mount_base_dir }}/plex/movies'
+        opts: "{{ mount_opts }}"
+        state: mounted
+        boot: true
+      - host: '{{ truenas_ipv4 }}'
+        source_path: '/mnt/tank1600/plex/libraries/video/uhd-movies'
+        dest_path: '{{ mount_base_dir }}/plex/uhd-movies'
+        opts: "{{ mount_opts }}"
+        state: mounted
+        boot: true
+      - host: '{{ truenas_ipv4 }}'
+        source_path: '/mnt/tank1600/plex/libraries/video/tv-shows'
+        dest_path: '{{ mount_base_dir }}/plex/tv-shows'
+        opts: "{{ mount_opts }}"
+        state: mounted
+        boot: true
+
+  tasks:
+    - name: Assert Redhat release (dnf required)
+      ansible.builtin.assert:
+        that: "ansible_os_family == 'RedHat'"
+        msg: "This module only works with Redhat releases"
+
+    - name: Update packages
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
+
+    - name: Install dependencies
+      ansible.builtin.dnf:
+        name:
+        # https://github.com/45drives/cockpit-identities?tab=readme-ov-file#generic-installation
+          - bash
+          - coreutils
+          - glibc-common
+          - hostname
+          - passwd
+          - psmisc
+          - samba-common-tools
+          - shadow-utils
+          - sudo
+          - util-linux
+          - util-linux-user
+          - perl
+          - openssh
+          #
+          - samba
+          - samba-client
+          - nfs-utils
+          - nfs4-acl-tools
+        state: latest
+
+    - name: Ensure samba services
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+        daemon_reload: true
+      with_items:
+        - smb
+        - nmb
+
+    - name: Mount NFS directories
+      ansible.posix.mount:
+        src: "{{ item.host }}:{{ item.source_path }}"
+        path: "{{ item.dest_path }}"
+        opts: "{{ item.opts }}"
+        state: "{{ item.state }}"
+        boot: "{{ item.boot }}"
+        fstype: nfs
+      loop: "{{ nfs_mounts }}"
+
+    - name: Add admin (login) group
+      ansible.builtin.group:
+        name: admin
+        state: present
+
+    - name: Add admin (login) user
+      ansible.builtin.user:
+        name: admin
+        group: admin
+        # set the password manually
+        comment: Admin User
+        append: true
+        groups: sudo
+        shell: /bin/bash
+
+    - name: Add admin to sudoers
+      community.general.sudoers:
+        name: admin
+        user: admin
+        commands: ALL
+        state: present
+
+    - name: Configure default groups
+      ansible.builtin.group:
+        name: "{{ item.name }}"
+        gid: "{{ item.gid }}"
+        state: "{{ item.state }}"
+      with_items:
+        - name: sambaetc
+          gid: 1200
+          state: present
+        - name: arm
+          gid: 1400
+          state: present
+        - name: plex
+          gid: 1800
+          state: present
+
+    - name: Configure default users
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        uid: "{{ item.uid }}"
+        comment: "{{ item.comment }}"
+        create_home: "{{ item.has_home | default(False) }}"
+        group: "{{ item.group }}"
+        state: "{{ item.state }}"
+      with_items:
+        - name: sambaetc
+          uid: 1200
+          comment: samba-etc shares
+          group: sambaetc
+          state: present
+        - name: arm
+          uid: 1400
+          comment: automatic-ripping-machine
+          group: arm
+          state: present
+        - name: plex
+          uid: 1800
+          comment: plex-media-server
+          group: plex
+          state: present
+
+- name: Configure Samba
+  hosts: cockpit0
+  become: true
+  tags:
+    - samba
+
+  tasks:
+  # https://github.com/45Drives/cockpit-file-sharing/issues/27#issuecomment-1026164084
+    - name: Ensure Samba Config
+      ansible.builtin.template:
+        src: templates/smb.conf.j2
+        dest: /etc/samba/smb.import.conf
+        owner: root
+        group: root
+        mode: 0644
+        backup: true
+        validate: /bin/testparm -s %s
+
+    - name: Ensure Samba Config is imported
+      ansible.builtin.command:
+        cmd: net conf import /etc/samba/smb.import.conf
+
+    - name: Ensure Base Samba Config
+      ansible.builtin.copy:
+        dest: /etc/samba/smb.conf
+        src: files/smb.conf
+        owner: root
+        group: root
+        mode: 0644
+        validate: /bin/testparm -s %s
+
+    - name: Reload Samba
+      ansible.builtin.systemd_service:
+        name: smb
+        state: restarted
+
+- name: Install Cockpit
+  hosts: cockpit0
+  become: true
+  tags:
+    - install
+
+  tasks:
+    - name: Assert Redhat release (dnf required)
+      ansible.builtin.assert:
+        that: "ansible_os_family == 'RedHat'"
+        msg: "This module only works with Redhat releases"
+
+    - name: Update packages
+      ansible.builtin.dnf:
+        name: '*'
+        state: latest
+
+    - name: Add 45Drives Repo
+      ansible.builtin.command:
+        cmd: dnf config-manager --add-repo https://repo.45drives.com/repofiles/rocky/45drives-enterprise.repo
+        creates: /etc/yum.repos.d/45drives-enterprise.repo
+
+# NOTE: add firewall rules for Samba
+    - name: Install RHEL/Fedora Web Console (Cockpit)
+      ansible.builtin.include_role:
+        name: linux-system-roles.cockpit
+      vars:
+        cockpit_packages:
+          - cockpit
+          - cockpit-networkmanager
+          - cockpit-packagekit
+          - cockpit-identities # https://github.com/45drives/cockpit-identities
+          - cockpit-file-sharing # https://github.com/45Drives/cockpit-file-sharing
+          - cockpit-navigator # https://github.com/45Drives/cockpit-navigator
