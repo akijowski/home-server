@@ -37,6 +37,8 @@
 
     - ansible.builtin.import_role:
         name: akijowski.vault
+      vars:
+        vault_version: '1.20*'
 
 - name: Initialize Vault
   hosts: vault

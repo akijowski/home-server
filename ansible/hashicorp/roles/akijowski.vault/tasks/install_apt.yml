@@ -30,7 +30,17 @@
     state: present
     update_cache: true
 
+- name: Allow Vault to be updated
+  ansible.builtin.dpkg_selections:
+    name: vault
+    selection: install
+
 - name: Ensure Vault is installed with apt
   ansible.builtin.apt:
     name: "vault={{ vault_version }}"
     state: present
+
+- name: Prevent Vault from being updated
+  ansible.builtin.dpkg_selections:
+    name: vault
+    selection: hold

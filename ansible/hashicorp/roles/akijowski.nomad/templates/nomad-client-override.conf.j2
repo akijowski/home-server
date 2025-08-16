@@ -1,6 +1,13 @@
 {# https://github.com/hashicorp/nomad-driver-podman/issues/229#issuecomment-1498065786 #}
 {# Modify the shutdown behavior of nomad clients by making sure to drain and then remove podman containers #}
 [Service]
+# Make sure the node is eligible after starting
+# If the node was shutdown or in a bad state, the ExecStop command to drain is still in effect
+# This will clear that status, allowing the node to be scheduled
+# Note that the node must not currently be draining otherwise setting eligibility will fail
+# -self = apply to the current local node
+# -enable = mark node as enabled
+ExecStartPost=nomad node eligibility -self -enable -address https://{{ ansible_eth0.ipv4.address }}:4646 -tls-skip-verify -no-color
 
 # Make sure to drain the node
 # -enable = begin draining
