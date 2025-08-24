@@ -1,0 +1,17 @@
+{
+  "builds": [
+    {
+      "name": "image",
+      "builder_type": "proxmox-iso",
+      "build_time": 1755993454,
+      "files": null,
+      "artifact_id": "8300",
+      "packer_run_uuid": "64af2a3b-2ae2-23e1-c24d-e2781e0746b5",
+      "custom_data": {
+        "build_timestamp": "2025-08-23T23:57:34Z",
+        "consul_version": "1.21*"
+      }
+    }
+  ],
+  "last_run_uuid": "64af2a3b-2ae2-23e1-c24d-e2781e0746b5"
+}

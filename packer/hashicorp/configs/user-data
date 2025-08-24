@@ -1,0 +1,37 @@
+#cloud-config
+autoinstall:
+  version: 1
+  user-data:
+    disable_root: false # create root user
+    # users: [] # disable creation of default users
+    users:
+      - default
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+  packages:
+    - qemu-guest-agent
+    - sudo
+    - cloud-guest-utils
+  refresh-installer:
+    update: false
+  storage:
+    layout:
+      name: direct
+    swap:
+      size: 0
+  shutdown: reboot
+  ssh:
+    install-server: true
+    allow-pw: false # disable root password
+    ssh_quiet_keygen: true
+    allow_public_ssh_keys: true
+    # root ssh keys, needed for packer build
+    # they are removed from the VM before completion
+    authorized-keys:
+      - ${ssh_public_key}
+  timezone: UTC
+  updates: security # "security" or "all"
+  late-commands:
+    - curtin in-target --target=/target -- systemctl start qemu-guest-agent
+    - curtin in-target --target=/target -- systemctl enable qemu-guest-agent

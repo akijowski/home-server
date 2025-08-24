@@ -1,0 +1,42 @@
+---
+- name: Ensure apt keyring directory
+  ansible.builtin.file:
+    path: "{{ apt_keyring_dir }}"
+    mode: 0755
+    owner: root
+    group: root
+    state: directory
+
+# TODO: update?
+- name: Ensure Hashicorp APT key
+  ansible.builtin.get_url:
+    url: "https://apt.releases.hashicorp.com/gpg"
+    dest: "{{ apt_keyring_hashicorp }}"
+    mode: 0644
+    force: true
+
+- name: Ensure Hashicorp APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by={{ apt_keyring_hashicorp }}] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    filename: hashicorp
+    state: present
+    update_cache: true
+
+- name: "Ensure Consul is installed with APT ({{ consul_version }})"
+  ansible.builtin.apt:
+    name: "consul={{ consul_version }}"
+    state: present
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Put Consul package upgrades on hold
+  ansible.builtin.dpkg_selections:
+    name: consul
+    selection: hold
+
+- name: Ensure systemd overrides directory
+  ansible.builtin.file:
+    path: "/etc/systemd/system/consul.service.d"
+    state: directory
+    mode: 0644
+    owner: root
+    group: root

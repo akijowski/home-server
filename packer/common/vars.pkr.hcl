@@ -160,6 +160,12 @@ variable "target_node" {
   }
 }
 
+variable "template_description_extra" {
+  description = "Additional template description"
+  type        = string
+  default     = ""
+}
+
 variable "vm_id" {
   description = "The template VM ID. Setting to 0 will use the next available. Setting to -1 will use defaults defined by the source. Only use this with the -only flag to create a single image on a single node"
   type        = number

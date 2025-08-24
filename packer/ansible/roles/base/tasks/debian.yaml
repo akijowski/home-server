@@ -1,0 +1,12 @@
+---
+- block:
+  - name: "Updating the guest operating system."
+    ansible.builtin.apt:
+      name: "*"
+      state: latest
+      update_cache: "yes"
+
+  - name: "Installing additional packages."
+    ansible.builtin.apt:
+      name: "{{ additional_packages[ansible_os_family] }}"
+      state: latest

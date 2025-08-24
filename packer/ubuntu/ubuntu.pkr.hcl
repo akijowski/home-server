@@ -101,6 +101,7 @@ build {
       "rm /etc/hostname /etc/ssh/ssh_host_* /var/lib/systemd/random-seed",
       // remove ssh configs
       "truncate -s 0 /root/.ssh/authorized_keys",
+      "truncate -s 0 /home/ubuntu/.ssh/authorized_keys",
       "sed -i 's/^#PasswordAuthentication\\ yes/PasswordAuthentication\\ no/' /etc/ssh/sshd_config",
       "sed -i 's/^#PermitRootLogin\\ prohibit-password/PermitRootLogin\\ no/' /etc/ssh/sshd_config"
     ]

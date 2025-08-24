@@ -7,3 +7,7 @@ additional_packages:
     - python3
     - unzip
     - wget
+  Debian:
+    - coreutils
+    - gpg
+    - wget

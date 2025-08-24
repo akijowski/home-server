@@ -1,9 +1,7 @@
 packer {
   required_plugins {
     proxmox = {
-      # version = "~> 1"
-      # https://github.com/hashicorp/packer-plugin-proxmox/issues/307
-      version = "1.2.1"
+      version = "1.2.3"
       source  = "github.com/hashicorp/proxmox"
     }
     ansible = {
@@ -11,6 +9,10 @@ packer {
       version = "~> 1"
     }
   }
+}
+
+locals {
+  template_description_base = "Packer generated template image on ${timestamp()}"
 }
 
 source "proxmox-iso" "image" {
@@ -29,7 +31,7 @@ source "proxmox-iso" "image" {
   ssh_clear_authorized_keys = true
 
   os                   = "l26"
-  template_description = "Packer generated template image on ${timestamp()}"
+  template_description = "${trimspace(join("\n\n", [local.template_description_base, var.template_description_extra]))}"
 
   // System
   machine    = "q35"
