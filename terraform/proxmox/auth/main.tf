@@ -40,8 +40,7 @@ locals {
         "Pool.Audit",
         "SDN.Audit",
         "Sys.Audit",
-        "VM.Audit",
-        "VM.Monitor"
+        "VM.Audit"
       ]
     }
     "PackerUser" = {
@@ -65,7 +64,12 @@ locals {
         "VM.Config.Network",
         "VM.Config.Options",
         "VM.Console",
-        "VM.Monitor",
+        "VM.GuestAgent.Audit",
+        "VM.GuestAgent.FileRead",
+        "VM.GuestAgent.FileSystemMgmt",
+        "VM.GuestAgent.FileWrite",
+        "VM.GuestAgent.Unrestricted",
+        "VM.Migrate",
         "VM.PowerMgmt"
       ]
     }

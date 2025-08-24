@@ -84,6 +84,8 @@ cockpit:
       # Fileserver with Cockpit
 
       https://cockpit-project.org
+
+      https://192.168.50.12:9090
     tags:
       - cockpit
       - fileserver
