@@ -13,9 +13,9 @@
       - name: ansible
         system: true
         comment: Ansible automation user
-      # - name: admin
-      #   system: false
-      #   comment: Admin user
+      - name: admin
+        system: false
+        comment: Admin user
   tasks:
     - name: Install sudo from apt
       ansible.builtin.apt:
