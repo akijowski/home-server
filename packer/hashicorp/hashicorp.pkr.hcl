@@ -87,10 +87,11 @@ build {
   }
 
   post-processor "manifest" {
-    output = "${local.terraform_dir}/hashicorp-hyperion.json"
+    output = "${local.terraform_dir}/hashicorp.json"
     custom_data = {
       build_timestamp = "${timestamp()}"
-      consul_version = var.consul_version
+      build_node      = "hyperion"
+      consul_version  = var.consul_version
     }
   }
 }

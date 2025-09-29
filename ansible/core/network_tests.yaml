@@ -1,0 +1,152 @@
+---
+- name: Extract multi-homed network info
+  hosts:
+    - nomadclient0
+  vars:
+    search_net: '10.10.10.0/24'
+    net_conf:
+      dev1:
+        name: eth0
+        net: '10.10.10.0/24'
+      dev2:
+        name: eth1
+        net: '192.168.50.10/24'
+  tasks:
+  # https://docs.ansible.com/ansible/8/playbook_guide/playbooks_vars_facts.html
+    # - name: Print all facts
+    #   ansible.builtin.debug:
+    #     var: ansible_facts
+
+    - name: Print all ipv4
+      ansible.builtin.debug:
+        msg: "{{ ansible_facts['all_ipv4_addresses'] }}"
+
+    # - name: Print all interfaces
+    #   ansible.builtin.debug:
+    #     var: ansible_interfaces
+
+    # - name: Set physical interfaces fact
+    #   ansible.builtin.set_fact:
+    #   # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tests.html#testing-strings
+    #     eth_ints: "{{ ansible_interfaces | select('match', 'e.*') }}"
+
+    # - name: Print all physical interfaces
+    #   ansible.builtin.debug:
+    #     var: eth_ints
+
+    # - name: Info on physical interfaces
+    #   ansible.builtin.debug:
+    #     msg: "{{ hostvars[inventory_hostname]['ansible_%s' | format(item) | regex_replace('-', '_')] }}"
+    #   with_items: "{{ eth_ints }}"
+
+    # - name: Another way
+    #   ansible.builtin.debug:
+    #     msg: "{{ hostvars[inventory_hostname] | dict2items | selectattr('key', 'regex', '^ansible_(eth|enp).*') }}"
+
+    # - name: Filter on type is ether
+    #   ansible.builtin.debug:
+    #     msg: "{{ ansible_facts | dict2items | selectattr('value.type', 'defined') | selectattr('value.type', 'match', 'ether') }}"
+
+    - name: This is probably most useful
+      ansible.builtin.set_fact:
+        my_eth_devices: "{{ ansible_facts | dict2items | selectattr('key', 'regex', '^(enp|eth).*') | items2dict }}"
+
+    - name: MACs
+      ansible.builtin.debug:
+        msg: "{{ my_eth_devices | dict2items | map(attribute='value.macaddress') }}"
+
+    - name: findbyipv4
+      ansible.builtin.set_fact:
+        my_dev: "{{ hostvars[inventory_hostname]['ansible_%s' | format(item) | regex_replace('-', '_')]['device'] }}"
+      with_items:
+        "{{ ansible_interfaces | select('match', 'e.*') }}"
+      when:
+        - hostvars[inventory_hostname]['ansible_%s' | format(item) | regex_replace('-', '_')].ipv4 is defined
+        - hostvars[inventory_hostname]['ansible_%s' | format(item) | regex_replace('-', '_')]['ipv4']['address'] | ansible.utils.ipaddr(search_net)
+
+    - name: Print result
+      ansible.builtin.debug:
+        var: my_dev
+
+    # Useful parts
+      # ipv4:
+      #   address: 1.2.3.4
+      #   broadcast: ''
+      #   netmask: 255.255.255.0
+      #   network: 1.2.3.0
+      #   prefix: '24'
+      # ipv6:
+      # - address: fe::
+      #   prefix: '64'
+      #   scope: link
+      # macaddress: ab:cd:ef:01:23:45
+    - name: get the full data for the result
+      ansible.builtin.debug:
+        msg: "{{ ansible_facts | dict2items | selectattr('key', 'match', my_dev) | items2dict }}"
+
+    - name: reset the device
+      ansible.builtin.set_fact:
+        my_dev: "{{ hostvars[inventory_hostname]['ansible_%s' | format(item) | regex_replace('-', '_')] }}"
+      with_items:
+        "{{ ansible_interfaces | select('match', 'e.*') }}"
+      when:
+        - hostvars[inventory_hostname]['ansible_%s' | format(item) | regex_replace('-', '_')].ipv4 is defined
+        - hostvars[inventory_hostname]['ansible_%s' | format(item) | regex_replace('-', '_')]['ipv4']['address'] | ansible.utils.ipaddr(search_net)
+
+    - name: Print the data
+      ansible.builtin.debug:
+        var: my_dev
+
+    - name: Netplan info
+      ansible.builtin.debug:
+        msg:
+          gw: "{{ search_net | ansible.utils.ipv4 | ansible.utils.ipaddr('net') | ansible.utils.ipaddr('1') }}"
+          mac: "{{ my_dev.macaddress }}"
+
+- name: Advanced network device checks
+  hosts:
+    - nomadclient0
+  tags:
+    - advanced
+  vars:
+    net_conf:
+      dev1:
+        name: eth0
+        net: '10.10.10.0/24'
+      dev2:
+        name: eth1
+        net: '192.168.50.10/24'
+  tasks:
+    - name: Find devices with ipv4
+      ansible.builtin.set_fact:
+        curr_eths: "{{ curr_eths | default({}) | combine({item.key : item.value}) }}"
+      loop: "{{ ansible_facts | dict2items | selectattr('key', 'regex', '^(enp|eth).*') }}"
+      when:
+        - item.value.ipv4 is defined
+        - item.value['ipv4'].address is defined
+
+    - name: Print current devices
+      ansible.builtin.debug:
+        msg: "{{ curr_eths }}"
+
+    # - name: Print current target networks
+    #   ansible.builtin.debug:
+    #     msg: "{{ net_conf | dict2items | map(attribute='value.net') }}"
+
+    - name: Print targets for searching
+      ansible.builtin.debug:
+        msg: "{{ curr_eths | dict2items | product(net_conf | dict2items ) }}"
+
+    - name: Filter it down
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ curr_eths | dict2items | product(net_conf | dict2items ) }}"
+      loop_control:
+        label: "{{ item[0].key }}"
+
+    # - name: Populate the config
+    #   ansible.builtin.set_fact:
+    #     net_conf: "{{ net_conf | combine({item.key : (ansible_facts | dict2items | selectattr('key', 'regex', '^(enp|eth).*') | map(attribute='value.macaddress')) } ) | items2dict }}"
+    #   loop: "{{ net_conf | dict2items }}"
+    #   when:
+    #     -
