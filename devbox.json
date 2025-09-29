@@ -3,21 +3,21 @@
   "packages": [
     "go-task@latest",
     "tenv@latest",
-    "ansible@2.17.6",
     "packer@latest",
     "awscli2@latest",
     "terraform-docs@latest",
-    "python312Packages.boto3@latest",
     "kubectl@latest",
     "kubecm@latest",
-    "k9s@latest",
-    "argocd@latest",
     "kustomize@latest",
     "ansible-lint@latest",
-    "python312Packages.hvac@latest",
     "vault@latest",
-    "python312Packages.dnspython@latest",
-    "python312Packages.proxmoxer@latest"
+    "podman@latest",
+    "ansible@latest",
+    "python313Packages.boto3@latest",
+    "python313Packages.hvac@latest",
+    "python313Packages.dnspython@latest",
+    "python313Packages.proxmoxer@latest",
+    "molecule@latest"
   ],
   "shell": {
     "init_hook": [
