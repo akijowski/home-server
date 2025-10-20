@@ -64,8 +64,8 @@ tasks:
   ssh:gh:
     desc: Copy public keys from github (used by Packer when creating templates)
     cmds:
-    # get the first line of the output (that is the correct one currently)
-      - wget -q -O- 'https://github.com/akijowski.keys' | sed -n 1p > ~/.ssh/github_akijowski.pub
+    # the correct key is 61081879
+      - wget -q -O- 'https://api.github.com/users/akijowski/keys' | jq -r '.[] | select(.id == 61081879).key' > ~/.ssh/github_akijowski.pub
     status:
       - test -f ~/.ssh/github_akijowski.pub
 
