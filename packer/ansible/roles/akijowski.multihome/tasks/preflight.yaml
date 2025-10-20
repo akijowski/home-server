@@ -1,0 +1,34 @@
+---
+- name: Assert usage of systemd as an init system
+  ansible.builtin.assert:
+    that: ansible_service_mgr == 'systemd'
+    msg: "This module only works with systemd"
+
+- name: Assert required variables
+  ansible.builtin.assert:
+    that:
+      - interfaces is defined
+      - interfaces | length > 0
+      - interfaces | map(attribute='name') | length > 0
+
+- name: Ensure systemd-networkd
+  ansible.builtin.systemd_service:
+    name: systemd-networkd
+    enabled: true
+
+# - name: Start and enable systemd-resolved
+#   become: true
+#   ansible.builtin.systemd:
+#     name: systemd-resolved
+#     enabled: true
+#     state: started
+#   when: systemd_networkd_enable_resolved
+
+# - name: Replace /etc/resolv.conf with a symlink to the systemd-resolved stub
+#   become: true
+#   ansible.builtin.file:
+#     path: /etc/resolv.conf
+#     src: /run/systemd/resolve/stub-resolv.conf
+#     state: link
+#     force: true
+#   when: systemd_networkd_symlink_resolv_conf

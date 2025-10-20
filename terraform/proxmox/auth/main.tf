@@ -40,7 +40,8 @@ locals {
         "Pool.Audit",
         "SDN.Audit",
         "Sys.Audit",
-        "VM.Audit"
+        "VM.Audit",
+        "VM.GuestAgent.Audit"
       ]
     }
     "PackerUser" = {

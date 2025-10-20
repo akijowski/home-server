@@ -1,0 +1,23 @@
+{{ ansible_managed | comment }}
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+  {%- for dev in if_configs.interfaces %}
+    {{ dev.matched_name }}:
+      match:
+        macaddress: {{ dev.macaddress }}
+      dhcp4: true
+      dhcp6: true
+      routes:
+        - to: {{ dev.cidr }}
+          from: {{ dev.cidr }}
+        - to: default
+          via: {{ dev.gateway }}
+          table: {{ loop.index }}
+        - to: {{ dev.cidr }}
+          table: {{ loop.index }}
+      routing-policy:
+        - from: {{ dev.cidr }}
+          table: {{ loop.index }}
+  {%- endfor %}

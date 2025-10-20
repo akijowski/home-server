@@ -1,0 +1,28 @@
+---
+- name: Ensure podman is installed
+  become: true
+  ansible.builtin.apt:
+    name:
+      - podman
+    state: present
+
+- name: Copy start-up Podman container
+  become: true
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "/etc/containers/systemd/{{ item.dest }}"
+    mode: 0644
+    owner: root
+    group: root
+  loop:
+    - src: podman-network-boot.image.j2
+      dest: podman-network-boot.image
+    - src: podman-network-boot.container.j2
+      dest: podman-network-boot.container
+  register: _podman_conf
+
+- name: Reboot machine
+  become: true
+  ansible.builtin.reboot: {}
+  when:
+    - _podman_conf is changed

@@ -1,0 +1,39 @@
+---
+- ansible.builtin.set_fact:
+    matched_ifs: "{{ matched_ifs | default({}) | combine( ansible_facts | dict2items | selectattr('key', 'regex', '^' + item + '.*') | items2dict ) }}"
+  loop: "{{ interfaces | map(attribute='name') }}"
+  # loop_control:
+  #   label: "{{ item.name }}"
+  no_log: true
+
+# - ansible.builtin.debug:
+#     var: matched_ifs
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/utils/update_fact_module.html
+- ansible.builtin.set_fact:
+    if_updates: "{{ if_updates + update }}"
+  loop: "{{ interfaces }}"
+  loop_control:
+    index_var: idx
+  vars:
+    if_updates: []
+    update:
+      - path: interfaces[{{ idx }}].macaddress
+        # search the matched_ifs, and select the macaddress
+        value: "{{ matched_ifs | dict2items | selectattr('key', 'regex', '^' + item.name + '.*') | map(attribute='value.macaddress') | first }}"
+      - path: interfaces[{{ idx }}].matched_name
+        # search the matched_ifs, and select the precise device name
+        value: "{{ matched_ifs | dict2items | selectattr('key', 'regex', '^' + item.name + '.*') | map(attribute='value.device') | first }}"
+      - path: interfaces[{{ idx }}].gateway
+        # increment the cidr to the first IP, to create the gateway
+        value: "{{ item.cidr | ansible.utils.ipv4 | ansible.utils.ipaddr('net') | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+
+# - ansible.builtin.debug:
+#     var: if_updates
+
+- ansible.utils.update_fact:
+    updates: "{{ if_updates }}"
+  register: if_configs
+
+- ansible.builtin.debug:
+    var: if_configs.interfaces

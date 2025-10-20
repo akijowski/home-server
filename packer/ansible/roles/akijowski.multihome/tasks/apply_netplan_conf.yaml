@@ -1,0 +1,24 @@
+---
+- name: Write Netplan configuration
+  become: true
+  ansible.builtin.template:
+    src: netplan_conf.yaml.j2
+    dest: "/etc/netplan/60-{{ if_configs['interfaces'][1]['matched_name'] }}.yaml"
+    owner: root
+    group: root
+    trim_blocks: false
+    validate: /usr/sbin/netplan try --config-file %s --timeout 10
+    mode: 0600
+  notify:
+    - apply netplan
+
+- name: Copy networkd hook
+  become: true
+  ansible.builtin.template:
+    src: netplan_hook.sh.j2
+    dest: /etc/networkd-dispatcher/routable.d/10-create-podman.sh
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - apply netplan

@@ -1,0 +1,21 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Converge
+  hosts: molecule-multi-home # group is defined by the tag on the vm
+  gather_facts: true # Disable if your role does not rely on facts
+  tasks:
+    # - ansible.builtin.debug:
+    #     var: ansible_facts
+    # - ansible.builtin.debug:
+    #     var: ansible_interfaces
+
+    - name: Apply role under test
+      ansible.builtin.include_role:
+        name: akijowski.multihome
+      vars:
+        interfaces:
+          - name: eth # look for the first device that matches this, i.e. eth0
+            cidr: '10.10.10.0/24' # use this cidr for gateway
+          - name: enp
+            cidr: '192.168.50.0/24'

@@ -1,0 +1,5 @@
+---
+- ansible.builtin.import_tasks: preflight.yaml
+- ansible.builtin.import_tasks: set_if_facts.yaml
+- ansible.builtin.import_tasks: configure_podman.yaml
+- ansible.builtin.import_tasks: apply_netplan_conf.yaml

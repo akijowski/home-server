@@ -1,0 +1,13 @@
+---
+all:
+  children:
+    server:
+      hosts:
+        molecule-multi-home:
+          hostname: molecule-multi-home
+          proxmox_clone: ubuntu24-noble
+          proxmox_clone_vmid: '8000'
+          proxmox_vmid: '3001'
+          proxmox_storage: vmstorage
+      vars:
+        proxmox_node: hyperion

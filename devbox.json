@@ -11,13 +11,12 @@
     "kustomize@latest",
     "ansible-lint@latest",
     "vault@latest",
-    "podman@latest",
-    "ansible@latest",
     "python313Packages.boto3@latest",
     "python313Packages.hvac@latest",
     "python313Packages.dnspython@latest",
     "python313Packages.proxmoxer@latest",
-    "molecule@latest"
+    "ansible@2.18.7",
+    "python313Packages.molecule@latest"
   ],
   "shell": {
     "init_hook": [
