@@ -1,0 +1,15 @@
+---
+# Purpose: bring the instance to the desired state by running the role under test.
+# Molecule calls this playbook with `molecule converge`.
+- name: Converge
+  hosts: molecule-consul
+  gather_facts: true # Disable if your role does not rely on facts
+  tasks:
+    # - ansible.builtin.debug:
+    #     var: ansible_interfaces
+
+    - name: Apply role under test
+      ansible.builtin.include_role:
+        name: akijowski.hashicorp.consul
+      vars:
+        consul_agent_server_bootstrap: true

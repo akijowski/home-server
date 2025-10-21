@@ -1,2 +1,0 @@
-apt_keyring_hashicorp: /etc/apt/keyrings/hashicorp.asc
-apt_keyring_dir: "{{ apt_keyring_hashicorp | dirname }}"

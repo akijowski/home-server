@@ -2,3 +2,6 @@
 - ansible.builtin.import_tasks: preflight.yaml
 
 - ansible.builtin.import_tasks: install_apt.yaml
+  become: true
+
+- ansible.builtin.import_tasks: configure_consul.yaml

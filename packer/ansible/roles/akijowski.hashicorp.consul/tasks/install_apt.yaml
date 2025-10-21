@@ -22,9 +22,9 @@
     state: present
     update_cache: true
 
-- name: "Ensure Consul is installed with APT ({{ consul_version }})"
+- name: "Ensure Consul is installed with Apt"
   ansible.builtin.apt:
-    name: "consul={{ consul_version }}"
+    name: "consul"
     state: present
   ignore_errors: "{{ ansible_check_mode }}"
 
@@ -32,6 +32,23 @@
   ansible.builtin.dpkg_selections:
     name: consul
     selection: hold
+
+- name: Find consul info
+  ansible.builtin.command: consul version --format=json
+  register: _consul_info
+
+###
+# {
+#    "Version": "1.21.5",
+#    "Revision": "3261d11a",
+#    "Prerelease": "",
+#    "BuildDate": "2025-09-21T15:22:53Z",
+#    "RPC": {
+#       "Default": 2,
+#       "Min": 2,
+#       "Max": 3
+#    }
+# }
 
 - name: Ensure systemd overrides directory
   ansible.builtin.file:

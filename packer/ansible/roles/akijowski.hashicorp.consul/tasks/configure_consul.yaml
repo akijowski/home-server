@@ -1,0 +1,76 @@
+---
+- name: Check if first server
+  ansible.builtin.set_fact:
+    is_first_server: "{{ inventory_hostname == (ansible_play_hosts_all | sort | first ) }}"
+
+- name: Ensure bootstrap setting
+  ansible.builtin.set_fact:
+    is_consul_bootstrap: "{{ consul_agent_server_bootstrap and is_first_server }}"
+
+- name: Ensure retry_join servers
+  ansible.builtin.set_fact:
+    consul_retry_join: "{{ consul_retry_join + [srv] }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  # when: inventory_hostname != item
+  vars:
+    consul_retry_join: []
+    srv: "{{ hostvars[item].ansible_default_ipv4.address }}"
+
+- name: Update Consul config
+  block:
+    - name: Read original config
+      ansible.builtin.slurp:
+        src: "/etc/consul.d/consul.hcl"
+      register: _consul_default_config
+
+    - name: Backup original config
+      ansible.builtin.copy:
+        src: "/etc/consul.d/consul.hcl"
+        dest: "/etc/consul.d/original.consul.hcl"
+        remote_src: true
+      when: '"Copyright (c) HashiCorp, Inc." in (_consul_default_config.content | b64decode)'
+      register: _consul_original_config_backup
+
+    - name: Remove original config
+      ansible.builtin.file:
+        path: "/etc/consul.d/consul.hcl"
+        state: absent
+      when: _consul_original_config_backup is changed
+
+    - name: Ensure Consul directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: 0755
+        owner: "{{ consul_user_name }}"
+        group: "{{ consul_group_name }}"
+        state: directory
+      loop:
+        - "{{ consul_config_dir }}"
+        - "{{ consul_data_dir }}"
+        - "{{ consul_tls_dir }}"
+
+    - name: Copy Consul config
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: 0644
+        owner: "{{ consul_user_name }}"
+        group: "{{ consul_group_name }}"
+      register: _consul_config
+      loop:
+        - src: "agent.hcl.j2"
+          dest: "{{ consul_config_dir }}/agent.hcl"
+
+    - name: Restart Consul for changes
+      ansible.builtin.systemd_service:
+        name: consul
+        state: restarted
+      when: _consul_config is changed
+  become: true
+
+- name: Wait for Consul UI
+  ansible.builtin.wait_for:
+    delay: 5
+    port: 8500
+    timeout: 300
+    state: started
