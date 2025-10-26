@@ -1,0 +1,74 @@
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  # no_log: "{{ molecule_no_log }}"
+  tasks:
+    # - ansible.builtin.debug:
+    #     var: hostvars
+
+    # - ansible.builtin.debug:
+    #     var: groups
+
+# https://docs.ansible.com/ansible/latest/collections/community/proxmox/proxmox_kvm_module.html#ansible-collections-community-proxmox-proxmox-kvm-module
+    - name: Create Proxmox VM
+      community.proxmox.proxmox_kvm:
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_TOKEN_SECRET') }}"
+
+        name: "{{ hostvars[item].hostname }}"
+        agent: true
+        clone: "{{ hostvars[item].proxmox_clone }}"
+        vmid: "{{ hostvars[item].proxmox_clone_vmid }}"
+        full: true
+        format: qcow2
+        ipconfig:
+          ipconfig0: 'ip=dhcp,ip6=dhcp'
+        newid: "{{ hostvars[item].proxmox_vmid }}"
+        node: "{{ hostvars[item].proxmox_node }}"
+        ostype: l26
+        storage: "{{ hostvars[item].proxmox_storage }}"
+        state: present
+        timeout: 120
+      loop: "{{ groups['all'] }}"
+
+    - name: Update Proxmox VM
+      community.proxmox.proxmox_kvm:
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_TOKEN_SECRET') }}"
+
+        name: "{{ hostvars[item].hostname }}"
+        agent: true
+        update: true
+        ipconfig:
+          ipconfig0: 'ip=dhcp,ip6=dhcp'
+        node: "{{ hostvars[item].proxmox_node }}"
+        serial:
+          serial0: "socket"
+        tags:
+          - molecule
+          - molecule-consul-cluster
+        state: present
+      loop: "{{ groups['all'] }}"
+
+    - name: Start the Proxmox VM
+      community.proxmox.proxmox_kvm:
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_MOLECULE_TOKEN_SECRET') }}"
+
+        name: "{{ hostvars[item].hostname }}"
+        state: started
+      loop: "{{ groups['all'] }}"
+
+    - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+      ansible.builtin.wait_for:
+        # port: 22
+        # host: "{{ hostvars[item].hostname }}"
+        # search_regex: OpenSSH
+        # delay: 10
+        timeout: 300
+      # loop: "{{ groups['all'] }}"

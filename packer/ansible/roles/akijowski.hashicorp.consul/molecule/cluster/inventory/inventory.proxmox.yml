@@ -1,0 +1,31 @@
+---
+plugin: community.proxmox.proxmox
+
+validate_certs: true
+want_facts: true
+
+exclude_nodes: true
+
+keyed_groups:
+  - key: proxmox_tags_parsed
+    separator: "_"
+    prefix: group
+# By default the hosts will show up as tags_<name> so host vars go under the name, but we can rename with groups so group vars make sense
+groups:
+  molecule-consul-cluster: "'consul-cluser' in (proxmox_tags_parsed|list)"
+
+# Return only running VMs/LXCs that are tagged as 'molecule'
+filters:
+  - proxmox_status == "running"
+  - "proxmox_tags_parsed is defined and 'molecule' in proxmox_tags_parsed"
+
+want_proxmox_nodes_ansible_host: false
+compose:
+  # default to lxc IP otherwise assume qemu
+  ansible_host: proxmox_lxc_interfaces[1]["inet"] | default(proxmox_agent_interfaces[1]["ip-addresses"][0] | default(proxmox_net0.ip)) | ansible.utils.ipaddr('address')
+  #ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ansible.utils.ipaddr('address')
+  # use the qemu guest agent IP. First one is localhost, so use the second one.
+  # workaround for the inconsistent naming: https://github.com/ansible-collections/community.general/issues/4854#issuecomment-1295908101
+  qemu_ipv4: proxmox_agent_interfaces[1]["ip-addresses"][0] | default(proxmox_net0.ip) | ansible.utils.ipaddr('address')
+  # use the lxc interfaces. First one is localhost, so use the second one.
+  lxc_ipv4: proxmox_lxc_interfaces[1]["inet"] | ansible.utils.ipaddr('address')

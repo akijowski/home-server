@@ -12,3 +12,5 @@ consul_agent_server_bootstrap: false
 consul_config_dir: "/etc/consul.d"
 consul_data_dir: "/opt/consul/data"
 consul_tls_dir: "/opt/consul/tls"
+
+consul_retry_join: []

@@ -9,18 +9,31 @@
 
 - name: Ensure retry_join servers
   ansible.builtin.set_fact:
-    consul_retry_join: "{{ consul_retry_join + [srv] }}"
+    consul_retry_join_servers: "{{ consul_retry_join_servers + [srv] }}"
   loop: "{{ ansible_play_hosts_all }}"
   # when: inventory_hostname != item
   vars:
-    consul_retry_join: []
+    consul_retry_join_servers: []
     srv: "{{ hostvars[item].ansible_default_ipv4.address }}"
+
+- name: Ensure retry join is set
+  ansible.builtin.set_fact:
+    consul_retry_join_all: "{{ consul_retry_join + (consul_retry_join_servers | default([])) }}"
+
+- ansible.builtin.debug:
+    var: consul_retry_join_all
 
 - name: Update Consul config
   block:
+    - name: Find original config
+      ansible.builtin.stat:
+        path: "/etc/consul.d/consul.hcl"
+      register: _consul_default_config_stats
+
     - name: Read original config
       ansible.builtin.slurp:
         src: "/etc/consul.d/consul.hcl"
+      when: _consul_default_config_stats.stat.exists
       register: _consul_default_config
 
     - name: Backup original config
@@ -28,7 +41,9 @@
         src: "/etc/consul.d/consul.hcl"
         dest: "/etc/consul.d/original.consul.hcl"
         remote_src: true
-      when: '"Copyright (c) HashiCorp, Inc." in (_consul_default_config.content | b64decode)'
+      when:
+        - _consul_default_config_stats.stat.exists
+        - '"Copyright (c) HashiCorp, Inc." in (_consul_default_config.content | b64decode)'
       register: _consul_original_config_backup
 
     - name: Remove original config
@@ -58,8 +73,8 @@
         group: "{{ consul_group_name }}"
       register: _consul_config
       loop:
-        - src: "agent.hcl.j2"
-          dest: "{{ consul_config_dir }}/agent.hcl"
+        - src: "consul.hcl.j2"
+          dest: "{{ consul_config_dir }}/consul.hcl"
 
     - name: Restart Consul for changes
       ansible.builtin.systemd_service:

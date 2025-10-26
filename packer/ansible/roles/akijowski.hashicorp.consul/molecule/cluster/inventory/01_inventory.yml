@@ -1,0 +1,25 @@
+---
+all:
+  children:
+    molecule-consul-cluster:
+      hosts:
+        molecule-consul-0:
+          hostname: molecule-consul-0
+          proxmox_clone: ubuntu24-noble
+          proxmox_clone_vmid: '8000'
+          proxmox_vmid: '3003'
+          proxmox_storage: vmstorage
+        molecule-consul-1:
+          hostname: molecule-consul-1
+          proxmox_clone: ubuntu24-noble
+          proxmox_clone_vmid: '8000'
+          proxmox_vmid: '3004'
+          proxmox_storage: vmstorage
+        molecule-consul-2:
+          hostname: molecule-consul-2
+          proxmox_clone: ubuntu24-noble
+          proxmox_clone_vmid: '8000'
+          proxmox_vmid: '3005'
+          proxmox_storage: vmstorage
+      vars:
+        proxmox_node: hyperion

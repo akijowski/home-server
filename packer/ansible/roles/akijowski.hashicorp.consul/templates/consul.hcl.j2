@@ -1,0 +1,37 @@
+{{ ansible_managed | comment }}
+
+# https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file
+
+auto_reload_config = true
+datacenter = "dc1"
+
+autopilot {
+    min_quorum = {{ consul_retry_join_all | length | to_json }}
+}
+
+{% if is_consul_bootstrap %}
+bootstrap_expect = {{ consul_retry_join_all | length | to_json }}
+{% endif -%}
+
+retry_join = {{ consul_retry_join_all | to_json }}
+bind_addr = "0.0.0.0"
+client_addr = {% raw %}"{{ GetPrivateInterfaces | exclude \"type\" \"ipv6\" | join \"address\" \" \" }} {{ GetAllInterfaces | include \"flags\" \"loopback\" | join \"address\" \" \" }}"
+{% endraw %}
+advertise_addr = {% raw %}"{{ GetInterfaceIP \"eth0\" }}"
+{% endraw %}
+
+data_dir = "{{ consul_data_dir }}"
+
+server = {{ consul_agent_server | to_json }}
+
+ui_config {
+    enabled = true
+}
+
+raft_logstore {
+    backend = "wal"
+    verification {
+        enabled = true
+        interval = "5m"
+    }
+}

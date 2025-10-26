@@ -36,6 +36,7 @@
 - name: Find consul info
   ansible.builtin.command: consul version --format=json
   register: _consul_info
+  changed_when: false
 
 ###
 # {
