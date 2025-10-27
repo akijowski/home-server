@@ -1,0 +1,13 @@
+---
+- name: Assert usage of systemd as an init system
+  ansible.builtin.assert:
+    that: ansible_service_mgr == 'systemd'
+    msg: "This module only works with systemd"
+
+- name: Assert required variables
+  ansible.builtin.assert:
+    msg: "Must define domains and a registration email"
+    that:
+      - lego_acme_domains is defined
+      - lego_acme_domains | length > 0
+      - lego_acme_email is defined

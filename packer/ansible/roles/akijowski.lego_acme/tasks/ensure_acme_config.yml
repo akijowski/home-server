@@ -1,0 +1,60 @@
+---
+- name: Ensure certs directory exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: 0744
+    owner: root
+    group: root
+    state: directory
+  loop:
+    - "{{ lego_root_dir }}"
+    - "{{ lego_certs_dir }}"
+    - "{{ lego_root_dir }}/env.d"
+
+- name: Ensure env variables
+  block:
+    - name: Ensure base env template
+      ansible.builtin.template:
+        dest: "{{ lego_root_dir }}/env.d/base.env"
+        src: acme-lego.env.j2
+        mode: 0700
+        owner: root
+        group: root
+
+    - name: Ensure env file template
+      ansible.builtin.template:
+        dest: "{{ lego_root_dir }}/env.d/template.env"
+        src: "{{ lego_env_file }}"
+        mode: 0700
+        owner: root
+        group: root
+      when: lego_env_file | length > 0
+
+    - name: Ensure env file is created
+      ansible.builtin.assemble:
+        src: "{{ lego_root_dir }}/env.d"
+        remote_src: true
+        dest: "{{ lego_root_dir }}/lego.env"
+        delimiter: '### ANSIBLE FRAGMENTS ###'
+        mode: 0700
+        owner: root
+        group: root
+
+- name: Ensure lego hook scripts
+  block:
+    - name: Ensure hook scripts directory
+      ansible.builtin.file:
+        path: "{{ lego_hooks_dir }}"
+        mode: 0744
+        owner: root
+        group: root
+        state: directory
+
+    - name: Ensure lego post-install hook
+      ansible.builtin.template:
+        dest: "{{ lego_run_hook }}"
+        src: "{{ lego_hook_script }}"
+        mode: 0700
+        owner: root
+        group: root
+  when: lego_hook_script | length > 0

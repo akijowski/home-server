@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+{{ ansible_managed | comment }}
+
+set -eou pipefail
+
+# copy certificates to a directory
+test_cert_dir="/etc/test"
+
+# TODO: make this more robust
+
+# our Vault server only runs on {{ lego_acme_domains | join(' ') }} domain
+if [ "$LEGO_CERT_DOMAIN" = "{{ lego_acme_domains | first }}" ]; then
+  echo "Copying $LEGO_CERT_PATH to $test_cert_dir"
+  mkdir -p "$test_cert_dir"
+  install -o ansible -g ansible -m 0644 "$LEGO_CERT_PATH" "$test_cert_dir"
+  install -o ansible -g ansible -m 0640 "$LEGO_CERT_KEY_PATH"  "$test_cert_dir"
+
+fi

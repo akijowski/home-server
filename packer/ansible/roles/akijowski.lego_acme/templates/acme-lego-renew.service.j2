@@ -1,0 +1,24 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=ACME Lego - Renews ACME certificates
+Documentation=https://go-acme.github.io/lego/
+# Network needs to be ready
+Wants=network-online.target
+After=network-online.target
+# Wait 60 seconds up to 3 times
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+User=root
+Group=root
+EnvironmentFile={{ lego_root_dir }}/lego.env
+
+Type=oneshot
+ExecStart=cd {{ lego_root_dir }}
+ExecStart=/usr/bin/lego {{ lego_cmd_renew }}
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

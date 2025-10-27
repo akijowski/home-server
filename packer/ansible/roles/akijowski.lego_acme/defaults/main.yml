@@ -1,0 +1,32 @@
+lego_version: latest
+lego_arch_map:
+  armv7l: arm
+  x86_64: amd64
+lego_arch: "{{ lego_arch_map[ansible_architecture] }}"
+lego_tar: "lego_v{{ lego_version }}_{{ ansible_system | lower }}_{{ lego_arch }}.tar.gz"
+
+lego_staging: true
+lego_acme_server: "https://acme{{ lego_staging | ansible.builtin.ternary('-staging', '') }}-v02.api.letsencrypt.org/directory"
+lego_root_dir: /etc/lego
+lego_certs_dir: "{{ lego_root_dir }}/certs"
+lego_hooks_dir: "{{ lego_root_dir }}/hooks"
+
+lego_acme_dns_provider: route53
+lego_run_hook_filename: acme-post-install.sh
+lego_run_hook: "{{ lego_hooks_dir }}/{{ lego_run_hook_filename }}"
+lego_cmd_domains: "{{ ['--domains'] | product(lego_acme_domains | map('tojson')) | map('join', '=') | list | join(' ') }}"
+
+lego_hook_script: ''
+lego_env: {}
+lego_env_file: ''
+# https://go-acme.github.io/lego/usage/cli/options/index.html
+lego_cmd_global_default:
+  - "--path={{ lego_certs_dir }}"
+  - '--accept-tos'
+  - "--server={{ lego_acme_server }}"
+  - "--email={{ lego_acme_email }}"
+  - "{{ lego_cmd_domains }}"
+  - "--dns={{ lego_acme_dns_provider }}"
+lego_cmd_global_extra_args: []
+lego_cmd_run_extra_args: []
+lego_cmd_renew_extra_args: []

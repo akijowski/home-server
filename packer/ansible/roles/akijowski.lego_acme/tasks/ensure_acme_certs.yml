@@ -1,0 +1,72 @@
+---
+- name: Ensure lego command
+  ansible.builtin.set_fact:
+    lego_cmd_prefix: "{{ (lego_cmd_global_default + lego_cmd_global_extra_args) | join(' ') }}"
+
+- name: Ensure lego systemd
+  block:
+    - name: Ensure lego renew hookscript args
+      ansible.builtin.set_fact:
+        lego_cmd_renew_hook_args: "{{ ['--renew-hook=' + lego_run_hook] }}"
+      when: lego_hook_script | length > 0
+
+    - name: Ensure lego renew args
+      ansible.builtin.set_fact:
+        lego_cmd_renew_args: "{{ (lego_cmd_renew_extra_args + (lego_cmd_renew_hook_args | default([]))) | join(' ') }}"
+
+    - name: Ensure lego renew command
+      ansible.builtin.set_fact:
+        lego_cmd_renew: "{{ lego_cmd_prefix + ' renew ' + lego_cmd_renew_args }}"
+
+    - name: Ensure lego systemd unit
+      ansible.builtin.template:
+        dest: /etc/systemd/system/acme-lego-renew.service
+        src: acme-lego-renew.service.j2
+        mode: 0740
+        owner: root
+        group: root
+
+    - name: Ensure lego systemd timer
+      ansible.builtin.template:
+        dest: /etc/systemd/system/acme-lego-renew.timer
+        src: acme-lego-renew.timer.j2
+        mode: 0740
+        owner: root
+        group: root
+
+    - name: Ensure timer is enabled
+      ansible.builtin.systemd_service:
+        name: acme-lego-renew.timer
+        daemon_reload: true
+        state: started
+        enabled: true
+
+- name: Check for existing certs
+  ansible.builtin.find:
+    paths: "{{ lego_certs_dir }}/certificates"
+    file_type: any
+    hidden: true
+  register: _lego_certs_found
+
+- name: Ensure initial certs exist
+  block:
+    - name: Ensure lego run hookscript args
+      ansible.builtin.set_fact:
+        lego_cmd_run_hook_args: "{{ ['--run-hook=' + lego_run_hook] }}"
+      when: lego_hook_script | length > 0
+
+    - name: Ensure lego run args
+      ansible.builtin.set_fact:
+        lego_cmd_run_args: "{{ (lego_cmd_run_extra_args + (lego_cmd_run_hook_args | default([]))) | join(' ') }}"
+
+    - name: Ensure lego run command
+      ansible.builtin.set_fact:
+        lego_cmd_run: "{{ lego_cmd_prefix + ' run ' + lego_cmd_run_args }}"
+
+    - name: Run lego for the first time
+      ansible.builtin.command: "/usr/bin/lego {{ lego_cmd_run }}"
+      environment: "{{ lego_env }}"
+  when: _lego_certs_found.matched == 0
+
+- ansible.builtin.debug:
+    msg: "!! Make sure to backup {{ lego_certs_dir }} as it contains private keys for accounts !!"

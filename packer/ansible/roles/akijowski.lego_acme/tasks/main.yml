@@ -1,0 +1,11 @@
+---
+- ansible.builtin.import_tasks: preflight.yml
+
+- ansible.builtin.import_tasks: ensure_acme.yml
+  become: true
+
+- ansible.builtin.import_tasks: ensure_acme_config.yml
+  become: true
+
+- ansible.builtin.import_tasks: ensure_acme_certs.yml
+  become: true

@@ -1,0 +1,13 @@
+---
+all:
+  children:
+    molecule_lego:
+      hosts:
+        moleculelego0:
+          hostname: moleculelego0
+          proxmox_clone: ubuntu24-noble
+          proxmox_clone_vmid: '8000'
+          proxmox_vmid: '3010'
+          proxmox_storage: vmstorage
+      vars:
+        proxmox_node: hyperion
