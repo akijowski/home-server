@@ -16,7 +16,6 @@ Group=root
 EnvironmentFile={{ lego_root_dir }}/lego.env
 
 Type=oneshot
-ExecStart=cd {{ lego_root_dir }}
 ExecStart=/usr/bin/lego {{ lego_cmd_renew }}
 Restart=no
 

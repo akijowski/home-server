@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    molecule-consul-cluster:
+    molecule_consul_cluster:
       hosts:
         molecule-consul-0:
           hostname: molecule-consul-0

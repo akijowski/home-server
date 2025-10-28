@@ -13,7 +13,7 @@
 
         name: "{{ hostvars[item].hostname }}"
         state: stopped
-      loop: "{{ groups['all'] }}"
+      loop: "{{ groups['molecule_multihome'] }}"
 
     - name: Destroy the Proxmox VM
       community.proxmox.proxmox_kvm:
@@ -23,4 +23,4 @@
 
         name: "{{ hostvars[item].hostname }}"
         state: absent
-      loop: "{{ groups['all'] }}"
+      loop: "{{ groups['molecule_multihome'] }}"

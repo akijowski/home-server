@@ -1,10 +1,10 @@
 ---
 all:
   children:
-    server:
+    molecule_consul:
       hosts:
-        molecule-consul:
-          hostname: molecule-consul
+        moleculeconsul0:
+          hostname: moleculeconsul0
           proxmox_clone: ubuntu24-noble
           proxmox_clone_vmid: '8000'
           proxmox_vmid: '3002'

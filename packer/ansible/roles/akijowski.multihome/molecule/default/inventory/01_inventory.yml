@@ -1,7 +1,7 @@
 ---
 all:
   children:
-    server:
+    molecule_multihome:
       hosts:
         molecule-multi-home:
           hostname: molecule-multi-home

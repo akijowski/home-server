@@ -12,7 +12,7 @@ keyed_groups:
     prefix: group
 # By default the hosts will show up as tags_<name> so host vars go under the name, but we can rename with groups so group vars make sense
 groups:
-  molecule-consul-cluster: "'consul-cluser' in (proxmox_tags_parsed|list)"
+  molecule_consul_cluster: "'consul-cluster' in (proxmox_tags_parsed|list)"
 
 # Return only running VMs/LXCs that are tagged as 'molecule'
 filters:

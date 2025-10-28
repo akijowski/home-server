@@ -32,7 +32,7 @@
         storage: "{{ hostvars[item].proxmox_storage }}"
         state: present
         timeout: 120
-      loop: "{{ groups['all'] }}"
+      loop: "{{ groups['molecule_consul_cluster'] }}"
 
     - name: Update Proxmox VM
       community.proxmox.proxmox_kvm:
@@ -50,9 +50,9 @@
           serial0: "socket"
         tags:
           - molecule
-          - molecule-consul-cluster
+          - consul-cluster
         state: present
-      loop: "{{ groups['all'] }}"
+      loop: "{{ groups['molecule_consul_cluster'] }}"
 
     - name: Start the Proxmox VM
       community.proxmox.proxmox_kvm:
@@ -62,7 +62,7 @@
 
         name: "{{ hostvars[item].hostname }}"
         state: started
-      loop: "{{ groups['all'] }}"
+      loop: "{{ groups['molecule_consul_cluster'] }}"
 
     - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
       ansible.builtin.wait_for:
@@ -71,4 +71,4 @@
         # search_regex: OpenSSH
         # delay: 10
         timeout: 300
-      # loop: "{{ groups['all'] }}"
+      # loop: "{{ groups['molecule_consul_cluster'] }}"
