@@ -9,14 +9,8 @@
     "kubectl@latest",
     "kubecm@latest",
     "kustomize@latest",
-    "ansible-lint@latest",
     "vault@latest",
-    "python313Packages.boto3@latest",
-    "python313Packages.hvac@latest",
-    "python313Packages.dnspython@latest",
-    "python313Packages.proxmoxer@latest",
-    "ansible@2.18.7",
-    "python313Packages.molecule@latest"
+    "path:flakes/python-pyutils"
   ],
   "shell": {
     "init_hook": [
