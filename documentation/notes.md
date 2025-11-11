@@ -19,3 +19,8 @@ https://docs.oracle.com/en-us/iaas/Content/Block/References/samplefiocommandslin
 ## References
 
 - [kencx homelab](https://github.com/kencx/homelab) Useful reference for hashicorp with ansible. Nomad/Vault and some Terraform inspiration.
+
+cloud init
+https://mattedwards.org/2024/07/using-cloud-init-with-proxmox-vms/
+https://ronamosa.io/docs/engineer/LAB/proxmox-packer-vm/
+https://technotim.live/posts/cloud-init-cloud-image/

@@ -2,7 +2,8 @@
     description = "A flake to manage python dependencies";
 
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+        # Avoid unstable and stick to the pinned nixpkgs. Could break Ansible
+        nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
         flake-utils.url = "github:numtide/flake-utils";
     };
 

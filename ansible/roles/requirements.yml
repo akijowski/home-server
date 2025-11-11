@@ -1,19 +1,16 @@
 ---
 roles:
   - name: hifis.unattended_upgrades
-  # - name: cloudalchemy.coredns
   - name: xanmanning.k3s
-  # - name: geerlingguy.docker
-  # - name: cloudalchemy.node_exporter
   - name: linux-system-roles.cockpit # https://galaxy.ansible.com/ui/standalone/roles/linux-system-roles/cockpit/documentation/
-
 collections:
   - name: ansible.posix
   - name: ansible.utils
   - name: community.general
   - name: community.crypto
+  - name: community.proxmox
+    version: ">=1.4.0"
   - name: amazon.aws
   - name: https://github.com/evrardjp/ansible-collection-ha.git # keepalived and haproxy
     type: git
     version: main
-  # - name: vladgh.samba
