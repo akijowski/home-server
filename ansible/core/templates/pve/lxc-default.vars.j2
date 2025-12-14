@@ -1,0 +1,50 @@
+{{ ansible_managed | comment }}
+# https://github.com/community-scripts/ProxmoxVE/wiki/%5BSettings%5D:-Configuration-&-Defaults-System-%E2%80%90-User-Guide
+# Community-Scripts defaults (var_* only). Lines starting with # are comments.
+# Precedence: ENV var_* > default.vars > built-ins.
+# Keep keys alphabetically sorted.
+
+# Container type
+var_unprivileged=1
+
+# Resources
+var_cpu=1
+var_disk=4
+var_ram=1024
+
+# Network
+var_brg=vmbr0
+var_net=dhcp
+var_ipv6_method=none
+# var_gateway=
+# var_vlan=
+# var_mtu=
+# var_mac=
+# var_ns=
+
+# SSH
+var_ssh=yes
+var_ssh_authorized_key="{{ lookup('ansible.builtin.file', '/home/admin/.ssh/github_akijowski.pub') }}"
+
+# APT cacher (optional - with example)
+# var_apt_cacher=yes
+# var_apt_cacher_ip=192.168.1.10
+
+# Features/Tags/verbosity
+var_fuse=no
+var_tun=no
+
+# Advanced Settings (Proxmox-official features)
+var_nesting=1          # Allow nesting (required for Docker/LXC in CT)
+var_keyctl=0           # Allow keyctl() - needed for Docker (systemd-networkd workaround)
+var_mknod=0            # Allow device node creation (requires kernel 5.3+, experimental)
+var_mount_fs=          # Allow specific filesystems: nfs,fuse,ext4,etc (leave empty for defaults)
+var_protection=no      # Prevent accidental deletion of container
+var_timezone=          # Container timezone (e.g. Europe/Berlin, leave empty for host timezone)
+var_tags=community-script
+var_verbose=no
+
+# Security (root PW) – empty => autologin
+# var_pw=
+var_template_storage=local
+var_container_storage=local-lvm

@@ -126,6 +126,27 @@
   vars:
     scripts_dir: "/opt/pvescripts"
   tasks:
+    - name: Ensure helper scripts default directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - "/usr/local/community-scripts"
+        - "/usr/local/community-scripts/defaults"
+
+    - name: Ensure helper script configurations
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: '0755'
+      loop: "{{ template_files }}"
+      when: template_files | default([]) | length > 0
+
     - name: Ensure scripts directory
       ansible.builtin.file:
         path: "{{ scripts_dir }}"

@@ -1,0 +1,26 @@
+{{ ansible_managed | comment }}
+# https://github.com/community-scripts/ProxmoxVE/wiki/%5BSettings%5D:-Configuration-&-Defaults-System-%E2%80%90-User-Guide
+
+var_unprivileged=1
+var_cpu=2
+var_ram=2048
+var_disk=10
+var_brg=vmbr0
+var_net=10.10.10.7/24
+var_gateway=10.10.10.1
+var_ipv6_method=dhcp
+var_ssh=yes
+var_apt_cacher=no
+var_fuse=no
+var_tun=no
+var_gpu=no
+var_nesting=1
+var_keyctl=0
+var_mknod=0
+var_protection=yes
+var_timezone=America/Denver
+var_tags=
+var_verbose=yes
+var_hostname=proxmox-backup-server
+var_template_storage=local
+var_container_storage=local-lvm
