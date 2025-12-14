@@ -1,4 +1,24 @@
-proxmox_nodes:
+all:
+  vars:
+    users:
+      - name: ansible
+        system: true
+        comment: Ansible automation user
+      - name: admin
+        system: false
+        comment: Admin user
+    apt_default_packages:
+      - curl
+      - wget
+      - fail2ban
+      - vim
+      - unzip
+      - gpg
+      - mailutils
+      - ufw
+      - git
+
+proxmoxcluster:
   hosts:
     hyperion:
       ansible_host: 'hyperion.lab.arpa'
@@ -6,3 +26,27 @@ proxmox_nodes:
       ansible_host: 'pve01.lab.arpa'
     pve02:
       ansible_host: 'pve02.lab.arpa'
+  vars:
+    helper_scripts:
+      - tools/pve/kernel-clean.sh
+      - tools/pve/microcode.sh
+      - tools/pve/post-pve-install.sh
+
+proxmoxmgrcluster:
+  hosts:
+    pvemgr01:
+      ansible_host: 'pvemgr01.lab.arpa'
+  vars:
+    helper_scripts:
+      - tools/pve/kernel-clean.sh
+      - tools/pve/microcode.sh
+      - tools/pve/post-pve-install.sh
+      - ct/proxmox-backup-server.sh
+
+proxmoxbackupserver:
+  hosts:
+    proxmox-backup-server:
+      ansible_host: '10.10.10.7'
+  vars:
+    helper_scripts:
+      - tools/pve/post-pbs-install.sh

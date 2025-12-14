@@ -24,3 +24,4 @@ cloud init
 https://mattedwards.org/2024/07/using-cloud-init-with-proxmox-vms/
 https://ronamosa.io/docs/engineer/LAB/proxmox-packer-vm/
 https://technotim.live/posts/cloud-init-cloud-image/
+https://github.com/M0NsTeRRR/homelabv3-infra

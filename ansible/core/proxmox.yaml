@@ -3,19 +3,13 @@
 # use -e 'ansible_user=root' to override the default user set in inventory vars
 - name: Ensure default users exist
   hosts:
-    - proxmox_nodes
+    - proxmoxcluster
+    - proxmoxmgrcluster
+    - proxmoxbackupserver
   become: true
   tags:
     - init
     - users
-  vars:
-    users:
-      - name: ansible
-        system: true
-        comment: Ansible automation user
-      - name: admin
-        system: false
-        comment: Admin user
   tasks:
     - name: Install sudo from apt
       ansible.builtin.apt:
@@ -71,7 +65,9 @@
 # Note: Proxmox automatically updates packages on a schedule. This may not be necessary
 - name: Update APT packages
   hosts:
-    - proxmox_nodes
+    - proxmoxcluster
+    - proxmoxmgrcluster
+    - proxmoxbackupserver
   become: true
   tags:
     - init
@@ -92,7 +88,9 @@
 
 - name: Ensure base packages
   hosts:
-    - proxmox_nodes
+    - proxmoxcluster
+    - proxmoxmgrcluster
+    - proxmoxbackupserver
   become: true
   tags:
     - init
@@ -118,18 +116,15 @@
 
 - name: Ensure helper scripts
   hosts:
-    - proxmox_nodes
+    - proxmoxcluster
+    - proxmoxmgrcluster
+    - proxmoxbackupserver
   become: true
   tags:
     - init
     - scripts
   vars:
     scripts_dir: "/opt/pvescripts"
-    scripts:
-      - kernel-clean.sh
-      - microcode.sh
-      - post-pve-install.sh
-      - host-backup.sh
   tasks:
     - name: Ensure scripts directory
       ansible.builtin.file:
@@ -139,13 +134,14 @@
     # Formerly https://tteck.github.io/Proxmox :(
     - name: Download helper scripts
       ansible.builtin.get_url:
-        url: "https://github.com/community-scripts/ProxmoxVE/raw/main/tools/pve/{{ item }}"
-        dest: "{{ scripts_dir }}/{{ item }}"
+        url: "https://github.com/community-scripts/ProxmoxVE/raw/main/{{ item }}"
+        dest: "{{ scripts_dir }}/{{ item | basename }}"
         mode: '0550'
         owner: root
         group: root
       register: __script_dl
-      loop: "{{ scripts }}"
+      loop: "{{ helper_scripts }}"
+      when: helper_scripts | length > 0
 
     - name: Message
       ansible.builtin.debug:
