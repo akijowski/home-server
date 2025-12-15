@@ -1,12 +1,34 @@
----
 # https://technotim.live/posts/cloud-init-cloud-image/
-- name: Ensure Cloud Init VM templates are available
+---
+- name: Ensure Cloud Init VM data
   hosts:
-    # - proxmox_nodes
     - hyperion
   become: true
+  tags:
+    - cidata
+  tasks:
+   # https://forum.proxmox.com/threads/explaining-snippets-feature.53553/post-247272
+    - name: Ensure CI data files
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - src: "templates/pve_snippets/net-conf-multihome-dhcp.yaml.j2"
+          dest: "/var/lib/vz/snippets/net-conf-multihome-dhcp.yaml"
+        - src: "templates/pve_snippets/user-data-multihome.yaml.j2"
+          dest: "/var/lib/vz/snippets/user-data-multihome.yaml"
+
+- name: Ensure Cloud Init VM images
+  hosts:
+    - hyperion
+  become: true
+  tags:
+    - ciimages
   vars:
-    img_base_dir: "/etc/ansible/cloud-init-images"
+    img_base_dir: "/mnt/pve/nfs-isos/import"
     images:
       debian13:
         state: present
@@ -14,15 +36,8 @@
         shasum: "sha512:https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS"
         vmid:
           hyperion: 9000
-
   tasks:
-    - name: Ensure image directory
-      ansible.builtin.file:
-        path: "{{ img_base_dir }}"
-        state: directory
-        mode: '0755'
-
-    - name: Ensure downloaded base images
+    - name: Ensure CI base images exist
       ansible.builtin.get_url:
         url: "{{ item.value.url }}"
         dest: "{{ img_base_dir }}/{{ item.value.url | basename }}"
@@ -32,6 +47,24 @@
       loop_control:
         label: "{{ item.key }}"
 
+- name: Ensure Cloud Init VM templates
+  hosts:
+    - hyperion
+  become: true
+  tags:
+    - citemplates
+  vars:
+    img_base_dir: "/mnt/pve/nfs-isos/import"
+    img_storage: nfs-isos
+    images:
+      debian13:
+        state: present
+        url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
+        shasum: "sha512:https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS"
+        format: qcow2
+        vmid:
+          hyperion: 9000
+  tasks:
     - name: Create base VM
       delegate_to: 127.0.0.1
       community.proxmox.proxmox_kvm:
@@ -45,10 +78,13 @@
         vmid: "{{ item.value.vmid[inventory_hostname] }}"
         agent: true
         bios: seabios
+        boot: 'order=scsi0;net0'
+        bootdisk: 'scsi0'
         cpu: host
         cores: 1
         description: "Created At: {{ now(utc=true) }}"
         machine: q35
+        scsihw: virtio-scsi-pci
         net:
           net0: 'virtio,bridge=vmbr0'
         ostype: l26
@@ -62,37 +98,28 @@
       loop_control:
         label: "{{ item.key }}"
 
-# Copied from the examples here: https://github.com/ansible-collections/community.proxmox/issues/53
-# TODO: Replace root user. Required while the cloud image file is an abs path.
-# Moving it to a snippets directory or something may work better
-    - name: Attach Disk and Add CI Drive to VM
+    - name: Attach CI disk
       delegate_to: 127.0.0.1
-      community.proxmox.proxmox_kvm:
+      community.proxmox.proxmox_disk:
         api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
-        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_ROOT_USER') }}"
-        api_password: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_ROOT_PASSWORD') }}"
+        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_SECRET') }}"
 
-        node: "{{ inventory_hostname }}"
+        backup: true
+        disk: 'scsi0'
+        format: "{{ item.value.format | default('raw') }}"
+        import_from: "{{ img_storage }}:import/{{ item.value.url | basename }}"
         name: "{{ item.value.url | basename | split('.') | first }}"
         vmid: "{{ item.value.vmid[inventory_hostname] }}"
-        boot: "order=scsi0;net0"
-        ide:
-          ide2: "local-lvm:cloudinit"
-        scsihw: virtio-scsi-pci
-        scsi:
-          scsi0: "local-lvm:0,import-from={{ img_base_dir }}/{{ item.value.url | basename }}"
         state: present
-        update: true
-        update_unsafe: true
-        timeout: 700 # importing disks can take a while
+        storage: local-lvm
+        timeout: 600
       loop: "{{ images | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
 
-# Right now the play bombs out at the above step due to a bug in the proxmox module
-# Error with read timeout: https://github.com/ansible-collections/community.proxmox/issues/160
-# But it gets far enough that you can still make the VM a template in the UI
-    - name: Convert VM to template
+    - name: Convert to template
       delegate_to: 127.0.0.1
       community.proxmox.proxmox_kvm:
         api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
@@ -102,8 +129,9 @@
 
         node: "{{ inventory_hostname }}"
         name: "{{ item.value.url | basename | split('.') | first }}"
+        vmid: "{{ item.value.vmid[inventory_hostname] }}"
         state: template
+        force: true # stop VM if necessary
       loop: "{{ images | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
-      when: item.value.state == 'present'
