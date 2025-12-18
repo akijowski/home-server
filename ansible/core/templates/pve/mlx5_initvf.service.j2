@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Configure SRIOV settings for Mellanox NICs. Latest kernel module uses sysfs so we write to there at boot.
+After=network.target
+
+[Service]
+Type=oneshot
+# note: change according to your hardware:
+ExecStart=/bin/bash -c "/usr/bin/echo {{ num_vfs | default(8) }} > /sys/class/infiniband/mlx5_0/device/sriov_numvfs"
+# There may be a limitation in the bios
+# Look in to ARI support for PCIe settings
+# https://forums.developer.nvidia.com/t/enablement-of-sr-iov-on-connectx-5-only-possible-for-one-port-physical-function/292867
+# https://forum.proxmox.com/threads/failed-to-enable-sriov-for-mellanox-cx-4.132082/
+#ExecStart=/bin/bash -c "/usr/bin/echo {{ num_vfs | default(4) }} > /sys/class/infiniband/mlx5_1/device/sriov_numvfs"
+#ExecStart=/usr/local/bin/initIbGuids.sh
+StandardOutput=journal
+TimeoutStartSec=60
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

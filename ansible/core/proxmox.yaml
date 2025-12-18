@@ -168,3 +168,28 @@
       ansible.builtin.debug:
         msg: "Downloaded helper scripts to {{ scripts_dir }}. Run these manually for each host as they require operator input."
       when: __script_dl is changed
+
+- name: Ensure Mellanox NIC configuration
+  hosts:
+    - pve02
+  become: true
+  tags:
+    - mlx5
+    - mellanox
+  tasks:
+    - name: Ensure systemd service oneshot
+      ansible.builtin.template:
+        src: "./templates/pve/mlx5_initvf.service.j2"
+        dest: "/etc/systemd/system/mlx5_initvf.service"
+        mode: '0755'
+        owner: root
+        group: root
+      register: _mlx_systemd
+
+    - name: Ensure systemd is updated
+      ansible.builtin.systemd_service:
+        name: mlx5_initvf.service
+        daemon_reload: true
+        state: started
+        enabled: true
+      when: _mlx_systemd is changed

@@ -49,3 +49,26 @@ Useful links
 - [CX-3 Not Recognized by mst start](https://www.reddit.com/r/homelab/comments/18a0mzk/mellanox_connectx3_is_not_recognized_by_firmware/)
   - use `mst start --with_unknown`
 - [Mellanox CX-4 or newer tips and tricks](https://forums.servethehome.com/index.php?threads/mellanox-connectx-4-or-newer-bluefield-tips-tricks.47779/)
+
+### Kernel changes mlx4 vs mlx5
+
+There are differences in the kernel modules for mellanox cards.
+The module `mlx4_core` can be configured with settings in `/etc/modprobe.d/`.
+However `mlx5_core` needs to be set through `/sys/` params.
+
+generic kernel links:
+
+- https://www.baeldung.com/linux/list-loadable-kernel-modules
+
+Flashing XC-4 and newer:
+
+- https://docs.nvidia.com/networking/display/mftv4250/mlxfwmanager+–+firmware+update+and+query+tool <-- Used this tool
+- https://network.nvidia.com/support/firmware/nic/
+- https://network.nvidia.com/support/firmware/firmware-downloads/
+
+link dump:
+
+- https://enterprise-support.nvidia.com/s/article/HowTo-Configure-SR-IOV-for-ConnectX-4-ConnectX-5-ConnectX-6-with-KVM-Ethernet
+- https://forums.servethehome.com/index.php?threads/how-to-use-the-mlx5_core-driver-with-mellanox-connectx-4-lx-in-debian.35663/
+- https://pavlokhmel.com/proxmox-virtual-network-interfaces-with-mellanox-infiniband-cards.html <-- this is useful
+- https://forum.proxmox.com/threads/tutorial-proxmox-8-mellanox-infiniband-and-sr-iov.146196/ <-- similar to above
