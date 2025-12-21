@@ -3,7 +3,7 @@
 
     inputs = {
         # Avoid unstable and stick to the pinned nixpkgs. Could break Ansible
-        nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+        nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
         flake-utils.url = "github:numtide/flake-utils";
     };
 
@@ -28,6 +28,7 @@
                         boto3
                         hvac
                         dnspython
+                        pre-commit-hooks
                     ]
                 );
 

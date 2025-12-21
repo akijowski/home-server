@@ -10,7 +10,10 @@
     "kubecm@latest",
     "kustomize@latest",
     "vault@latest",
-    "path:flakes/python-pyutils"
+    "path:flakes/python-pyutils",
+    "cdrtools@latest",
+    "hugo@latest",
+    "pre-commit@latest"
   ],
   "shell": {
     "init_hook": [
