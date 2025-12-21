@@ -1,7 +1,5 @@
 ---
-date: '2025-12-20T13:59:57-07:00'
-draft: false
-title: 'Proxmox'
+title: 'Terraform'
 ---
 ## Introduction
 
