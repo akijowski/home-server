@@ -53,7 +53,7 @@ I then passed these VFs to the NAS VM.
 
 These are the basic steps I followed to configure the NIC on Proxmox.
 
-{{% details "Modify Grub Config" open=false %}}
+{{% details "Modify Grub Config" %}}
 
 #### Modify Grub Config
 
@@ -64,7 +64,7 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
 ```
 
 {{% /details %}}
-{{% details "Update /etc/modules" open=false %}}
+{{% details "Update /etc/modules" %}}
 
 #### Update /etc/modules
 
@@ -81,7 +81,7 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
 ```
 
 {{% /details %}}
-{{% details "Update initramfs" open=false %}}
+{{% details "Update initramfs" %}}
 
 #### Update initramfs
 
@@ -96,7 +96,7 @@ reboot
 ```
 
 {{% /details %}}
-{{% details "Add firmware and configure" open=false %}}
+{{% details "Add firmware and configure" %}}
 
 #### Add firmware and configure
 
@@ -130,7 +130,7 @@ mst status
 ```
 
 {{% /details %}}
-{{% details "Updated kernel configs" open=false %}}
+{{% details "Updated kernel configs" %}}
 
 #### Updated kernel configs
 
