@@ -9,9 +9,9 @@ The NIC I use are Mellanox cards.
 Configuring these cards is a bit of a challenge, since it requires drivers and configuration on the host.
 
 {{% hint info %}}
-For CX-3 use firmware 4.22.1-417-LTS successfully up until linux kernel 6.17.2-1-pve (2025-10-21T11:55Z) for Proxmox
+For CX-3 use firmware *4.22.1-417-LTS* successfully up until linux kernel 6.17.2-1-pve (2025-10-21T11:55Z) for Proxmox
 (6.14.11-4-pve (2025-10-10T08:04Z) was last successful kernel for MFT).
-Had to use latest MFT version (4.34.0-145) to get compatibility with kernel 6.17.
+Had to use MFT version (*4.34.0-145*) to get compatibility with kernel 6.17.
 {{% /hint %}}
 
 ### Links
@@ -55,8 +55,6 @@ These are the basic steps I followed to configure the NIC on Proxmox.
 
 {{% details "Modify Grub Config" %}}
 
-#### Modify Grub Config
-
 `/etc/default/grub`
 
 ```text
@@ -66,24 +64,21 @@ GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
 {{% /details %}}
 {{% details "Update /etc/modules" %}}
 
-#### Update /etc/modules
-
 ```text
 # /etc/modules: kernel modules to load at boot time.
 #
 # This file contains the names of kernel modules that should be loaded
 # at boot time, one per line. Lines beginning with "#" are ignored.
 # Parameters can be specified after the module name.
+
 # PCI Passthrough
-#vfio
-#vfio_iommu_type1
-#vfio_pci
+vfio
+vfio_iommu_type1
+vfio_pci
 ```
 
 {{% /details %}}
 {{% details "Update initramfs" %}}
-
-#### Update initramfs
 
 After updating grub and modules.
 
@@ -97,8 +92,6 @@ reboot
 
 {{% /details %}}
 {{% details "Add firmware and configure" %}}
-
-#### Add firmware and configure
 
 Before PVE9 and Linux Kernel 6.17, this version of Mellanox Firmware Tools (MFT) worked: **4.22.1-526-LTS**.
 
@@ -132,20 +125,18 @@ mst status
 {{% /details %}}
 {{% details "Updated kernel configs" %}}
 
-#### Updated kernel configs
-
 Proxmox needs to have the kernel configured.
 This can be done by writing config files in `/etc/modprobe.d/`.
 I am including default Proxmox ones for reference.
 
-##### blacklist.conf
+> blacklist.conf
 
 ```text
 # Prevent Proxmox from using these PCIe devices (sas and melanox)
 blacklist mpt3sas
 ```
 
-##### mlx4_core.conf
+> mlx4_core.conf
 
 ```text
 # Mellanox config for eth devices
@@ -161,7 +152,7 @@ options mlx4_en inline_thold=0
 options mlx4_core log_num_mgm_entry_size=-7
 ```
 
-##### mlx4-vfio.conf
+> mlx4-vfio.conf
 
 ```text
 # SFP Mellanox NIC for TrueNAS
@@ -171,7 +162,7 @@ options mlx4_core log_num_mgm_entry_size=-7
 
 This configures the SAS device for my TrueNAS VM
 
-##### sas-vfio.conf
+> sas-vfio.conf
 
 ```text
 # SAS PCIe Device for TrueNAS
