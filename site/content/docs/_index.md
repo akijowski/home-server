@@ -1,8 +1,8 @@
 ---
-title: Home-Server Configuration
+title: ""
 ---
 
-# Home Server Configuration Management
+# Home Server Configuration Management {anchor=false}
 
 This project is the configuration for my personal home lab environment.
 It is on-going and a test bed for me to continue learning.
