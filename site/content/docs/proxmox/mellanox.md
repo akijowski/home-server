@@ -41,7 +41,7 @@ Useful links
 #### ConnectX-4 and Up
 
 - ["Official" HowTo Configure from Nvidia](https://enterprise-support.nvidia.com/s/article/HowTo-Configure-SR-IOV-for-ConnectX-4-ConnectX-5-ConnectX-6-with-KVM-Ethernet)
-- [More info on what changed with the new kernel module](https://forums.servethehome.com/index.php?threads/)how-to-use-the-mlx5_core-driver-with-mellanox-connectx-4-lx-in-debian.35663/
+- [More info on what changed with the new kernel module](https://forums.servethehome.com/index.php?threads/how-to-use-the-mlx5_core-driver-with-mellanox-connectx-4-lx-in-debian.35663/)
 - [Useful way to ensure sysfs is configured for mlx5_core](https://pavlokhmel.com/proxmox-virtual-network-interfaces-with-mellanox-infiniband-cards.html)
 - [Similar to above](https://forum.proxmox.com/threads/tutorial-proxmox-8-mellanox-infiniband-and-sr-iov.146196/)
 
@@ -93,7 +93,8 @@ reboot
 {{% /details %}}
 {{% details "Add firmware and configure" %}}
 
-Before PVE9 and Linux Kernel 6.17, this version of Mellanox Firmware Tools (MFT) worked: **4.22.1-526-LTS**.
+Before PVE9 and Linux Kernel 6.17, this version of Mellanox Firmware Tools (MFT) worked: **4.22.1-417-LTS**.
+Kernel 6.17 needed **4.34.0-145** for the ConnectX-3 card to work.
 
 I saved these tools in `/opt/mellanox`
 
