@@ -1,0 +1,157 @@
+#! /usr/bin/env bash
+
+{{ ansible_managed | comment }}
+# based on https://github.com/CurtisBlumer/ProxmoxVE-hookscripts/blob/main/Intel_iGPU_multipass.sh
+
+# Intel iGPU multi-container passthrough hookscript.
+#
+# This script automatically configures the host and container to allow the
+# Intel iGPU to be attached to multiple Proxmox containers at the same time.
+#
+# This hookscript will work for protected and unprotected containers.
+#
+# Copyright (c) 2024 Curtis Blumer
+# License: AGPLv3
+# https://github.com/CurtisBlumer/ProxmoxVE-hookscripts/LICENSE
+#
+
+friendly_name="Intel iGPU multi-container passthrough";
+
+echo "\nExecuting the $friendly_name hookscript ($0)\n";
+
+vmid=$1;
+
+phase=$2;
+
+vmid_conf_file=/etc/pve/lxc/$vmid.conf;
+
+card0=dev/dri/card1;
+card0_major=226;
+card0_minor=1;
+lxc_cgroup2_allow_card0="lxc.cgroup2.devices.allow: c $card0_major:$card0_minor rwm";
+lxc_mount_card0="lxc.mount.entry: /var/lib/lxc/$vmid/$card0 $card0 none bind,optional,create=file,mode=0660";
+
+renderD128=dev/dri/renderD128;
+renderD128_major=226;
+renderD128_minor=128;
+lxc_cgroup2_allow_renderD128="lxc.cgroup2.devices.allow: c $renderD128_major:$renderD128_minor rwm";
+lxc_mount_renderD128="lxc.mount.entry: /var/lib/lxc/$vmid/$renderD128 $renderD128 none bind,optional,create=file,mode=0660";
+
+if [ $phase = 'pre-start' ]; then
+    # First phase 'pre-start' will be executed before the guest
+    # is started. Exiting with a code != 0 will abort the start
+
+    echo "Starting configuration of container $vmid for $friendly_name";
+
+    echo "Checking configuration file for container $vmid...";
+
+    grep_lxc_cgroup2_allow_card0=$(grep "$lxc_cgroup2_allow_card0" $vmid_conf_file);
+    grep_lxc_mount_card0=$(grep "$lxc_mount_card0" $vmid_conf_file);
+    grep_lxc_cgroup2_allow_renderD128=$(grep "$lxc_cgroup2_allow_renderD128" $vmid_conf_file);
+    grep_lxc_mount_renderD128=$(grep "$lxc_mount_renderD128" $vmid_conf_file);
+
+    if [ "$grep_lxc_cgroup2_allow_card0" = "" ] ||
+        [ "$grep_lxc_mount_card0" = "" ] ||
+        [ "$grep_lxc_cgroup2_allow_renderD128" = "" ] ||
+        [ "$grep_lxc_mount_renderD128" = "" ]; then
+
+        echo "The configuration file needs updating.\n";
+
+        echo "Attmepting to update the configuration file...";
+
+        if [ "$grep_lxc_cgroup2_allow_card0" = "" ]; then echo "$lxc_cgroup2_allow_card0" | tee -a $vmid_conf_file > /dev/null 2>&1; fi
+        if [ "$grep_lxc_mount_card0" = "" ]; then echo "$lxc_mount_card0" | tee -a $vmid_conf_file > /dev/null 2>&1; fi
+        if [ "$grep_lxc_cgroup2_allow_renderD128" = "" ]; then echo "$lxc_cgroup2_allow_renderD128" | tee -a $vmid_conf_file > /dev/null 2>&1; fi
+        if [ "$grep_lxc_mount_renderD128" = "" ]; then echo "$lxc_mount_renderD128" | tee -a $vmid_conf_file > /dev/null 2>&1; fi
+
+        echo "Rechecking config file for container $vmid...";
+
+        grep_lxc_cgroup2_allow_card0=$(grep "$lxc_cgroup2_allow_card0" $vmid_conf_file);
+        grep_lxc_mount_card0=$(grep "$lxc_mount_card0" $vmid_conf_file);
+        grep_lxc_cgroup2_allow_renderD128=$(grep "$lxc_cgroup2_allow_renderD128" $vmid_conf_file);
+        grep_lxc_mount_renderD128=$(grep "$lxc_mount_renderD128" $vmid_conf_file);
+
+        if [ "$grep_lxc_cgroup2_allow_card0" = "" ] ||
+            [ "$grep_lxc_mount_card0" = "" ] ||
+            [ "$grep_lxc_cgroup2_allow_renderD128" = "" ] ||
+            [ "$grep_lxc_mount_renderD128" = "" ]; then
+
+            echo "\nYou must add the following lines to $vmid_conf_file\n";
+
+            if [ "$grep_lxc_cgroup2_allow_card0" = "" ]; then echo "$lxc_cgroup2_allow_card0"; fi
+            if [ "$grep_lxc_mount_card0" = "" ]; then echo "$lxc_mount_card0"; fi
+            if [ "$grep_lxc_cgroup2_allow_renderD128" = "" ]; then echo "$lxc_cgroup2_allow_renderD128"; fi
+            if [ "$grep_lxc_mount_renderD128" = "" ]; then echo "$lxc_mount_renderD128"; fi
+
+            echo ""
+            ErrorExit 5 "Could not automatically update the configation file.";
+        else
+            echo "\n\nYOU MUST REBOOT THE CONTAINER MANUALLY FOR CHANGES TO TAKE EFFECT.\n\n";
+        fi
+    fi
+
+    echo "Beginning system preparations on `hostname -f`.";
+
+    echo "Creating special devices folder for iGPU passthrough at '/var/lib/lxc/$vmid/dev/dri' on PVE host.";
+    mkdir -p /var/lib/lxc/$vmid/dev/dri;
+
+    echo "Creating special '/$card0' device at '/var/lib/lxc/$vmid/$card0' on PVE host.";
+    mknod -m 660 /var/lib/lxc/$vmid/$card0 c $card0_major $card0_minor;
+    chown 100000:100000 /var/lib/lxc/$vmid/$card0;
+
+    echo "Creating special '/$renderD128' device at '/var/lib/lxc/$vmid/$renderD128' on PVE host.";
+    mknod -m 660 /var/lib/lxc/$vmid/$renderD128 c $renderD128_major $renderD128_minor;
+    chown 100000:100000 /var/lib/lxc/$vmid/$renderD128;
+
+elif [ $phase = 'post-start' ]; then
+    # Second phase 'post-start' will be executed after the guest
+    # successfully started.
+
+    is_card0_available=$(pct exec $vmid -- sh -c "(ls /$card0 >> /dev/null 2>&1 && echo 1) || echo ''");
+    is_renderD128_available=$(pct exec $vmid -- sh -c "(ls /$renderD128 >> /dev/null 2>&1 && echo 1) || echo ''");
+
+    if [ "$is_card0_available" = "" ]; then echo "/$card0 is not available. You must restart the container manually.\n"; fi
+    if [ "$is_renderD128_available" = "" ]; then echo "/$renderD128 is not available. You must restart the container manually.\n"; fi
+
+    echo "Changing ownership on '/$card0' to 'root:video' in LXC container.";
+    pct exec $vmid --keep-env=0 chown root:video /$card0;
+
+    echo "Changing ownership on '/dev/dri/renderD128' to 'root:render' in LXC container.";
+    pct exec $vmid --keep-env=0 chown root:render /$renderD128;
+
+    echo "$friendly_name for container $vmid started."
+
+elif [ $phase = 'pre-stop' ]; then
+    # Third phase 'pre-stop' will be executed before stopping the guest
+    # via the API. Will not be executed if the guest is stopped from
+    # within e.g., with a 'poweroff'
+
+    echo "$friendly_name for container $vmid stopping...";
+
+elif [ $phase = 'post-stop' ]; then
+    # Last phase 'post-stop' will be executed after the guest stopped.
+    # This should even be executed in case the guest crashes or stopped
+    # unexpectedly.
+
+    echo "$vmid stopped. Doing cleanup.";
+
+    echo "Removing special devices folder at '/var/lib/lxc/$vmid/dev/dri' on `hostname -f`";
+    rm -R /var/lib/lxc/$vmid/dev/dri;
+else
+    ErrorExit 1 "Got unknown phase $phase for $vmid";
+fi
+
+ErrorExit()
+{
+    default_msg="Exiting early."
+    code=$1;
+    message=$2;
+
+    echo "";
+    if [ "$message" != "" ]; then echo "$message"; fi
+    echo "Exiting early.\n\n";
+
+    exit $code;
+}
+
+exit 0;

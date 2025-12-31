@@ -6,7 +6,10 @@
   # https://devenv.sh/basics/
 
   env = {
+    # ansible inventory
     ANSIBLE_PROXMOX_TOKEN_SECRET = config.secretspec.secrets.ANSIBLE_PROXMOX_TOKEN_SECRET or "";
+    # packer and ansible provisioning
+    PACKER_PROXMOX_TOKEN_SECRET = config.secretspec.secrets.PACKER_PROXMOX_TOKEN_SECRET or "";
   };
 
   dotenv.enable = true;
@@ -28,8 +31,8 @@
       venv.enable = true;
       venv.quiet = true;
       venv.requirements = ''
-        ansible-core
-        pre-commit-hooks
+        ansible
+        requests
         proxmoxer
         boto3
       '';

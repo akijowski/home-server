@@ -1,6 +1,10 @@
 ---
 plugin: community.proxmox.proxmox
 
+user: "{{ lookup('ansible.builtin.env', 'ANSIBLE_PROXMOX_USER') }}"
+token_id: "{{ lookup('ansible.builtin.env', 'ANSIBLE_PROXMOX_TOKEN_ID') }}"
+token_secret: "{{ lookup('ansible.builtin.env', 'ANSIBLE_PROXMOX_TOKEN_SECRET') }}"
+
 validate_certs: true
 want_facts: true
 

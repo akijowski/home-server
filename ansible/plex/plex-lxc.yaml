@@ -1,4 +1,60 @@
 ---
+- name: Ensure Plex Hookscripts
+  hosts:
+    - pve01
+  become: true
+  tags:
+    - lxc
+    - hooks
+  tasks:
+    - name: Ensure hookscripts
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - src: "templates/hookscripts/plex-intel-igpu.sh.j2"
+          dest: "/var/lib/vz/snippets/plex-intel-igpu.sh"
+
+# TODO: This just makes a sample container, that uses a hookscript to configure iGPU passthrough
+# Need to get it fully configured to run plex
+- name: Create Plex container (LXC)
+  hosts:
+    - pve01
+  become: true
+  tags:
+    - lxc
+    - create
+  tasks:
+    - name: Ensure LXC is configured
+      delegate_to: 127.0.0.1
+      community.general.proxmox:
+        api_host: "proxmox.kijowski.casa"
+        api_port: 8006
+        api_user: "root@pam"
+        api_password: "<USE THE ROOT PASSWORD>"
+
+        vmid: 1000
+        node: "pve01"
+        ostemplate: "nfs-isos:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+        ostype: ubuntu
+        hostname: plexsample01
+        cores: 4
+        memory: 4096
+        password: "password"
+        disk_volume:
+          storage: local-lvm
+          size: 64
+        hookscript: "local:snippets/plex-intel-igpu.sh"
+        netif:
+          net0: "name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr50"
+        features:
+          - nesting=1
+        state: present
+
+
 - name: Initialize Plex (LXC)
   hosts: plex
   debugger: on_failed
