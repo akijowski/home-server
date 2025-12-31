@@ -51,8 +51,6 @@
 
   # https://devenv.sh/basics/
   enterShell = ''
-  #   hello         # Run scripts directly
-  #   git --version # Use packages
   # https://github.com/cachix/devenv/issues/2323#issuecomment-3612165852
     export ANSIBLE_BECOME_PASSWORD_FILE=$(secretspec get ANSIBLE_BECOME_PASSWORD_FILE)
     export ANSIBLE_VAULT_PASSWORD_FILE=$(secretspec get ANSIBLE_VAULT_PASSWORD_FILE)
@@ -71,7 +69,18 @@
   # '';
 
   # https://devenv.sh/git-hooks/
-  # git-hooks.hooks.shellcheck.enable = true;
+  git-hooks.hooks = {
+    check-json.enable = true;
+    check-toml.enable = true;
+    check-yaml = {
+      enable = true;
+      args = [ "--allow-multiple-documents" ];
+    };
+    check-added-large-files.enable = true;
+    detect-private-keys.enable = true;
+    end-of-file-fixer.enable = true;
+    trim-trailing-whitespace.enable = true;
+  };
 
   # See full reference at https://devenv.sh/reference/options/
 }
