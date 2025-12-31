@@ -1,0 +1,77 @@
+{ pkgs, lib, config, inputs, ... }:
+
+{
+  # needs to be a root (trusted) user to modify root nixos cache
+  cachix.enable = true;
+  # https://devenv.sh/basics/
+
+  env = {
+    ANSIBLE_PROXMOX_TOKEN_SECRET = config.secretspec.secrets.ANSIBLE_PROXMOX_TOKEN_SECRET or "";
+  };
+
+  dotenv.enable = true;
+
+  # https://devenv.sh/packages/
+  packages = [
+    pkgs.go-task
+    #pkgs.packer
+    pkgs.awscli2
+    pkgs.pre-commit
+    pkgs.hugo
+  ];
+
+  # https://devenv.sh/languages/
+  # languages.rust.enable = true;
+  languages = {
+    python = {
+      enable = true;
+      venv.enable = true;
+      venv.quiet = true;
+      venv.requirements = ''
+        ansible-core
+        pre-commit-hooks
+        proxmoxer
+        boto3
+      '';
+    };
+
+    opentofu.enable = true;
+  };
+
+  # https://devenv.sh/processes/
+  # processes.dev.exec = "${lib.getExe pkgs.watchexec} -n -- ls -la";
+
+  # https://devenv.sh/services/
+  # services.postgres.enable = true;
+
+  # https://devenv.sh/scripts/
+  # scripts.hello.exec = ''
+  #   echo hello from $GREET
+  # '';
+
+  # https://devenv.sh/basics/
+  enterShell = ''
+  #   hello         # Run scripts directly
+  #   git --version # Use packages
+  # https://github.com/cachix/devenv/issues/2323#issuecomment-3612165852
+    export ANSIBLE_BECOME_PASSWORD_FILE=$(secretspec get ANSIBLE_BECOME_PASSWORD_FILE)
+    export ANSIBLE_VAULT_PASSWORD_FILE=$(secretspec get ANSIBLE_VAULT_PASSWORD_FILE)
+  '';
+
+  # https://devenv.sh/tasks/
+  # tasks = {
+  #   "myproj:setup".exec = "mytool build";
+  #   "devenv:enterShell".after = [ "myproj:setup" ];
+  # };
+
+  # https://devenv.sh/tests/
+  # enterTest = ''
+  #   echo "Running tests"
+  #   git --version | grep --color=auto "${pkgs.git.version}"
+  # '';
+
+  # https://devenv.sh/git-hooks/
+  # git-hooks.hooks.shellcheck.enable = true;
+
+  # See full reference at https://devenv.sh/reference/options/
+}
