@@ -1,5 +1,0 @@
----
-adguard_version: 0.107.41
-adguard_system_user: adguard
-adguard_system_group: adguard
-adguard_binary_path: /usr/local/bin/adguard

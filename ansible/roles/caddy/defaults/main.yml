@@ -1,4 +1,0 @@
-caddy_file_location: conf/caddy/Caddyfile
-caddy_additional_groups: []
-xcaddy_modules:
-  - github.com/caddy-dns/route53
