@@ -3,6 +3,8 @@
 {
   # needs to be a root (trusted) user to modify root nixos cache
   cachix.enable = true;
+
+  delta.enable = true;
   # https://devenv.sh/basics/
 
   env = {

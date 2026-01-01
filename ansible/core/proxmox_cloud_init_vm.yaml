@@ -69,9 +69,9 @@
       delegate_to: 127.0.0.1
       community.proxmox.proxmox_kvm:
         api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
-        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_USER') }}"
-        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_ID') }}"
-        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_SECRET') }}"
+        api_user: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
 
         node: "{{ inventory_hostname }}"
         name: "{{ item.value.url | basename | split('.') | first }}"
@@ -102,9 +102,9 @@
       delegate_to: 127.0.0.1
       community.proxmox.proxmox_disk:
         api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
-        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_USER') }}"
-        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_ID') }}"
-        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_SECRET') }}"
+        api_user: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
 
         backup: true
         disk: 'scsi0'
@@ -123,9 +123,9 @@
       delegate_to: 127.0.0.1
       community.proxmox.proxmox_kvm:
         api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
-        api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_USER') }}"
-        api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_ID') }}"
-        api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_CI_TOKEN_SECRET') }}"
+        api_user: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
 
         node: "{{ inventory_hostname }}"
         name: "{{ item.value.url | basename | split('.') | first }}"
