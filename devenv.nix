@@ -1,5 +1,11 @@
 { pkgs, lib, config, inputs, ... }:
 
+let
+  pkgs-unstable = import inputs.nixpkgs-unstable {
+    system = pkgs.stdenv.system;
+    config.allowUnfree = true;
+  };
+in
 {
   # needs to be a root (trusted) user to modify root nixos cache
   cachix.enable = true;
@@ -21,8 +27,8 @@
   # https://devenv.sh/packages/
   packages = [
     pkgs.go-task
-    #pkgs.packer
-    pkgs.awscli2
+    pkgs-unstable.packer
+    pkgs-unstable.awscli2
     pkgs.pre-commit
     pkgs.hugo
   ];

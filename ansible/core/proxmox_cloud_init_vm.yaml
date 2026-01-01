@@ -16,14 +16,15 @@
         group: root
         mode: '0755'
       vars:
+        packer_ssh_public_key: "{{ lookup('ansible.builtin.file', '~/.ssh/packer_id_ed25519.pub') }}"
         ssh_public_key: "{{ lookup('ansible.builtin.file', '~/.ssh/github_akijowski.pub') }}"
       loop:
         - src: "templates/pve_snippets/net-conf-multihome-dhcp.yaml.j2"
           dest: "/var/lib/vz/snippets/net-conf-multihome-dhcp.yaml"
-        - src: "templates/pve_snippets/user-data-multihome.yaml.j2"
-          dest: "/var/lib/vz/snippets/user-data-multihome.yaml"
-        - src: "templates/pve_snippets/user-data-multihome.yaml.j2"
+        - src: "templates/pve_snippets/user-data.yaml.j2"
           dest: "/var/lib/vz/snippets/user-data.yaml"
+        - src: "templates/pve_snippets/user-data-packer.yaml.j2"
+          dest: "/var/lib/vz/snippets/user-data-packer.yaml"
 
 - name: Ensure Cloud Init VM images
   hosts:
@@ -70,11 +71,11 @@
           net0: 'virtio,bridge=vmbr0'
         vmid:
           hyperion: 9000
-      debian13-trixie-multi:
+      debian13-trixie-multi-packer:
         state: present
         url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
         format: qcow2
-        cicustom: "user=local:snippets/user-data.yaml,network=local:snippets/net-conf-multihome-dhcp.yaml"
+        cicustom: "user=local:snippets/user-data-packer.yaml,network=local:snippets/net-conf-multihome-dhcp.yaml"
         netconfig:
           net0: 'virtio,bridge=vmbr0'
           net1: 'virtio,bridge=vmbr50'
