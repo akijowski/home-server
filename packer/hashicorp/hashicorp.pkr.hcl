@@ -1,65 +1,98 @@
-locals {
-  boot_iso = {
-    type         = "scsi"
-    storage_pool = "nfs-isos"
-    download_pve = false
-    unmount      = true
-    file         = var.iso_file["ubuntu24"]
-    checksum     = var.iso_checksum["ubuntu24"]
+packer {
+  required_plugins {
+    proxmox = {
+      version = "~> 1"
+      source  = "github.com/hashicorp/proxmox"
+    }
+    ansible = {
+      source  = "github.com/hashicorp/ansible"
+      version = "~> 1"
+    }
   }
-
-  terraform_dir = abspath("${path.root}/../../terraform/proxmox/packer/manifests")
 }
 
-variable "consul_version" {
-  type        = string
-  description = "Consul version"
+variable "proxmox_username" {
+  type    = string
+  default = "${env("PACKER_PROXMOX_USER")}!${env("PACKER_PROXMOX_TOKEN_ID")}"
+}
+
+variable "proxmox_token" {
+  type    = string
+  default = env("PACKER_PROXMOX_TOKEN_SECRET")
+}
+
+variable "ansible_ssh_pub_key_file" {
+  type      = string
+  default   = "/home/admin/.ssh/github_akijowski.pub"
+  sensitive = true
+  validation {
+    condition     = can(regex("(?i)PRIVATE", var.ansible_ssh_pub_key_file)) == false
+    error_message = "ERROR Private SSH Key."
+  }
+}
+
+locals {
+  clone_vm         = "debian13-trixie-multi-packer"
+  project_root_dir = abspath("${path.root}/../..")
+  terraform_dir    = abspath("${local.project_root_dir}/terraform/proxmox/packer/manifests")
+}
+
+source "proxmox-clone" "debian-multihome" {
+
+  clone_vm = local.clone_vm
+
+  proxmox_url = "https://proxmox.kijowski.casa:8006/api2/json"
+  username    = var.proxmox_username
+  token       = var.proxmox_token
+  node        = "hyperion"
+
+  // SSH (packer)
+  ssh_username              = "packer"
+  ssh_timeout               = "20m"
+  ssh_keypair_name          = "packer_id_ed25519"
+  ssh_private_key_file      = "~/.ssh/packer_id_ed25519"
+  ssh_clear_authorized_keys = false # this doesn't seem to work, so I remove them in a provisioner
+
+  vm_id         = 9100
+  template_name = "hashicorp-debian13"
+
+  cores    = 4
+  cpu_type = "host"
+  memory   = 4096
+
+  # keep an empty cloud-init drive attached
+  cloud_init           = true
+  cloud_init_disk_type = "ide"
+
+  os              = "l26"
+  bios            = "seabios"
+  machine         = "q35"
+  scsi_controller = "virtio-scsi-pci"
+
+  vga {
+    type   = "qxl"
+    memory = 16
+  }
+  # Note: adding a disks block does not resize or remove the existing scsi0/cloud-image
+
 }
 
 build {
-  source "proxmox-iso.image" {
-    name          = "hashicorp-hyperion"
-    node          = "hyperion"
-    vm_id         = var.vm_id >= 0 ? var.vm_id : 8300
-    template_name = "hashicorp-stack-${formatdate("YYYYMMDD", timestamp())}"
-
-    boot_command = var.boot_cmd_ubuntu22
-    boot_wait    = "5s"
-    http_content = {
-      "/meta-data" = file("configs/meta-data")
-      "/user-data" = templatefile("configs/user-data",
-        {
-          ssh_public_key = chomp(file(var.ssh_public_key_file))
-      })
-    }
-    // ISO
-    boot_iso {
-      type             = local.boot_iso.type
-      iso_storage_pool = local.boot_iso.storage_pool
-      iso_download_pve = local.boot_iso.download_pve
-      unmount          = local.boot_iso.unmount
-      # iso_url          = var.iso_url["ubuntu24"]
-      iso_file     = local.boot_iso.file
-      iso_checksum = local.boot_iso.checksum
-    }
-  }
+  name    = "hyperion"
+  sources = ["source.proxmox-clone.debian-multihome"]
 
   provisioner "ansible" {
-    user                   = "${var.ssh_username}"
-    galaxy_file            = "${path.cwd}/ansible/linux-requirements.yaml"
+    user = "packer"
+    # ssh_authorized_key_file = var.ansible_ssh_pub_key_file
+    galaxy_file            = "${local.project_root_dir}/ansible/linux-requirements.yaml"
     galaxy_force_with_deps = true
-    playbook_file          = "${path.cwd}/ansible/hashicorp-playbook.yaml"
-    roles_path             = "${path.cwd}/ansible/roles"
+    playbook_file          = "${local.project_root_dir}/packer/ansible/linux-playbook.yaml"
+    roles_path             = "${local.project_root_dir}/packer/ansible/roles"
     ansible_env_vars = [
-      "ANSIBLE_CONFIG=${path.cwd}/ansible/ansible.cfg",
-      "ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3"
+      "ANSIBLE_CONFIG=${local.project_root_dir}/ansible/ansible_packer.cfg",
+      "ANSIBLE_LOG_PATH=${local.project_root_dir}/packer/ansible/.logs/${build.name}-${build.ID}.log"
     ]
-    extra_arguments = [
-      "--extra-vars", "display_skipped_hosts=false",
-      "--extra-vars", "ansible_username=ansible",
-      "--extra-vars", "ansible_key=https://github.com/akijowski.keys",
-      "--extra-vars", "consul_version=${var.consul_version}"
-    ]
+    extra_arguments = []
 
   }
 
@@ -67,13 +100,20 @@ build {
     inline = [
       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
       // clean image identifiers
-      "cloud-init clean --machine-id --seed",
-      "rm /etc/hostname /etc/ssh/ssh_host_* /var/lib/systemd/random-seed",
+      "sudo cloud-init clean --machine-id --seed",
+      "sudo rm /etc/hostname /etc/ssh/ssh_host_* /var/lib/systemd/random-seed"
+    ]
+  }
+
+  provisioner "shell" {
+    inline = [
       // remove ssh configs
-      "truncate -s 0 /root/.ssh/authorized_keys",
-      "truncate -s 0 /home/ubuntu/.ssh/authorized_keys",
-      "sed -i 's/^#PasswordAuthentication\\ yes/PasswordAuthentication\\ no/' /etc/ssh/sshd_config",
-      "sed -i 's/^#PermitRootLogin\\ prohibit-password/PermitRootLogin\\ no/' /etc/ssh/sshd_config"
+      "sudo truncate -s 0 /root/.ssh/authorized_keys",
+      "sudo truncate -s 0 /home/debian/.ssh/authorized_keys",
+      "sudo sed -i 's/^#PasswordAuthentication\\ yes/PasswordAuthentication\\ no/' /etc/ssh/sshd_config",
+      "sudo sed -i 's/^#PermitRootLogin\\ prohibit-password/PermitRootLogin\\ no/' /etc/ssh/sshd_config",
+      // remove packer user ssh keys, TODO: look in to this
+      "sudo rm -f /home/packer/.ssh/authorized_keys"
     ]
   }
 
@@ -87,11 +127,13 @@ build {
   }
 
   post-processor "manifest" {
-    output = "${local.terraform_dir}/hashicorp.json"
+    output = "${local.terraform_dir}/hashicorp_${build.ID}.json"
     custom_data = {
       build_timestamp = "${timestamp()}"
       build_node      = "hyperion"
-      consul_version  = var.consul_version
+      clone_vm        = local.clone_vm
+      packer_version  = "${packer.version}"
+      consul_version  = "TODO"
     }
   }
 }

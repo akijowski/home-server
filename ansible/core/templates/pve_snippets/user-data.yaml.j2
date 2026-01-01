@@ -24,6 +24,7 @@ packages:
   - sudo
   - cloud-guest-utils
   - console-setup # allow updating keyboard and locale, but will require a restart to get past any ci failures
+  - perl # used for some debian commands like 'deluser'
 ssh_quiet_keygen: true
 disable_root: false # create root user
 allow_public_ssh_keys: true

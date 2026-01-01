@@ -1,0 +1,20 @@
+{
+  "builds": [
+    {
+      "name": "debian-multihome",
+      "builder_type": "proxmox-clone",
+      "build_time": 1767308278,
+      "files": null,
+      "artifact_id": "9100",
+      "packer_run_uuid": "e719283f-e03b-d072-edf5-01d945937600",
+      "custom_data": {
+        "build_node": "hyperion",
+        "build_timestamp": "2026-01-01T22:57:58Z",
+        "clone_vm": "debian13-trixie-multi-packer",
+        "consul_version": "TODO",
+        "packer_version": "1.14.3"
+      }
+    }
+  ],
+  "last_run_uuid": "e719283f-e03b-d072-edf5-01d945937600"
+}
