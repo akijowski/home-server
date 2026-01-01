@@ -3,6 +3,8 @@ version: 2
 renderer: networkd
 ethernets:
 # These device IDs are hardcoded which kind of stinks
+# I should consider using an ansible playbook that runs as part of cloud-init
+# to instead set the routes on each interface
   enp6s18:
     dhcp4: true
     dhcp6: true

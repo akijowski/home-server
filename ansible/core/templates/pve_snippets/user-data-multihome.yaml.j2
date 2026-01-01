@@ -1,5 +1,4 @@
 #cloud-config
-# users: [] # disable creation of default users
 users:
   - default
   # - name: foobar
@@ -14,7 +13,7 @@ users:
     shell: /bin/bash
     lock_passwd: true
     ssh_authorized_keys:
-      - ${ansible_ssh_public_key}
+      - {{ ssh_public_key }}
 locale: en_US
 keyboard:
   layout: us

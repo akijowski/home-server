@@ -15,11 +15,15 @@
         owner: root
         group: root
         mode: '0755'
+      vars:
+        ssh_public_key: "{{ lookup('ansible.builtin.file', '~/.ssh/github_akijowski.pub') }}"
       loop:
         - src: "templates/pve_snippets/net-conf-multihome-dhcp.yaml.j2"
           dest: "/var/lib/vz/snippets/net-conf-multihome-dhcp.yaml"
         - src: "templates/pve_snippets/user-data-multihome.yaml.j2"
           dest: "/var/lib/vz/snippets/user-data-multihome.yaml"
+        - src: "templates/pve_snippets/user-data-multihome.yaml.j2"
+          dest: "/var/lib/vz/snippets/user-data.yaml"
 
 - name: Ensure Cloud Init VM images
   hosts:
@@ -47,34 +51,47 @@
       loop_control:
         label: "{{ item.key }}"
 
-- name: Ensure Cloud Init VM templates
+- name: Ensure Cloud Init VM base templates
   hosts:
     - hyperion
   become: true
   tags:
-    - citemplates
+    - cibase
   vars:
     img_base_dir: "/mnt/pve/nfs-isos/import"
     img_storage: nfs-isos
     images:
-      debian13:
+      debian13-trixie:
         state: present
         url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
-        shasum: "sha512:https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS"
         format: qcow2
+        cicustom: "user=local:snippets/user-data.yaml"
+        netconfig:
+          net0: 'virtio,bridge=vmbr0'
         vmid:
           hyperion: 9000
+      debian13-trixie-multi:
+        state: present
+        url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
+        format: qcow2
+        cicustom: "user=local:snippets/user-data.yaml,network=local:snippets/net-conf-multihome-dhcp.yaml"
+        netconfig:
+          net0: 'virtio,bridge=vmbr0'
+          net1: 'virtio,bridge=vmbr50'
+        vmid:
+          hyperion: 9001
   tasks:
+    # TODO: add clean up/delete previous templates
     - name: Create base VM
       delegate_to: 127.0.0.1
       community.proxmox.proxmox_kvm:
+        # Must be root to update CI data. No API Tokens.
         api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
-        api_user: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_USER') }}"
-        api_token_id: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_ID') }}"
-        api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
+        api_user: "root@pam"
+        api_password: "{{ lookup('ansible.builtin.env', 'PROXMOX_ROOT_PASSWORD') }}"
 
         node: "{{ inventory_hostname }}"
-        name: "{{ item.value.url | basename | split('.') | first }}"
+        name: "{{ item.key }}"
         vmid: "{{ item.value.vmid[inventory_hostname] }}"
         agent: true
         bios: seabios
@@ -85,8 +102,12 @@
         description: "Created At: {{ now(utc=true) }}"
         machine: q35
         scsihw: virtio-scsi-pci
-        net:
-          net0: 'virtio,bridge=vmbr0'
+        net: "{{ item.value.netconfig }}"
+        ipconfig:
+          ipconfig0: 'ip=dhcp,ip6=dhcp'
+        ide:
+          ide2: 'local-lvm:cloudinit,format=raw'
+        cicustom: "{{ item.value.cicustom }}"
         ostype: l26
         rng0: '/dev/urandom'
         serial:
@@ -110,7 +131,7 @@
         disk: 'scsi0'
         format: "{{ item.value.format | default('raw') }}"
         import_from: "{{ img_storage }}:import/{{ item.value.url | basename }}"
-        name: "{{ item.value.url | basename | split('.') | first }}"
+        name: "{{ item.key }}"
         vmid: "{{ item.value.vmid[inventory_hostname] }}"
         state: present
         storage: local-lvm
@@ -128,7 +149,7 @@
         api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
 
         node: "{{ inventory_hostname }}"
-        name: "{{ item.value.url | basename | split('.') | first }}"
+        name: "{{ item.key }}"
         vmid: "{{ item.value.vmid[inventory_hostname] }}"
         state: template
         force: true # stop VM if necessary

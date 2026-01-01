@@ -12,6 +12,8 @@
     ANSIBLE_PROXMOX_TOKEN_SECRET = config.secretspec.secrets.ANSIBLE_PROXMOX_TOKEN_SECRET or "";
     # packer and ansible provisioning
     PACKER_PROXMOX_TOKEN_SECRET = config.secretspec.secrets.PACKER_PROXMOX_TOKEN_SECRET or "";
+    # root required for specific proxmox actions
+    PROXMOX_ROOT_PASSWORD = config.secretspec.secrets.PROXMOX_ROOT_PASSWORD or "";
   };
 
   dotenv.enable = true;
