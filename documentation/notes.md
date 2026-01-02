@@ -25,3 +25,5 @@ https://mattedwards.org/2024/07/using-cloud-init-with-proxmox-vms/
 https://ronamosa.io/docs/engineer/LAB/proxmox-packer-vm/
 https://technotim.live/posts/cloud-init-cloud-image/
 https://github.com/M0NsTeRRR/homelabv3-infra
+https://atodorov.me/2021/03/27/using-traefik-on-nomad/
+https://github.com/assareh/home-lab - old repo but some good concepts
