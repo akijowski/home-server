@@ -25,6 +25,8 @@
           dest: "/var/lib/vz/snippets/user-data.yaml"
         - src: "templates/pve_snippets/user-data-packer.yaml.j2"
           dest: "/var/lib/vz/snippets/user-data-packer.yaml"
+        - src: "templates/pve_snippets/vendor-data.yaml.j2"
+          dest: "/var/lib/vz/snippets/vendor-data.yaml"
 
 - name: Ensure Cloud Init VM images
   hosts:
@@ -66,16 +68,16 @@
         state: present
         url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
         format: qcow2
-        cicustom: "user=local:snippets/user-data.yaml"
+        cicustom: "vendor=local:snippets/vendor-data.yaml"
         netconfig:
           net0: 'virtio,bridge=vmbr0'
         vmid:
           hyperion: 9000
-      debian13-trixie-multi-packer:
+      debian13-trixie-multi:
         state: present
         url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
         format: qcow2
-        cicustom: "user=local:snippets/user-data-packer.yaml,network=local:snippets/net-conf-multihome-dhcp.yaml"
+        cicustom: "vendor=local:snippets/vendor-data.yaml,network=local:snippets/net-conf-multihome-dhcp.yaml"
         netconfig:
           net0: 'virtio,bridge=vmbr0'
           net1: 'virtio,bridge=vmbr50'

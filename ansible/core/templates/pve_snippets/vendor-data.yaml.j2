@@ -1,0 +1,32 @@
+#cloud-config
+
+# This can be applied over proxmox
+# however we cannot modify the settings that
+# proxmox will try to auto generate:
+
+#cloud-config
+# hostname: debian13-trixie
+# manage_etc_hosts: true
+# fqdn: debian13-trixie
+# chpasswd:
+#   expire: False
+# users:
+#   - default
+# package_upgrade: true
+
+locale: en_US
+keyboard:
+  layout: us
+packages:
+  - qemu-guest-agent
+  - sudo
+  - cloud-guest-utils
+  - console-setup # allow updating keyboard and locale, but will require a restart to get past any ci failures
+  - perl # used for some debian commands like 'deluser'
+ssh_quiet_keygen: true
+timezone: UTC
+disable_ec2_metadata: true
+runcmd:
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agent
+  - echo "done" > /tmp/cloud-config.done
