@@ -81,6 +81,7 @@ build {
   name    = "hyperion"
   sources = ["source.proxmox-clone.debian-multihome"]
 
+  // generic plays
   provisioner "ansible" {
     user = "packer"
     # ssh_authorized_key_file = var.ansible_ssh_pub_key_file
@@ -88,6 +89,21 @@ build {
     galaxy_force_with_deps = true
     playbook_file          = "${local.project_root_dir}/packer/ansible/linux-playbook.yaml"
     roles_path             = "${local.project_root_dir}/packer/ansible/roles"
+    ansible_env_vars = [
+      "ANSIBLE_CONFIG=${local.project_root_dir}/ansible/ansible_packer.cfg",
+      "ANSIBLE_LOG_PATH=${local.project_root_dir}/packer/ansible/.logs/${build.name}-${build.ID}.log"
+    ]
+    extra_arguments = []
+
+  }
+  // install consul
+  provisioner "ansible" {
+    user = "packer"
+    # ssh_authorized_key_file = var.ansible_ssh_pub_key_file
+    galaxy_file            = "${local.project_root_dir}/ansible/linux-requirements.yaml"
+    galaxy_force_with_deps = true
+    playbook_file          = "${local.project_root_dir}/ansible/hashicorp/packer_consul.yaml"
+    roles_path             = "${local.project_root_dir}/ansible/hashicorp/roles"
     ansible_env_vars = [
       "ANSIBLE_CONFIG=${local.project_root_dir}/ansible/ansible_packer.cfg",
       "ANSIBLE_LOG_PATH=${local.project_root_dir}/packer/ansible/.logs/${build.name}-${build.ID}.log"

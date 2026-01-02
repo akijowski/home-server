@@ -1,0 +1,17 @@
+---
+- name: Update apt
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
+    update_cache: "yes"
+
+- name: "Ensure go is installed (for other tools)"
+  ansible.builtin.apt:
+    name: "golang"
+    state: present
+
+- name: Update go env
+  ansible.builtin.command: go env -w GOBIN=/home/ansible/go/bin
+
+- name: "Install go-sockaddr"
+  ansible.builtin.command: go install github.com/hashicorp/go-sockaddr/cmd/sockaddr@latest

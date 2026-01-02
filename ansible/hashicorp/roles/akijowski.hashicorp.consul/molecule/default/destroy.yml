@@ -1,0 +1,28 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  # no_log: "{{ molecule_no_log }}"
+  tasks:
+    - name: Stop the Proxmox VM
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
+        api_user: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
+
+        name: "{{ hostvars[item].hostname }}"
+        state: stopped
+      loop: "{{ groups['molecule_consul'] }}"
+
+    - name: Destroy the Proxmox VM
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
+        api_user: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
+
+        name: "{{ hostvars[item].hostname }}"
+        state: absent
+      loop: "{{ groups['molecule_consul'] }}"

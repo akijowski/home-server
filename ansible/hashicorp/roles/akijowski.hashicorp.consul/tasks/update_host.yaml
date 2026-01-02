@@ -1,0 +1,8 @@
+---
+# Until I fix the dynamic hostname that is missing from overriding proxmox user-data
+# We need to set it manually here based on the inventory_hostname
+# There are a lot of problems with this approach
+- name: Update hostname to match inventory_hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+    use: debian

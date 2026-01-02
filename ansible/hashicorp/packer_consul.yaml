@@ -1,0 +1,11 @@
+---
+- name: Install Consul (Packer)
+  become: true
+  become_method: sudo
+  debugger: never
+  gather_facts: true
+  hosts: all
+  roles:
+    - akijowski.hashicorp.consul
+  vars:
+    consul_agent_server_bootstrap: true

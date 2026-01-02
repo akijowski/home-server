@@ -1,0 +1,67 @@
+---
+- name: Update Consul config
+  block:
+    - name: Find original config
+      ansible.builtin.stat:
+        path: "/etc/consul.d/consul.hcl"
+      register: _consul_default_config_stats
+
+    - name: Read original config
+      ansible.builtin.slurp:
+        src: "/etc/consul.d/consul.hcl"
+      when: _consul_default_config_stats.stat.exists
+      register: _consul_default_config
+
+    - name: Backup original config
+      ansible.builtin.copy:
+        src: "/etc/consul.d/consul.hcl"
+        dest: "/etc/consul.d/original.consul.hcl"
+        remote_src: true
+      when:
+        - _consul_default_config_stats.stat.exists
+        - '"Copyright (c) HashiCorp, Inc." in (_consul_default_config.content | b64decode)'
+      register: _consul_original_config_backup
+
+    - name: Remove original config
+      ansible.builtin.file:
+        path: "/etc/consul.d/consul.hcl"
+        state: absent
+      when: _consul_original_config_backup is changed
+
+    - name: Ensure Consul directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: 0755
+        owner: "{{ consul_user_name }}"
+        group: "{{ consul_group_name }}"
+        state: directory
+      loop:
+        - "{{ consul_config_dir }}"
+        - "{{ consul_data_dir }}"
+        - "{{ consul_tls_dir }}"
+
+    - name: Copy Consul config
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: 0644
+        owner: "{{ consul_user_name }}"
+        group: "{{ consul_group_name }}"
+      register: _consul_config
+      loop:
+        - src: "consul.hcl.j2"
+          dest: "{{ consul_config_dir }}/consul.hcl"
+
+    - name: Restart Consul for changes
+      ansible.builtin.systemd_service:
+        name: consul
+        state: restarted
+      when: _consul_config is changed
+  become: true
+
+- name: Wait for Consul UI
+  ansible.builtin.wait_for:
+    delay: 5
+    port: 8500
+    timeout: 300
+    state: started

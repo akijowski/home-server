@@ -1,0 +1,24 @@
+---
+- ansible.builtin.import_tasks: preflight.yaml
+
+- ansible.builtin.import_tasks: ensure_facts.yaml
+
+- ansible.builtin.import_tasks: update_host.yaml
+  become: true
+
+- ansible.builtin.import_tasks: install_helpers.yaml
+  become: true
+  when: install_helpers | default(False)
+
+- ansible.builtin.import_tasks: install_apt.yaml
+  become: true
+
+- ansible.builtin.import_tasks: configure_consul.yaml
+
+- name: Ensure Consul is enabled
+  become: true
+  ansible.builtin.systemd_service:
+    name: consul
+    state: started
+    daemon_reload: true
+    enabled: true

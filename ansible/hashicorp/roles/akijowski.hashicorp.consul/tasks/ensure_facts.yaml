@@ -1,0 +1,24 @@
+---
+- name: Check if first server
+  ansible.builtin.set_fact:
+    is_first_server: "{{ inventory_hostname == (ansible_play_hosts_all | sort | first ) }}"
+
+- name: Ensure bootstrap setting
+  ansible.builtin.set_fact:
+    is_consul_bootstrap: "{{ consul_agent_server_bootstrap and is_first_server }}"
+
+- name: Ensure retry_join servers
+  ansible.builtin.set_fact:
+    consul_retry_join_servers: "{{ consul_retry_join_servers + [srv] }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  # when: inventory_hostname != item
+  vars:
+    consul_retry_join_servers: []
+    srv: "{{ hostvars[item].ansible_default_ipv4.address }}"
+
+- name: Ensure retry join is set
+  ansible.builtin.set_fact:
+    consul_retry_join_all: "{{ consul_retry_join + (consul_retry_join_servers | default([])) }}"
+
+- ansible.builtin.debug:
+    var: consul_retry_join_all

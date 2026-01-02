@@ -1,0 +1,15 @@
+consul_user_name: consul
+consul_group_name: consul
+
+# false for client mode
+consul_agent_server: true
+# set to true to enable bootstrap mode
+consul_agent_server_bootstrap: false
+
+consul_config_dir: "/etc/consul.d"
+consul_data_dir: "/opt/consul/data"
+consul_tls_dir: "/opt/consul/tls"
+
+consul_retry_join: []
+
+consul_dc_name: "dc1"

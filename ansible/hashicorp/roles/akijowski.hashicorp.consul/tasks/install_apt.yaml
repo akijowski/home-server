@@ -1,0 +1,59 @@
+---
+- name: Ensure Hashicorp Apt repository
+  ansible.builtin.deb822_repository:
+    name: hashicorp
+    types: deb
+    architectures: amd64
+    signed_by: https://apt.releases.hashicorp.com/gpg
+    uris: https://apt.releases.hashicorp.com
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    state: present
+
+- name: Update Apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Ensure Consul is installed with Apt
+  ansible.builtin.apt:
+    name: "consul"
+    state: present
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Put Consul package upgrades on hold
+  ansible.builtin.dpkg_selections:
+    name: consul
+    selection: hold
+
+- name: Find consul info
+  ansible.builtin.command: consul version --format=json
+  register: _consul_info
+  changed_when: false
+
+- name: Write consul info to file
+  ansible.builtin.copy:
+    content: "{{ _consul_info.stdout + '\n'}}"
+    dest: /etc/consul_info.json
+    owner: root
+    group: root
+    mode: 0444
+###
+# {
+#    "Version": "1.21.5",
+#    "Revision": "3261d11a",
+#    "Prerelease": "",
+#    "BuildDate": "2025-09-21T15:22:53Z",
+#    "RPC": {
+#       "Default": 2,
+#       "Min": 2,
+#       "Max": 3
+#    }
+# }
+
+- name: Ensure systemd overrides directory
+  ansible.builtin.file:
+    path: "/etc/systemd/system/consul.service.d"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
