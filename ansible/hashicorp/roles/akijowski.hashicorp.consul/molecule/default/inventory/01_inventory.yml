@@ -5,8 +5,8 @@ all:
       hosts:
         moleculeconsul0:
           # Workaround to broken proxmox inventory
-          # ansible_host: 10.10.10.93
-          hostname: moleculeconsul0
+          ansible_host: moleculeconsul0.lab.arpa
+          hostname: moleculeconsul0.lab.arpa
           proxmox_clone: debian13-trixie-multi-packer
           proxmox_clone_vmid: '9001'
           proxmox_vmid: '3002'

@@ -30,7 +30,7 @@ compose:
   # Apparently with the latest Ansible, these values are being marked as "unsafe" (__ansible_unsafe) preventing use in jinja templates
   # workaround is to statically add the ansible_host value for now to the static inventory
   #
-  ansible_host: "proxmox_agent_interfaces[1].get('ip-addresses')[0]"
+  #ansible_host: "proxmox_agent_interfaces[1].get('ip-addresses')[0]"
   #ansible_host: proxmox_lxc_interfaces[1]["inet"] | default(proxmox_agent_interfaces[1]["ip-addresses"][0] | default(proxmox_net0.ip)) | ansible.utils.ipaddr('address')
   #ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ansible.utils.ipaddr('address')
   # use the qemu guest agent IP. First one is localhost, so use the second one.

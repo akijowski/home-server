@@ -7,14 +7,72 @@
   ansible.builtin.set_fact:
     is_consul_bootstrap: "{{ consul_agent_server_bootstrap and is_first_server }}"
 
-- name: Ensure retry_join servers
+- name: Ensure retry_join servers IPv4 (default)
   ansible.builtin.set_fact:
-    consul_retry_join_servers: "{{ consul_retry_join_servers + [srv] }}"
+    consul_retry_join_servers_ip_default: "{{ consul_retry_join_servers_ip_default + [srv] }}"
   loop: "{{ ansible_play_hosts_all }}"
-  # when: inventory_hostname != item
+  when:
+    # - inventory_hostname != item
+    - consul_retry_join_include_default_ipv4 | default(False)
+  vars:
+    consul_retry_join_servers_ip_default: []
+    srv: "{{ hostvars[item].ansible_default_ipv4.address }}"
+
+- name: Ensure retry_join servers IPv4 (all)
+  ansible.builtin.set_fact:
+    consul_retry_join_servers_ip_all: "{{ consul_retry_join_servers_ip_all + srv }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  when:
+    # - inventory_hostname != item
+    - consul_retry_join_include_all_ipv4 | default(False)
+  vars:
+    consul_retry_join_servers_ip_all: []
+    srv: "{{ hostvars[item].ansible_all_ipv4_addresses }}"
+
+- name: Ensure retry_join servers IPv4 (ansible host)
+  ansible.builtin.set_fact:
+    consul_retry_join_servers_ip_host: "{{ consul_retry_join_servers_ip_host + [srv] }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  when:
+    # - inventory_hostname != item
+    - consul_retry_join_include_host_ipv4 | default(False)
+  vars:
+    consul_retry_join_servers_ip_host: []
+    srv: "{{ hostvars[item].ansible_host }}"
+
+- name: Ensure retry_join servers hostnames
+  ansible.builtin.set_fact:
+    consul_retry_join_servers_host: "{{ consul_retry_join_servers_host + [srv] }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  when:
+    - consul_retry_join_include_hostname | default(False)
+  vars:
+    consul_retry_join_servers_host: []
+    srv: "{{ hostvars[item].ansible_fqdn }}"
+
+- name: Ensure retry_join servers interface IPv4
+  ansible.builtin.set_fact:
+    consul_retry_join_servers_if: "{{ consul_retry_join_servers_if + [srv] }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  when:
+    - if_name is defined
+    - if_name | length > 0
+  vars:
+    consul_retry_join_servers_if: []
+    if_name: "{{ hostvars[item].consul_retry_join_include_interface }}"
+    srv: "{{ hostvars[item]['ansible_' + if_name]['ipv4']['address'] }}"
+
+- name: Ensure retry_servers is set
+  ansible.builtin.set_fact:
+    consul_retry_join_servers: "{{ consul_retry_join_servers + item }}"
+  loop:
+    - "{{ (consul_retry_join_servers_ip_default | default([])) }}"
+    - "{{ (consul_retry_join_servers_ip_all | default([])) }}"
+    - "{{ (consul_retry_join_servers_ip_host | default([])) }}"
+    - "{{ (consul_retry_join_servers_host | default([])) }}"
+    - "{{ (consul_retry_join_servers_if | default([])) }}"
   vars:
     consul_retry_join_servers: []
-    srv: "{{ hostvars[item].ansible_default_ipv4.address }}"
 
 - name: Ensure retry join is set
   ansible.builtin.set_fact:
@@ -22,3 +80,6 @@
 
 - ansible.builtin.debug:
     var: consul_retry_join_all
+
+- ansible.builtin.debug:
+    var: consul_retry_join_servers

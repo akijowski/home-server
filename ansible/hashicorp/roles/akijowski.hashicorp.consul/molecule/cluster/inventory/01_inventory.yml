@@ -4,28 +4,31 @@ all:
     molecule_consul_cluster:
       hosts:
         molecule-consul-0:
-          ansible_host: 10.10.10.95
+          ansible_host: molecule-consul-0.lab.arpa
 
-          hostname: molecule-consul-0
-          proxmox_clone: ubuntu24-noble
-          proxmox_clone_vmid: '8000'
+          hostname: molecule-consul-0.lab.arpa
+          proxmox_clone: debian13-trixie-multi-packer
+          proxmox_clone_vmid: '9001'
           proxmox_vmid: '3003'
           proxmox_storage: vmstorage
+          consul_retry_join_include_interface: 'ens18'
         molecule-consul-1:
-          ansible_host: 10.10.10.94
+          ansible_host: molecule-consul-1.lab.arpa
 
-          hostname: molecule-consul-1
-          proxmox_clone: ubuntu24-noble
-          proxmox_clone_vmid: '8000'
+          hostname: molecule-consul-1.lab.arpa
+          proxmox_clone: debian13-trixie-multi-packer
+          proxmox_clone_vmid: '9001'
           proxmox_vmid: '3004'
           proxmox_storage: vmstorage
+          consul_retry_join_include_interface: 'ens18'
         molecule-consul-2:
-          ansible_host: 10.10.10.96
+          ansible_host: molecule-consul-2.lab.arpa
 
-          hostname: molecule-consul-2
-          proxmox_clone: ubuntu24-noble
-          proxmox_clone_vmid: '8000'
+          hostname: molecule-consul-2.lab.arpa
+          proxmox_clone: debian13-trixie-multi-packer
+          proxmox_clone_vmid: '9001'
           proxmox_vmid: '3005'
           proxmox_storage: vmstorage
+          consul_retry_join_include_interface: 'ens18'
       vars:
         proxmox_node: hyperion

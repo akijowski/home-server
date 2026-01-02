@@ -3,9 +3,6 @@
 
 - ansible.builtin.import_tasks: ensure_facts.yaml
 
-- ansible.builtin.import_tasks: update_host.yaml
-  become: true
-
 - ansible.builtin.import_tasks: install_helpers.yaml
   become: true
   when: install_helpers | default(False)

@@ -13,5 +13,6 @@
         name: akijowski.hashicorp.consul
       vars:
         install_helpers: true
+        consul_retry_join_include_interface: 'ens18'
         consul_agent_server_bootstrap: true
         consul_retry_join: ["consul.lab.arpa"]

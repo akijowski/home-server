@@ -46,6 +46,8 @@
         vmid: "{{ hostvars[item].proxmox_vmid }}"
         agent: true
         update: true
+        ciuser: ansible
+        sshkeys: "{{ lookup('ansible.builtin.file', '~/.ssh/github_akijowski.pub') }}"
         ipconfig:
           ipconfig0: 'ip=dhcp,ip6=dhcp'
         node: "{{ hostvars[item].proxmox_node }}"
@@ -68,11 +70,27 @@
         state: started
       loop: "{{ groups['molecule_consul_cluster'] }}"
 
+  # TODO: loop on VM state to see when guest agent is populated
+    - name: Wait 210 seconds for CI to finish
+      ansible.builtin.wait_for:
+        timeout: 210
+
+    - name: Reboot VM for DNS settings to take effect
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST') }}"
+        api_user: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_USER') }}"
+        api_token_id: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_ID') }}"
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PACKER_PROXMOX_TOKEN_SECRET') }}"
+
+        name: "{{ hostvars[item].hostname }}"
+        state: restarted
+      loop: "{{ groups['molecule_consul_cluster'] }}"
+
     - name: Wait 150 seconds for port 22 to become open and contain "OpenSSH"
       ansible.builtin.wait_for:
-        # port: 22
-        # host: "{{ hostvars[item].hostname }}"
-        # search_regex: OpenSSH
-        # delay: 10
+        port: 22
+        host: "{{ hostvars[item].hostname }}"
+        search_regex: OpenSSH
+        delay: 10
         timeout: 150
-      # loop: "{{ groups['molecule_consul_cluster'] }}"
+      loop: "{{ groups['molecule_consul_cluster'] }}"
