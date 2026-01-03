@@ -4,6 +4,8 @@ inputs:
     url: github:cachix/devenv-nixpkgs/rolling
   nixpkgs-unstable:
     url: github:NixOS/nixpkgs/nixpkgs-unstable
+  nixpkgs-terraform:
+    url: github:stackbuilders/nixpkgs-terraform
 
 secretspec:
   enable: true

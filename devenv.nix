@@ -48,7 +48,10 @@ in
       '';
     };
 
-    opentofu.enable = true;
+    terraform = {
+      enable = true;
+      version = "1.14";
+    };
   };
 
   # https://devenv.sh/processes/
