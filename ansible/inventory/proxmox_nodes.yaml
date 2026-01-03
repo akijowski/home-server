@@ -42,11 +42,14 @@ proxmoxmgrcluster:
       - tools/pve/microcode.sh
       - tools/pve/post-pve-install.sh
       - ct/proxmox-backup-server.sh
+      - ct/netbox.sh
     template_files:
       - src: templates/pve/lxc-default.vars.j2
         dest: /usr/local/community-scripts/default.vars
       - src: templates/pve/pbs-settings.vars.j2
         dest: /usr/local/community-scripts/defaults/proxmox-backup-server.vars
+      - src: templates/pve/netbox-settings.vars.j2
+        dest: /usr/local/community-scripts/defaults/netbox.vars
 
 proxmoxbackupserver:
   hosts:
