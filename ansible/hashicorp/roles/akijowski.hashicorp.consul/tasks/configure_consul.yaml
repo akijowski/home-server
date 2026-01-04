@@ -56,7 +56,9 @@
       ansible.builtin.systemd_service:
         name: consul
         state: restarted
-      when: _consul_config is changed
+      when:
+        - _consul_config is changed
+        - consul_start
   become: true
 
 - name: Wait for Consul UI
@@ -65,3 +67,5 @@
     port: 8500
     timeout: 300
     state: started
+  when:
+    - consul_start

@@ -31,6 +31,7 @@ in
     pkgs-unstable.awscli2
     pkgs.pre-commit
     pkgs.hugo
+    pkgs.libisoburn # used by packer-proxmox-clone. Can remove if I provision outside of Packer (tf or ansible)
   ];
 
   # https://devenv.sh/languages/

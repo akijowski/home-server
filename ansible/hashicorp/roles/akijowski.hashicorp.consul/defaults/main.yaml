@@ -6,6 +6,9 @@ consul_agent_server: true
 # set to true to enable bootstrap mode
 consul_agent_server_bootstrap: false
 
+# set to false to avoid starting consul, install and configure only
+consul_start: true
+
 consul_config_dir: "/etc/consul.d"
 consul_data_dir: "/opt/consul/data"
 consul_tls_dir: "/opt/consul/tls"
