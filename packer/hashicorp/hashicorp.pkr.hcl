@@ -32,7 +32,7 @@ variable "ansible_ssh_pub_key_file" {
 }
 
 locals {
-  clone_vm         = "debian13-trixie-multi-packer"
+  clone_vm         = "debian13-trixie-multi"
   project_root_dir = abspath("${path.root}/../..")
   terraform_dir    = abspath("${local.project_root_dir}/terraform/proxmox/packer/manifests")
 }
@@ -53,7 +53,7 @@ source "proxmox-clone" "debian-multihome" {
   ssh_private_key_file      = "~/.ssh/packer_id_ed25519"
   ssh_clear_authorized_keys = false # this doesn't seem to work, so I remove them in a provisioner
 
-  vm_id         = 9100
+  vm_id         = 910
   template_name = "hashicorp-debian13"
 
   cores    = 4
@@ -64,8 +64,8 @@ source "proxmox-clone" "debian-multihome" {
   cloud_init           = true
   cloud_init_disk_type = "ide"
 
-  os              = "l26"
-  bios            = "seabios"
+  os = "l26"
+  # bios            = "seabios"
   machine         = "q35"
   scsi_controller = "virtio-scsi-pci"
 
@@ -75,6 +75,25 @@ source "proxmox-clone" "debian-multihome" {
   }
   # Note: adding a disks block does not resize or remove the existing scsi0/cloud-image
 
+  additional_iso_files {
+    cd_label = "cidata"
+
+    # custom user-data to feed hostname, and ssh keys for packer
+    cd_content = {
+      "user-data.yaml" = templatefile("./configs/user-data.yaml.pkrtpl", {
+        hostname        = "hashicorp-debian13"
+        fqdn            = "hashicorp.debian13.lab.arpa"
+        ansible_pub_key = chomp(file(var.ansible_ssh_pub_key_file))
+        packer_pub_key  = chomp(file("~/.ssh/packer_id_ed25519.pub"))
+      })
+    }
+    # undocumented fields
+    # https://github.com/hashicorp/packer-plugin-proxmox/blob/main/docs-partials/builder/proxmox/common/ISOsConfig-not-required.mdx
+    iso_storage_pool = "local"
+    unmount = true
+  }
+
+
 }
 
 build {
@@ -83,7 +102,7 @@ build {
 
   // generic plays
   provisioner "ansible" {
-    user = "packer"
+    user = "ansible"
     # ssh_authorized_key_file = var.ansible_ssh_pub_key_file
     galaxy_file            = "${local.project_root_dir}/ansible/linux-requirements.yaml"
     galaxy_force_with_deps = true
@@ -98,7 +117,7 @@ build {
   }
   // install consul
   provisioner "ansible" {
-    user = "packer"
+    user = "ansible"
     # ssh_authorized_key_file = var.ansible_ssh_pub_key_file
     galaxy_file            = "${local.project_root_dir}/ansible/linux-requirements.yaml"
     galaxy_force_with_deps = true
@@ -116,7 +135,7 @@ build {
     inline = [
       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done",
       // clean image identifiers
-      "sudo cloud-init clean --machine-id --seed",
+      "sudo cloud-init clean --machine-id --seed --logs",
       "sudo rm /etc/hostname /etc/ssh/ssh_host_* /var/lib/systemd/random-seed"
     ]
   }
@@ -125,11 +144,11 @@ build {
     inline = [
       // remove ssh configs
       "sudo truncate -s 0 /root/.ssh/authorized_keys",
-      "sudo truncate -s 0 /home/debian/.ssh/authorized_keys",
+      // "sudo truncate -s 0 /home/debian/.ssh/authorized_keys",
       "sudo sed -i 's/^#PasswordAuthentication\\ yes/PasswordAuthentication\\ no/' /etc/ssh/sshd_config",
       "sudo sed -i 's/^#PermitRootLogin\\ prohibit-password/PermitRootLogin\\ no/' /etc/ssh/sshd_config",
       // remove packer user ssh keys, TODO: look in to this
-      "sudo rm -f /home/packer/.ssh/authorized_keys"
+      // "sudo rm -f /home/packer/.ssh/authorized_keys"
     ]
   }
 
