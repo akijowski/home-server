@@ -41,8 +41,10 @@
         state: present
         url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
         shasum: "sha512:https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS"
-        vmid:
-          hyperion: 9000
+      ubuntu24_noble:
+        state: present
+        url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-arm64.img"
+        shasum: "sha256:https://cloud-images.ubuntu.com/noble/current/SHA256SUMS"
   tasks:
     - name: Ensure CI base images exist
       ansible.builtin.get_url:
@@ -126,6 +128,8 @@
           ipconfig0: 'ip=dhcp,ip6=dhcp'
         ide:
           ide2: 'local-lvm:cloudinit,format=raw'
+        ciuser: ansible
+        sshkeys: "{{ lookup('ansible.builtin.file', '~/.ssh/github_akijowski.pub') }}"
         cicustom: "{{ item.value.cicustom }}"
         ostype: l26
         rng0: '/dev/urandom'

@@ -1,3 +1,5 @@
+# https://netboxlabs.com/docs/netbox/features/virtualization/
+
 locals {
   virt_clusters = {
     types = {
