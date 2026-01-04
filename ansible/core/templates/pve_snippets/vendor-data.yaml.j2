@@ -14,9 +14,8 @@
 #   - default
 # package_upgrade: true
 
-locale: en_US
-keyboard:
-  layout: us
+# keyboard:
+#   layout: us
 packages:
   - qemu-guest-agent
   - sudo
@@ -27,6 +26,6 @@ ssh_quiet_keygen: true
 timezone: UTC
 disable_ec2_metadata: true
 runcmd:
-  - systemctl enable qemu-guest-agent
-  - systemctl start qemu-guest-agent
+  - systemctl daemon-reload
+  - systemctl enable --now qemu-guest-agent.service
   - echo "done" > /tmp/cloud-config.done

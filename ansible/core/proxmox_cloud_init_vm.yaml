@@ -15,16 +15,16 @@
         owner: root
         group: root
         mode: '0755'
-      vars:
-        packer_ssh_public_key: "{{ lookup('ansible.builtin.file', '~/.ssh/packer_id_ed25519.pub') }}"
-        ssh_public_key: "{{ lookup('ansible.builtin.file', '~/.ssh/github_akijowski.pub') }}"
+      # vars:
+        # packer_ssh_public_key: "{{ lookup('ansible.builtin.file', '~/.ssh/packer_id_ed25519.pub') }}"
+        # ssh_public_key: "{{ lookup('ansible.builtin.file', '~/.ssh/github_akijowski.pub') }}"
       loop:
         - src: "templates/pve_snippets/net-conf-multihome-dhcp.yaml.j2"
           dest: "/var/lib/vz/snippets/net-conf-multihome-dhcp.yaml"
-        - src: "templates/pve_snippets/user-data.yaml.j2"
-          dest: "/var/lib/vz/snippets/user-data.yaml"
-        - src: "templates/pve_snippets/user-data-packer.yaml.j2"
-          dest: "/var/lib/vz/snippets/user-data-packer.yaml"
+        # - src: "templates/pve_snippets/user-data.yaml.j2"
+        #   dest: "/var/lib/vz/snippets/user-data.yaml"
+        # - src: "templates/pve_snippets/user-data-packer.yaml.j2"
+        #   dest: "/var/lib/vz/snippets/user-data-packer.yaml"
         - src: "templates/pve_snippets/vendor-data.yaml.j2"
           dest: "/var/lib/vz/snippets/vendor-data.yaml"
 
@@ -41,10 +41,6 @@
         state: present
         url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
         shasum: "sha512:https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS"
-      ubuntu24_noble:
-        state: present
-        url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-arm64.img"
-        shasum: "sha256:https://cloud-images.ubuntu.com/noble/current/SHA256SUMS"
   tasks:
     - name: Ensure CI base images exist
       ansible.builtin.get_url:
@@ -74,7 +70,7 @@
         netconfig:
           net0: 'virtio,bridge=vmbr0'
         vmid:
-          hyperion: 9000
+          hyperion: 900
       debian13-trixie-multi:
         state: present
         url: "https://cloud.debian.org/images/cloud/trixie/latest/debian-13-generic-amd64.qcow2"
@@ -84,7 +80,7 @@
           net0: 'virtio,bridge=vmbr0'
           net1: 'virtio,bridge=vmbr50'
         vmid:
-          hyperion: 9001
+          hyperion: 901
   tasks:
     # TODO: add clean up/delete previous templates
     - name: Remove existing templates
@@ -115,12 +111,17 @@
         name: "{{ item.key }}"
         vmid: "{{ item.value.vmid[inventory_hostname] }}"
         agent: true
-        bios: seabios
+        bios: ovmf
         boot: 'order=scsi0;net0'
         bootdisk: 'scsi0'
         cpu: host
         cores: 1
         description: "Created At: {{ now(utc=true) }}"
+        efidisk0:
+          efitype: 4m
+          format: raw
+          pre_enrolled_keys: true
+          storage: 'local-lvm'
         machine: q35
         scsihw: virtio-scsi-pci
         net: "{{ item.value.netconfig }}"
@@ -136,6 +137,9 @@
         serial:
           serial0: socket
         tablet: true
+        tpmstate0:
+          storage: 'local-lvm'
+          version: '2.0'
         vga: serial0
         state: "{{ item.value.state }}"
       loop: "{{ images | dict2items }}"
