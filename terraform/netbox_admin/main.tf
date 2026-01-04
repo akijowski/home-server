@@ -20,6 +20,11 @@ locals {
       color_hex   = "#65c8c6"
       description = "managed by ansible"
     }
+    consul = {
+      name        = "consul"
+      color_hex   = "#e03875"
+      description = "consul"
+    }
   }
 }
 
